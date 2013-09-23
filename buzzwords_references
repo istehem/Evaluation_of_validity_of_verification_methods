@@ -1,0 +1,163 @@
+a semi-formal verification methodology
+[p. 1] - "However, due to the state explosion problem, model checking cannot verify designs at the system level."
+
+"A number of researchers and engineers have started to investigate how to integrate formal techniques into random simulation based verification methodology in order to improve the efficiency of verification process"
+
+"we describe a new semi-formal verification methology /../ closed-loop verification"
+
+[p. 3]
+"It is usually very hard to justify how many properties need to be proved in order to guarantee that the design works correctly."
+
+handlar om FSM
+
+SMV system
+CTL - computation tree logic
+
+------------------------------------------------------------------------
+Certifying you car with Erlang: John Hughes [TALK] (2012)
+Large XML configurations (in total flexray interface component 40k)
+shows how specification could be hard to interpret and
+how configuration is generated
+"on target to start certifing (autosar modules) code later this year"
+'reimplemented autosar in erlang'
+
+------------------------------------------------------------------------
+Osäker tvetydig källa där trattiga forskare inte håller med varandra.
+
+https://bugsareeasy.wordpress.com/tag/formal-verification-proof-system-soundness-completeness-simulation-semi-formal/
+
+simulation: sound, incomplete, not aware of what is not proven
+semi formal verification: sound, incomplete, aware of what is not proven
+formal verification: sound, complete
+
+Test vectors corresponding to simulation encode a trivial exponential proof
+(that enumerates input assignments). Test vectors corresponding to formal
+verification encode a structured proof (i.e. a proof taking into account the
+circuit structure). The trivial proof is long but universal. A formal proof is
+short but has to be generated for every design property separately).
+
+TTPE (Treating Tests as a Proof Encoding)
+
+finite proofs can be generated using simulation provided we allow some amount
+of formal analysis as long as it is computationally tractable (say, no more
+than polynomial complexity).
+
+------------------------------------------------------------------------
+[p. 42] ISO 26262-6:2011(E)
+Verification of the configuration data shall be performed to ensure:
+a) the use of values within their specified range; and
+b) the compatibility with the other configuration data.
+------------------------------------------------------------------------
+CORE a specification package developed by British Aerospace and System Designers.
+------------------------------------------------------------------------
+
+Talks
+http://vimeo.com/26085628
+
+
+
+-------------------------------------------------------------------------
+A semi-formal method to verify correctness of functional requirements specifications of complex embedded system
+[p. 2]
+"Formal methods are based on a translation of requirements into mathematical form."
+
+"Semi-formal methods are based on the expression of requirement specifications in a special requirement language."
+
+-------------------------------------------------------------------------
+ISO 26262 - 8
+
+[11.1] objectives
+"the first objective of this clause is to provide criteria to determine the required level of confidence in a software tool when applicable."
+
+"the second objective /../ is to provide means for the qualification of the software tool when applicable, in order to create evidence that the software tool is suitable to be used /../"
+
+[11.2] general
+"/../ the following criteria is evaluated:
+  * the possibility that the malfunctioning software tool and its corresponding erroneous output can introduce or fail to detect errors in a safety-related item or element being developed, and
+  * the confidence in preventing or detecting such errors in its corresponding output"
+
+"if indicated by the determined tool confidence level, then appropriate qualification methods are applied to comply with both this tool confidence level and the maximum ASIL of all the safety requirements allocated to the item or element that is to be developed using the software tool. Otherwise there is no need to apply such qualification methods."
+
+[11.3] prerequisites
+"safety plan in accordance with ISO 26262-4, 5.5.2;"
+"applicable prerequisites of the phases of the safety lifecycle where a software tool is used."
+
+[11.4] requirements and recommendations
+11.4.1.1 - "/../ such tools shall comply with the requirements of this clause. /../" - i helhet typ: tools used comply with iso 26262."
+11.4.2.1 - "the validity of this predetermined tool confidence level or qualification shall be confirmed, in accordance with ISO 26262-2, table 1."
+11.4.3.1 - "/../ its usage, its determined environmental and functional constraints and its general operating conditions comply with its evaluation criteria or its qualification."
+11.4.4.1 - "the usage of a software tool shall be planned including the determination of:
+  * the identification and version number of the software tool,
+  * the configuration of the software tool
+  * the use cases of the software tool
+  * the environment in which the software tool is executed
+  * the maximum ASIL of all the safety requirements, allocated to the item or the element that can be violated if the software tool is malfunctioning and producing corresponding erroneous output
+  * the methods to qualify the software tool, if required based on the determined level of confidence."
+11.4.4.2 - "to ensure the proper evaluation or usage of the software tool, the following information shall be available:
+  * a description of the features, functions and technical properties of the software tool
+  * the user manual or other usage guides, if applicable
+  * a description of the environment required for its operation
+  * a description of the expected behaviour of the software tool under anomalous operating conditions, if applicable
+  * a description of known software tool malfunctions and the appropriate safeguards, avoidance or workaround measures, if applicable
+  * the measures for the detection of malfunctions and the corresponding erroneous output of the software tool identified during the determination of the required level of confidence for this software tool."
+
+11.4.5.1 - "the description of the usage of a software tool shall contain the following information:
+  * the intended purpose
+  * the inputs and expected outputs
+  * the environmental and functional constraints, if applicable"
+11.4.5.2 - the intended usage of the software tool shall be analysed and evaluated to determine:
+  * the possibility that a malfunction of a particular software tool can introduce or fail to detect errors in a safety-related item or element being developed. this is expressed by the classes of Tool Impact (TI):
+    1) TI1 shall be selected when there is an argument that there is no such possibility
+    2) TI2 shall be selected in all other cases
+  * the confidence in measures that prevent the software tool from malfunctioning and producing corresponding erroneous output, or in measures that detect that the software tool has malfunctioned and has produced corresponding erroneous output. this is expressed by the classes of Tool error Detection (TD):
+    1) TD1 shall be selected if there is a high degree of confidence that a malfunction and its corresponding erroneous output will be prevented or detected;
+    2) TD2 shall be selected if there is a medium degree of confidence that a malfunction and its corresponding erroneous output will be prevented or detected;
+    3) TD3 shall be selected in all other cases."
+11.4.5.3 - "if the correct selection of TI or TD is unclear or doubtful, TI and TD should be estimated conservatively.
+11.4.5.4 - "if a software tool is used for the tailoring of the development process in such a way that activities or tasks required by ISO 26262 are omitted, TD2 shall not be selected"
+11.4.5.5 - based on the values determined for the classes of TI and TD, the required software Tool Confidence Level shall be determined according to Table 3."
+11.4.6.1 - "For the qualification of software tools classified at TCL3, the methods listed in Table 4 shall be applied. For the qualification /../ TCL2, the methods listed in Table 5 shall be applied. A software tool classified at TCL1 needs no qualification methods."
+11.4.6.2 - "The qualification of the software tool shall be documented including the following:
+  * the unique identification and version number of the software tool
+  * the maximum TCL for which the software tool is classified together with a reference to its evaluation analysis
+  * the pre-determined maximum ASIL, or specific ASIL, of any safety requirement which might be violated if the software tool is malfunctioning and produuces corresponding errenous output
+  * the configuration and environment for which the software tool is qualified
+  * the person or organization who carried out the qualification
+  * the methods applied for its qualification in accordance with 11.4.6.1
+  * the results of the measures applied to qualify the software tool
+  * the usage constraints and malfunctions identified during the qualification, if applicable"
+
+11.4.7.1 - "if the method 'increased confidence from use' in accordance with Table 4 or Table 5 is applied for the qualification of a software tool the requirements of this subclause shall be complied with."
+11.4.7.2 - "a software tool shall only be argued as having increased confidence from use, if evidence is provided for the following:
+  * the software tool has been used previously for the same purpose with comparable use cases and a comparable determined operating environment and with similar functional constraints
+  * the justification for increased confidence from use is based on sufficient and adequate data
+  * the specification of the software tool is unchanged
+  * the occurrence of malfunctions and corresponding erroneous outputs of the software tool acquired during previous developments are accumulated in a systematic way."
+11.4.7.3 - "the experience from the previous usage of the software tool during given development activities shall be analysed and evaluated by considering the following information:
+  * the unique identification and version number of the software tool
+  * the configuration of the software tool
+  * the details of the period of use and relevant data on its use
+  * the documentation of malfunctions and corresponding erroneous outputs of the software tool with details of the conditions leading to them
+  * the list of the previous versions monitored, listing the malfunctions fixed in each relevant version
+  * the safeguards, avoidance measures or work-arounds for the known malfunctions, or detection measures for a corresponding erroneous output, if applicable."
+11.4.7.4 - "the increased confidence from use shall only be valid for the considered version of the software tool."
+
+11.4.8.1 - "if the method 'evaluation of the tool development process' in accordance with Table 4 or Table 5 is applied for the qualification of a software tool the requirements of this subclause shall be complied with."
+11.4.8.2 - "the development process applied for the development of the software tool shall comply with an appropriate standard."
+11.4.8.3 - "the evaluation of the development process applied for the development of the software tool shall be provided by an assessment based on an appropriate national or international standard and the proper application of the assessed development process shall be demonstrated."
+
+11.4.9.1 - "if the method 'validation of the software tool' in accordance with Table 4 or Table 5 is applied for the qualification of a software tool the requirements of this subclause shall be complied with."
+11.4.9.2 - "the validation of the software tool shall meet the following criteria:
+  * the validation measures shall demonstrate that the software tool complies with its specified requirements
+  * the malfunctions and their corresponding erroneous outputs of the software tool occurring during validation shall be analysed together with information on their possible consequences and with measures to avoid or detect them
+  * the reaction of the software tool to anomalous operating conditions shall be examined"
+
+11.4.10 - "this subclause applies to ASILs (B), C, D, in accordance with 4.3."
+"the confidence in the use of the software tool shall be evaluated in accordance with ISO 26262-2, Table 1, to ensure:
+  * the correct evaluation of the required level of confidence in the software tool
+  * the appropriate qualification of the software tool in accordance with its required level of confidence."
+
+11.5.1 - "software tool criteria evaluation report resulting from requirements 11.4.1, 11.4.2, 11.4.3, 11.4.4, 11.4.5 and 11.4.10"
+11.5.2 - "software tool qualification report resulting from requirements 11.4.1 to 11.4.10."
+
+----------------------------------------------------------------------------------------------

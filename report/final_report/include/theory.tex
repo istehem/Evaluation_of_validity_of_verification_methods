@@ -1,0 +1,179 @@
+\section{Verification}
+The exact meaning of verification is confusing \cite{thomas_arts}. The
+definition may differ in comparison of academic or industrial sense. Even in
+different phases of the safety lifecycle verification is conducted in various
+forms \cite[Chapter 9.2, Part 8]{ISO26262}.
+
+\subsection{Formal Verification}
+%Skriv något luddigt
+\subsection{Semi foramal verification}
+%Skriv något än mer luddigt
+
+\section{Industrial Safety Standards}
+It is useful to distinguish between systems with different levels of
+dependability and determine where the hazards
+exists\cite{COURSEBOOK:safety-critical}. When this risk analysis is done and
+appropriate reliability and availability requirements is assigned to the system,
+the system can be identified by a certain safety integrity level (SIL). If this
+number is high, the system will experience a more rigorous design and testing
+than could be justified for a lesser demanding system. These levels is more
+defined in the standards IEC~61508 and ISO~26262.
+
+%\setion{Functional Safety}
+% Kanske något vi vill skriva om? Näms i metoden
+
+
+\subsection {IEC~61508 and ISO~26262}
+
+%Gör skillnad på verifikation och verifikation. Dvs vilken fas handlar det om?
+Automotive software for safety related systems is required to be designed,
+implemented and verified by the standard ISO~26262 that handles functional
+safety for automotive equipment.
+For a higher level of integrity ISO~26262 strongly recommends that a semi-formal
+verification of each module should exist \cite[Part 6]{ISO26262}.
+It also recommends a formal verification, but because of the state-space
+complexity this is hard to achieve.
+
+ISO~26262 is built on IEC~61508 which is titled Functional Safety of
+Electrical/Electronic/Programmable Electronic Safety-related Systems which can
+be applied to any kind of industry. IEC~61508 have four safety integrity levels
+(SIL) ranked 1-4. SIL 4 is the highest and should be applied where a failure can
+do devastating damage to a large area. The automotive industry is improbable to
+have this risk. That is why ISO~26262 exists, it also has four levels of SIL
+called automotive safety integrity level (ASIL). The ASIL range from A-D, where
+D is the highest and roughly translated to SIL 3.
+
+\subsection{AUTOSAR (AUTomotive Open System ARchitecture)}
+%Beskriv vad fan det är
+%Källa http://www.autosar.org/
+AUTOSAR is a worldwide development partnership of car manufacturers, suppliers
+and other companies from the electronics, semiconductor and software industry.
+
+Some of the specifications in AUTOSAR is left quite open for interpretation.
+This makes it possible for vehicle developers to have different specifications
+for a configuration. Some parts of those configuration specifications is
+generated into code, while other is manually written or added as a configurable.
+
+%\subsection{Automotive Safety Integrity Level (ASIL)}
+
+%ISO 26262 is intended to be applied to safety rated systems that include on or
+%more electrical and/or electronic (E/E) systems and that are installed in series
+%production passenger cars.
+
+\section{Existing Software}
+There are a number of existing software tools whose aim are to simplify, for a
+developer, the implementation of verification and testing.
+\begin{itemize}
+\item QuickCheck
+\item SPIN
+\item McErlang
+\item $\mu$CRL toolset
+\item CADP
+\item Parasoft C/C++test
+%\item Erlang and QuickCheck
+%\item Symlink
+%\item CORE
+%\item Isabelle
+
+\end{itemize}
+
+\subsection{QuickCheck}
+% QuickCheck tests a program with a specification implemented as properties
+% that the program must hold \cite{QUICKCHECK:manual}. QuickCheck creates an
+% arbitrary test vector for each of the properties. Because it is arbitrary it
+% can't be used for true formal verification(?).
+
+QuickCheck tests a program with specification implemented as properties that
+the program must hold \cite{QUICKCHECK:manual}. QuickCheck has guided random
+test generation. This means that the samples can be weighted to cover certain
+parts of the state-space with more likelihood.
+
+\subsection{Erlang}
+Erlang can easily communicate with other programming language by
+using byte streams. There have been some work done including Erlang,
+AUTOSAR and QuickCheck, mostly by the QuviQ company\cite{QUVIQ:flyer}.
+Imperative coding requires state based testing(?). There are a library in
+Erlang developed by QuviQ for this purpose(?).
+
+% \subsection{CORE}
+% A specification package developed by British Aerospace and System Designers.
+
+%\subsection{Promela}
+
+\subsection{SPIN}
+SPIN is used to trace logical design errors in distributed
+software\cite{SPIN:manual}. It supports a high level language, Promela, to
+specify system descriptions. Promela stands for Process Meta Language and is a
+verification model language. The system properties that should be checked are
+written in logical temporal language (LTL) and SPIN reports errors such as
+deadlocks, race conditions and incompleteness between these properties and the
+system model. It also supports embedded C code as part of the model
+specifications. Even further it supports random, interactive and guided
+simulation, with both partial or exhaustive proof techniques.
+
+\subsection{McErlang}
+McErlang is a model checker written in Erlang used for verifying distributed
+Erlang programs\cite{MCERLANG:model-checker}. Its purpose is to check a program
+against a correctness property, but can also among other things check safety
+or liveness properties.
+
+McErlang offers two depth-first state traversal model checking algorithms, one
+checks safety properties and the other is used for checking the liveness.
+McErlang also implements weak process fairness, by omitting non-fair loops from the
+accepting runs in its liveness algorithm.
+
+\subsection{$\mu$CRL toolset} $\mu$CRL is a process algebraic language which is
+suited for the analysis of distributed systems. The toolkit is built on this
+language and contains a theorem prover based on binary decision
+diagrams\cite{MCRL:manual}.
+
+\subsection{CADP} Construction and Analysis of Distributed Processes (CADP) is
+a toolset for design of distributed systems\cite{CADP:manual}. It includes,
+among others, tools for equivalence checking, state space manipulation and
+model checking and also includes several verification algorithms. It provides
+functionality as step-by-step simulation to parallel model-checking.
+
+\subsection{Parasoft}
+
+%\subsection{Isabelle}
+% Isabelle theorem prover is an interactive theorem prover, successor of the
+% Higher Order Logic (HOL) theorem prover
+
+\section{Verification Methods}
+The standard 61508-7 © IEC:2000 propose to two methods to say that a program is
+formal verified. The key is to model the program into one of the following
+machines.
+\begin{enumerate}
+\item \label{enum:FSM} Finite state machines/state transition diagrams
+\item Time Petri nets
+\end{enumerate}
+
+The standard emphasises that Time Petri nets are best suited for concurrent
+programs. Regarding method \ref{enum:FSM} the following criteria needs to be
+satisfied for the implemented state machine to be formal verified.
+
+\begin{enumerate}
+\item completeness (the system must have an action and new state for every input
+in every state);
+\item consistency (only one state change is described for each state/input
+pair); and
+\item reachability (whether or not it is possible to get from one state to
+another by any sequence of inputs).
+\end{enumerate}
+
+If the state machine is correct implemented, hence is a correct model of the
+original program, this also says that the original program is formal verified.
+
+Since most program specification are written in natural languages there may be
+lots of ambiguities. Therefor a lots of techniques has been developed to reduce
+such cases. This techniques are often referred as semi formal verification,
+because they lack of mathematical rigour associated with formal
+verification. This methods use textual, graphical or other notation; often
+several techniques are used. % These tests may not be
+
+The description of semi formal verification in the 61508-7 © IEC:2000 standard
+states: \\
+''Semi-formal methods provide a means of developing a description of a system at
+some stage in its development, i.e. specification, design or coding. The
+description can in some cases be analysed by machine or animated to display
+various aspects of the system behaviour.''

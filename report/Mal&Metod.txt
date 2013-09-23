@@ -1,0 +1,12 @@
+Syfte:
+automatisera, skita i unit tester
+strongly recommended to semi-formal verify the modules.
+
+Mål:
+Bevisa att man kan göra en semi-formell verifiering av en AUTOSAR-modul och dess specification genom användandet av QuickCheck.
+
+Metod:
+* Översätta delar av en vald specification till QuickCheck properties för att senare få ner hela specificationen.
+* Visa genom användandet av statistik och konfidenceintervall att resultatet av tillräckligt många testningar är uttömmande av state-space:t.
+* Testa andra semi-formella tekniker för att se om de pekar på samma sak som QuickCheck.
+

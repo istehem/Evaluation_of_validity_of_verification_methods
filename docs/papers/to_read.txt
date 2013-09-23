@@ -1,0 +1,14 @@
+From test cases to FSMs: Augmented test-driven development and property inference
+http://gup.ub.gu.se/publication/131918 ;;;; finns på chalmers
+
+Erlang QuickCheck Tutorial
+http://gup.ub.gu.se/publication/115894 ;;;; finns inte alls?
+
+Testing Implementations of Formally Verified Algorithms
+http://gup.ub.gu.se/publication/61962 ;;;; finns på chalmers
+
+Semi-Formal Development of a Fault-Tolerant Leader Election Protocol in Erlang
+http://gup.ub.gu.se/publication/61965 ;;;; finns på chalmers
+
+A Verification Tool for Erlang
+http://gup.ub.gu.se/publication/61953 ;;;; finns på chalmers

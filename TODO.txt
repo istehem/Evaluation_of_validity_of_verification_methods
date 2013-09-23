@@ -1,0 +1,28 @@
+Planerningsrapport:
+   Mecels slutmål
+   Spotta in binärkod för module och full spec. Retunera
+   semiformelt verfikerad ja/nej.
+
+   Våra mål:
+   Mecels slutmål är avlägset och kommer inte hinnas med. Detta är vad Mecel
+   räknar med.
+   Mycket att göra (varför?).
+   Kan vi begränsa oss till viss typ spec-krav?
+
+   Resurser:
+   Quickcheck Quviq (Autosar)
+   Information om detta
+
+   Tillvägagångssätt:
+   Hur sätter vi igång? Modulering, statemachin? Temporär logik etc?
+   Vad kan vi göra i quickcheck? Är det tillräckligt?
+
+   Random
+   Vad skall planeringsrapporten innehålla? Sätt ihop en mall först och främst.
+
+Faktiskt projekt:
+   Läsa på.
+   Bekanta sig med quickcheck i Erlang
+   Vad erbjuder quviq, spec implementation i Erlang?
+   Hur sätter vi igång?
+

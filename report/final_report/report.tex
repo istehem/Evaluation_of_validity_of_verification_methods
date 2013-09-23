@@ -1,0 +1,58 @@
+\documentclass[11pt,a4paper]{report}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{eso-pic}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{pgfgantt}
+%\usepackage{tikz}
+\usepackage{float}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage[nottoc]{tocbibind}
+\usepackage{algorithm2e}
+
+
+
+\newcommand{\backgroundpic}[3]{
+  \put(#1,#2){
+    \parbox[b][\paperheight]{\paperwidth}{
+      \centering
+ \includegraphics[width=\paperwidth,height=\paperheight,keepaspectratio]{#3}
+      \vfill
+}}}
+
+\def\keywords#1{\begin{center}{\bf Keywords}\\{#1}\end{center}} %
+
+\begin{document}
+\input{include/titleandlegalpage}
+\input{include/abstract}
+\tableofcontents
+\pagenumbering{arabic}
+\chapter{Introduction}
+\input{include/introduction}
+
+\chapter{Theory}
+\input{include/theory}
+
+\chapter{Method}
+\input{include/method}
+
+\chapter{Result}
+\input{include/result}
+
+\chapter{Discussion}
+\input{include/discussion}
+
+\chapter{Conclusion}
+\input{include/conclusion}
+
+\bibliographystyle{vancouver}
+\bibliography{references}
+
+\appendix
+
+
+\end{document}

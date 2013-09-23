@@ -1,0 +1,233 @@
+\documentclass[11pt,a4paper]{report}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{eso-pic}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{pgfgantt}
+%\usepackage{tikz}
+\usepackage{float}
+\usepackage{url}
+
+\newcommand{\backgroundpic}[3]{
+  \put(#1,#2){
+    \parbox[b][\paperheight]{\paperwidth}{
+      \centering
+      \includegraphics[width=\paperwidth,height=\paperheight,keepaspectratio]{#3}
+      \vfill
+}}}
+
+\begin{document}
+\input{titleandlegalpage}
+\tableofcontents
+\chapter{Introduction}
+
+%Background to the assignment. Why is it relevant?
+\section{Background}
+Testing is time consuming and labour intensive, accounting for up to 50 \% of
+the development cost\cite{QUICKCHECK:lightweight}. Unit tests adds additional
+complexity to the code. It is still very important to test and verify all steps
+of the development. Figure~\ref{IMG:phase_model} shows the different steps of
+software development and the test and verification phases it has.
+
+\begin{figure}[!ht]
+  \includegraphics[keepaspectratio, width=\linewidth]{pictures/V}
+  \label{IMG:phase_model}
+  \caption{Phase model for software development}
+\end{figure}
+
+The first step is the system design. At this point the system specification is
+written and then the software specifications. When all
+specifications exists, the next phase is to design the software architecture.
+The last part of the design is software unit design and implementation. All
+phases must be a verification of the former phase.
+
+When the implementation is done, it is time for the test phases. These begins
+with software unit testing which tests the software unit design phase. If the
+tests verifies that the software unit design and implementation is correct, the
+test phase moves on to the architectural design and then to verification of
+software safety requirements.
+The last test phase verifies that the system is
+designed according to the specification. %It is important that the test phases test the
+% specifications and not the implementation.
+
+\subsection{QuickCheck}
+QuickCheck tests a program with a specification implemented as properties that
+the program must hold \cite{QUICKCHECK:manual}. QuickCheck creates an arbitrary
+test vector for each of the properties. Because it is arbitrary it can't be used
+for true formal verification(?).
+
+\subsection{Industrial standards}
+Automotive software for safety related systems is required to be designed,
+implemented and verified by the standard ISO~26262 that handles functional
+safety for automotive equipment.
+For a higher level of integrity ISO~26262 strongly recommends that a semi-formal
+verification of each module should exist \cite[Table 9, part 6, p. 26]{ISO26262}.
+It also recommends a formal verification, but because of the state-space
+complexity this is hard to achieve.
+
+ISO~26262 is built on IEC~61508 which is titled Functional Safety of
+Electrical/Electro-nic/Programmable Electronic Safety-related Systems which can
+be applied to any kind of industry. IEC~61508 have four safety integrity levels
+(SIL) ranked 1-4. SIL 4 is the highest and sould be applied where a failure can
+do devastating damage to a large area. The automotive industry is improbable to
+have this risk. That is why ISO~26262 exists, it also has four levels of SIL
+called automotive safety integrity level (ASIL). The ASIL range from A-D, where
+D is the highest and roughly translated to SIL 3.
+
+Some of the specifications in AUTOSAR is left quite open for interpretation.
+This makes it possible for vehicle developers to have different specifications
+for a configuration. Some parts of those configuration specifications is
+generated into code, while other is manually written or added as configurables.
+
+\subsection{Why Erlang?}
+First of all Erlang can easily communicate with other programming language by
+using byte streams. There have already been some work done including Erlang
+AUTOSAR and QuickCheck, mostly by the QuviQ company\cite{QUVIQ:flyer}.
+Imperative coding requires state based testing(?). There are a library in
+Erlang developed by QuviQ for this purpose(?).
+
+%Aim for the work. What should be accomplished?
+\section{Purpose}
+The purpose is to automate the testing process in an effective and good way
+preferably using QuickCheck. To make it possible to raise the Automotive Safety
+Integration Level (ASIL), in the software unit design and implementation phase
+and in the software architectural design phase, a check must be done to see if
+it exist a tool that can be used in order to perform a semi formal verification
+of a module, and then make this process generalized for modules in
+coexistence.\\
+
+The purpose is also to be able to decrease the number of needed unit tests in
+the software unit design and implementation phase. Even further is the goal to
+introduce semi formal verification of the software architectural design face.
+
+%question formulation?
+%The problem at hand, the assignment
+\section{Objective}
+Propose and motivate what should be done to be able to achieve a semi-formal
+verification. This should include a confidence interval for how certain the
+verification is.
+
+Prove that it is possible to do a semi-formal verification for an AUTOSAR module
+and its specification, preferably using QuickCheck. This should be generalized
+so its possible to test other specifications and modules at a later moment.
+Also it should not matter which configuration that is active, because the
+specification holds for all configurations.
+
+%Limitations. What should be left out and why?
+\section{Scope}
+We will use AUTOSAR 4.0 revision 3 for our thesis work.
+Since AUTOSAR consists of around 80 specifications and other auxiliary
+materials\cite{AUTOSAR:URL}, we will limit our scope to one or two
+specifications. The main module of this thesis is the CryptoServiceManager. This
+module provides cryptographic functionalities for synchronous and asynchronous
+services. This module is chosen because it only got a few dependencies, is used to trace
+development and production errors but also to incorporate cryptographic
+libraries.
+
+It is hard to test that a call to another module gives the right results,
+that is why we have chosen a module with a small number of
+dependencies.
+The CryptoServiceManager should also have functionality which gives the same
+results no matter which state it is in, such as hash
+functions\cite{SPEC:AUTOSAR:CSM}.
+
+%Method of accomplishment. How should the work be carried out?
+\chapter{Method}
+\section{Specification}
+Specifications for what each module should do in AUTOSAR is given in text form.
+Hence one must first, before a module can be tested, implement the specification
+for that module in code.
+\section{Testing}
+Properties for a module have to take the current state in consideration since
+most functions written in an imperative language are not immutable. This gives
+raise to the idea of an state machine based testing tool.
+\begin{itemize}
+\item Choose a specification which will be translated to QuickCheck properties
+in parts.
+\item With the use of statistics and confidence intervals, show that, with
+enough tests the state-space will be exhausted.
+\item Evaluate other semi-formal techniques and show that the results from them
+shows that QuickCheck is reliable for verification.
+\item Generalize the technique.
+\end{itemize}
+
+\section{Implementation}
+A challenging step is the analysing part. If the testing tool returns zero
+errors what does that say about the robustness of the input byte code? Passed
+100 of 100 tests is just a statement and does not say anything more than that
+some tests passed. Can tests be implemented in a clever way so that it is
+possible to get some kind of confidence interval on the correctness of the code?
+\begin{figure}[!ht]
+\input{box.tex}
+\caption{Abstract implementation module}
+\end{figure}
+
+%Gantt-schema.
+\chapter{Time-plan}
+\section{Provisional plan}
+Exactly how things should be done isn't clear. Therefor we are proposing a more
+orderly plan to be able learn what can be done and where problems may lie a
+head. At first just try to implement one or two simple rules from an AUTOSAR
+specification, in Erlang, and try to run it on AUTOSAR module. It's important to
+notice that this may have nothing to do with our final solution and is mostly
+for evaluating what can be done in QuickCheck. Since our work is not just about
+implementing tests, but rather show that we can make semi formal verification on
+a module in AUTOSAR, the number of rules that we implement seems less relevant
+than what we can do with the rules that we implement.
+
+The next step is to analyse the results and come to a conclusion for how to
+continue. Possible Erlang and QuickCheck is not suited for our goals.
+More information about this can be found on the Gantt scheme
+represented below.
+
+\begin{ganttchart}[vgrid={dotted}, today=1, today label={Current week}]{1}{20}
+  \setganttlinklabel{s-s}{}
+  \setganttlinklabel{f-s}{}
+  \gantttitle{2013}{17}\gantttitle{2014}{3} \\
+  \gantttitlelist{36,...,52,1,2,3}{1} \\
+  %\ganttgroup{Group 1}{1}{10} \\
+  \ganttbar{Planning}{1}{2} \\
+  \ganttbar{Semi formal verification}{2}{5}\\
+  \ganttgroup[inline, group top shift=1.1, group left shift=0.4, group label font=\normalsize, group height=0.1]{Course}{2}{6}\\
+  \ganttbar{QuviQ Erlang course}{4}{4}\\
+  \ganttbar{First test}{4}{4}\\
+  \ganttbar{Analysis of other tools}{2}{3}\ganttbar{}{5}{5}\\
+  \ganttbar{Decision of technique}{6}{6} \\
+  \ganttbar{Implementation}{7}{10} \\
+  \ganttbar{Evaluation of results}{11}{12}\\
+  \ganttbar{Focus on thesis}{13}{15}\\
+  \ganttmilestone{Presentation to Mecel}{16}\\
+  \ganttbar{Polish}{17}{20}\\
+  \ganttbar{Opposition}{17}{20}\\
+  \ganttmilestone{Presentation to Chalmers}{20}\\
+  \ganttbar{Thesis}{1}{20}
+  \ganttlink{elem1}{elem3} % semi formal - erlang course
+  \ganttlink[link type=s-s]{elem3}{elem4} % erlang course - first test
+  \ganttlink[link type=f-s]{elem5}{elem4} % other tools - first test
+  \ganttlink[link type=f-s]{elem4}{elem6} % first test - other tools (end)
+  \ganttlink[link type=f-s]{elem6}{elem7} % other tools - decision
+  \ganttlink[link type=f-s]{elem7}{elem8} % decision - implementation
+  \ganttlink[link type=f-s]{elem8}{elem9} % implementation - evaluation
+%  \ganttlink[link type=f-s]{elem9}{elem10} % evaluation - focus on thesis
+  \ganttlink{elem10}{elem11} % focus on thesis - presentation to mecel
+\end{ganttchart}
+
+Finding out the exact definition of semi formal verification and getting an idea of how this
+can be implemented is a fundamental step. Hence this is added explicitly, as
+shown in the Gantt Scheme, to the project plan.
+In the first test week we translate some specification
+demands to QuickCheck code, and test if it is possible to prove that this is
+semi formal verfied. The purpose of doing analysis of other tools is to see if there exists better
+tools for our goals, we should then decide which tools and techniques to use.
+A presentation to Mecel is planned to the last week in December.  In January we
+present our work to Chalmers.
+
+
+\bibliographystyle{vancouver}
+\bibliography{references}
+
+
+\end{document}
