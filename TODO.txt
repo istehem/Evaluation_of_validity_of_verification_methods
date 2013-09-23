@@ -25,13 +25,3 @@ Faktiskt projekt:
    Bekanta sig med quickcheck i Erlang
    Vad erbjuder quviq, spec implementation i Erlang?
    Hur sätter vi igång?
-
-README.md
-TODO.txt
-buzzwords_references
-code
-docs
-iso26262-8.kap11.org
-iso26262-8.kap9.org
-report
-waste
