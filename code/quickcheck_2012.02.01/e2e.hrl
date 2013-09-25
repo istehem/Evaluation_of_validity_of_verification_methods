@@ -1,0 +1,7 @@
+-record('Std_VersionInfoType', {vendorID, moduleID, sw_major_version, sw_minor_version, sw_patch_version}).
+-record('E2E_P01ConfigType_Tag', {'DataLength', 'DataID', 'DataIDMode', 'MaxDeltaCounterInit', 'CRCOffset', 'CounterOffset'}).
+-record('E2E_P01SenderStateType_Tag', {'Counter'}).
+-record('E2E_P01ReceiverStateType', {'LastValidCounter', 'MaxDeltaCounter', 'WaitForFirstData', 'NewDataAvailable', 'LostData', 'Status'}).
+-record('E2E_P02ConfigType_Tag', {'DataLength', 'DataIDList', 'MaxDeltaCounterInit'}).
+-record('E2E_P02SenderStateType_Tag', {'Counter'}).
+-record('E2E_P02ReceiverStateType', {'LastValidCounter', 'MaxDeltaCounter', 'WaitForFirstData', 'NewDataAvailable', 'LostData', 'Status'}).

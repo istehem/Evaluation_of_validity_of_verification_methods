@@ -1,0 +1,1 @@
+-record('Std_VersionInfoType', {vendorID, moduleID, sw_major_version, sw_minor_version, sw_patch_version}).
