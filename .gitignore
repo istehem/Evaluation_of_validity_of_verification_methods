@@ -6,5 +6,6 @@ report.pdf
 *.blg
 *.toc
 *.out
+*.beam
 vancouver.bst
 review.pdf
