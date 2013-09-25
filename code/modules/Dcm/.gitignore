@@ -1,0 +1,12 @@
+*.pdf
+*.aux
+*.log
+*.swp
+*.bbl
+*.blg
+*.toc
+*.out
+*.c
+*.h
+vancouver.bst
+review.pdf
