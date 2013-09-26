@@ -9,30 +9,27 @@ forms \cite[Chapter 9.2, Part 8]{ISO26262}.
 \subsection{Semi foramal verification}
 %Skriv något än mer luddigt
 
-\section{Industrial Safety Standards}
-It is useful to distinguish between systems with different levels of
-dependability and determine where the hazards
+\section{Industrial Safety Standards} It is useful to distinguish between
+systems with different levels of dependability and determine where the hazards
 exists\cite{COURSEBOOK:safety-critical}. When this risk analysis is done and
-appropriate reliability and availability requirements is assigned to the system,
-the system can be identified by a certain safety integrity level (SIL). If this
-number is high, the system will experience a more rigorous design and testing
-than could be justified for a lesser demanding system. These levels is more
-defined in the standards IEC~61508 and ISO~26262.
+appropriate reliability and availability requirements is assigned to the
+system, the system can be identified by a certain safety integrity level (SIL).
+If this number is high, the system will experience a more rigorous design and
+testing than could be justified for a lesser demanding system. These levels is
+more defined in the standards IEC~61508 and ISO~26262.
 
 %\setion{Functional Safety}
 % Kanske något vi vill skriva om? Näms i metoden
-
 
 \subsection {IEC~61508 and ISO~26262}
 
 %Gör skillnad på verifikation och verifikation. Dvs vilken fas handlar det om?
 Automotive software for safety related systems is required to be designed,
 implemented and verified by the standard ISO~26262 that handles functional
-safety for automotive equipment.
-For a higher level of integrity ISO~26262 strongly recommends that a semi-formal
-verification of each module should exist \cite[Part 6]{ISO26262}.
-It also recommends a formal verification, but because of the state-space
-complexity this is hard to achieve.
+safety for automotive equipment.  For a higher level of integrity ISO~26262
+strongly recommends that a semi-formal verification of each module should exist
+\cite[Part 6]{ISO26262}.  It also recommends a formal verification, but because
+of the state-space complexity this is hard to achieve.
 
 ISO~26262 is built on IEC~61508 which is titled Functional Safety of
 Electrical/Electronic/Programmable Electronic Safety-related Systems which can
@@ -133,8 +130,11 @@ among others, tools for equivalence checking, state space manipulation and
 model checking and also includes several verification algorithms. It provides
 functionality as step-by-step simulation to parallel model-checking.
 
-\subsection{Parasoft}
-
+\subsection{Parasoft C++test}
+Parasoft C++ is a commercial software with a huge range of functionality
+developed by the Parasoft company with the purpose of testing software written
+in C or C++. Parasoft theme self claims that it should be possible to satisfy
+ASIL requirements using their software.
 %\subsection{Isabelle}
 % Isabelle theorem prover is an interactive theorem prover, successor of the
 % Higher Order Logic (HOL) theorem prover
