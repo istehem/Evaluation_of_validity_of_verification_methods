@@ -1,51 +1,60 @@
+%% kolla att allt är i imperfekt
+%% verb i passiv form
 
 \section{Choose of tool for verification}
-Software unit testing can achieved by almost any tool. This since its just more
-or less about unit testing. This phase is hence not the most interesting when it
-comes to the choose of a tool verification. Of course one can take the simplicity
-to achieve good unit testing into account but still it is not what makes
-a verification tool especially unique for the project goals.
+Software unit testing can be achieved by almost any tool.
+%% motivera.
+Consequently this phase is not the most interesting when it comes to the choose
+of a tool verification. Of course one can take the simplicity to achieve good
+%% "simplicity" - av vad?
+unit testing into account, but still it is not what makes a verification tool
+especially unique for the project goals.
 
-Since the purposes is about benchmarking the software the phase ''verification of
-software safety requirements'' will not influence the choose. For be able to test
-this phase a greater amount of components of the hole system must be available. Such
-components may include hardware etcetera. Implementation wise should everything
-be able to run on a standard PC-machine.
+Since the purpose is about benchmarking software the phase ''verification of
+software safety requirements'' will not influence the choose. To be able to test
+this phase, a greater amount of components of the whole system must be
+available. Such components may include hardware etcetera. Implementation wise
+%% "etcetera" borde arbetas bort.
+should everything be able to run on a standard PC-machine.
 
 The most interesting part is the software integration and testing. Is there a
 tool that one can use to easily combine test and requirements from different
 modules? Is it possible to test functional safety concept from this
-combination, for example corrupting some software elements?
+combination, for example by corrupting some software elements?
 
 \subsection{Why QuickCheck and Erlang?}
 
 \section{Specification}
-Specifications for what each module should do in AUTOSAR is given in text form.
-Hence one must first, before a module can be tested, implement the specification
-for that module in code.
+In AUTOSAR, specifications for each module is given in text form. Consequently
+one must first, before a module can be tested, implement the specification for
+that module in code.
+
 \section{Testing}
-Properties for a module have to take the current state in consideration since
+%% vilka properties? quickcheck?
+%% kanske är bättre att skriva "Module properties have to take..."
+%% alternativt "Quickcheck properties for a module have to take..."
+Properties for a module have to take the current state in consideration, since
 most functions written in an imperative language are not immutable. This gives
-raise to the idea of an state machine based testing tool.
+raise to the idea of a state based testing tool.
+%% .. och plötsligt: en lista:...
 \begin{itemize}
 \item Choose a specification which will be translated to QuickCheck properties
 in parts.
 \item With the use of statistics and confidence intervals, show that, with
 enough tests the state-space will be exhausted.
-\item Evaluate other semi-formal techniques and show that the results from them
+\item Evaluate other semi formal techniques and show that the results from them
 shows that QuickCheck is reliable for verification.
 \item Generalize the technique.
 \end{itemize}
 
-
 \section{Implementation}
-A challenging step is the analysing part. If the testing tool returns zero
+A challenging step is the analysis of the results. If the testing tool returns zero
 errors what does that say about the robustness of the input byte code? Passed
 100 of 100 tests is just a statement and does not say anything more than that
 some tests passed. Can tests be implemented in a clever way so that it is
 possible to get some kind of confidence interval on the correctness of the code?
+
 \begin{figure}[!ht]
 \input{pictures/box.tex}
 \caption{Abstract implementation module}
 \end{figure}
-
