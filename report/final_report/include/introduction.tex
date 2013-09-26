@@ -82,34 +82,38 @@ The functional safety concept will be most important in this phase.
 %question formulation?
 %The problem at hand, the assignment
 \section{Objective}
-Propose and motivate what should be done to be able to achieve a semi-formal
-verification. This should include a confidence interval for how certain the
-verification is.
+The objective is to propose and motivate what should be done to be able to
+achieve a semi formal verification. This should include a confidence interval
+for how certain the verification is.
 
-Prove that it is possible to do a semi-formal verification for an AUTOSAR
-module and its specification. This should be generalized so its possible to
-test other specifications and modules at a later moment.  Also it should not
-matter which configuration that is active, because the specification holds for
-all configurations.
+The objective is also to prove that it is possible to do semi formal
+verification for an AUTOSAR module and its specification. This should be
+generalized so its possible to test other specifications and modules at a later
+moment. It should also not matter which configuration that is active, because
+the specification should hold for all configurations.
 
 %Limitations. What should be left out and why?
 \section{Scope}
 We will use AUTOSAR 4.0 revision 3 for our thesis work.
-Since AUTOSAR consists of around 80 specifications and other auxiliary
-materials\cite{AUTOSAR:URL}, we will limit our scope to one or two
+Since this version of AUTOSAR consists of around 80 specifications and other
+auxiliary materials\cite{AUTOSAR:URL}, we will limit our scope to one or two
 specifications. The main module of this thesis is the CryptoServiceManager. This
 module provides cryptographic functionalities for synchronous and asynchronous
-services. This module is chosen because it only got a few dependencies, is used to trace
-development and production errors but also to incorporate cryptographic
+services. This module is chosen because it only got a few dependencies, is used
+%% "is used to trace development and production errors"?
+to trace development and production errors but also to incorporate cryptographic
 libraries.
 
-It is hard to test that a call to another module gives the right results, that
-is why we have chosen a module with a small number of dependencies.  The
-CryptoServiceManager should also have functionality which gives the same
-results no matter which state it is in, such as hash
-functions\cite{SPEC:AUTOSAR:CSM}.
+It is hard to test that a call to another module gives the right results. This
+is the reason why we have chosen a module with a small number of
+dependencies. The CryptoServiceManager should also have functionality which
+gives the same results no matter which state it is in, such as hash
+functions\cite{SPEC:AUTOSAR:CSM}. %% förklara varför detta är bra.
 
 Also the aim of the work is to verify software components. In other words no
 work considered hardware or a combination of hardware and software will be
 prioritized. All implemented code for the verification will run on a standard
 PC-machine.
+
+%% lägga till ett stycke angående att vi bara går in på 6-9 och 6-10, och inte
+%% på 6-8 eller 6-11.
