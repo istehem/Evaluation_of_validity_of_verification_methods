@@ -1,0 +1,30 @@
+the watchdog manager has three supervision mechanisms:
+
+alive supervision checks if a supervised entiity is run not too frequently or
+  not too rarely.
+
+deadline supervision checks if some steps in a supervised entity take a time
+  that is within the configured minimum and maximum.
+
+logical supervision fundamental technique for checking the correct execution of
+  embedded system software.  focuses on control flow errors, which cause a
+  divergence from the valid program sequence during the error-free execution of
+  the application.
+  incorrect control flow occurs if one or more program instructions are
+  processed either in the incorrect sequence or not at all.
+
+
+watchdog manager may need to use supervised entities and checkpoints within watchdog
+manager itself, while avoiding recursion.
+
+if detecting a supervision failure which is located in a non-trusted partition,
+the watchdog manager may request a partition shutdown by calling the BswM.
+
+in case an immediate, global reaction to the supervision failure is necessary,
+the watchdog manager may directly cause an MCU reset.
+MCU reset and watchdog reset are two mostly equivalent mechanisms for
+system-level error reaction. in safety-related systems, it is recommended to use
+both of them in parallel.
+
+en hel del av limitations, är den safe?
+mycket dependencies. bra/dåligt?

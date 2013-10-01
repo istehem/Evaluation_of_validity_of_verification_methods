@@ -1,0 +1,346 @@
+CSM is only pre-compile-time configurable
+
+CSM provides cryptography functionality, based on a software library or on a
+hardware module, or a mixed setup of the two.
+
+Due to memory restrictions the CSM module and the underlying Crypto Library
+shall only provide those services and algorithms which are necessary for the
+applications running on the ECU.
+
+Therefore parts of the CSM module have to be generated based
+on a configuration that describes which cryptographic methods are necessary for
+the applications.
+
+
+
+
+################################################################################
+
+-5 Dependencies-----------------------------------------------------------------
+
+CSM0001
+The CSM shall be able to incorporate cryptographic library modules.
+
+CSM0506
+The CSM shall use the interfaces of the incorporated cryptographic library
+modules.
+
+CSM0528
+The CSM module is using services of the DET module for tracing development
+errors.
+
+CSM0529
+The CSM module is using services of the DEM module for tracing production
+errors.
+
+-Code file structure------------------------------------------------------------
+
+CSM0002
+The code file structure shall not be defined within this specification
+completely.
+
+CSM0006, CSM0692
+The code file structure shall contain one or more MISRA-C 2004 conform source
+files (Csm_<xxx>.c, Cry_<xxx>.c) that contain the entire parts of the CSM code.
+
+-Header file structure----------------------------------------------------------
+
+CSM0693, CSM0005, CSM0003, CSM0727, CSM0677, CSM0678, CSM0004
+header file.
+
+CSM0694
+header files.
+
+CSM0008, CSM0695 (diagram)
+File structure.
+
+CSM0009
+CSM module shall include Dem.h file. This inclusion allows the CSM to report
+errors with the required Event Id symbols.
+
+CSM0015
+CSM module and the underlying Crypto Library shall only provide those services
+and algorithms which are necessary for the applications running on the ECU. (due
+to memory restrictions)
+
+-7.2 General behavior-----------------------------------------------------------
+
+CSM0016
+CSM only support processing of a single instance of each service at a time.
+
+CSM0022
+CSM shall allow parallel access to different services
+
+CSM0017
+if not idle and requested, reject by returning value CSM_E_BUSY
+
+CSM0019
+if asynchronous - provide main function Csm_MainFunction() - to control the
+processing of the services via a state machine
+
+CSM0020
+if interruption is configured - provide interruption function Csm_Interruption()
+- to interrupt the processing of the services
+
+CSM0021
+Csm_Init() shall initialize all variables.
+
+-Normal behavior----------------------------------------------------------------
+CSM0023, CSM0024 (diagram)
+CSM services which expect arbitrary amounts of user data (i.e. hashing or
+encryption) shall be based on the streaming approach with start, update and
+finish functions.
+
+-Functional requirements--------------------------------------------------------
+CSM0025
+each service configuration shall be realized as a constant structure of type
+Csm_<service>ConfigType.
+
+CSM0026
+Each service configuration shall have a name which can be configured.
+
+CSM0028
+It shall be possible to create arbitrary many service configuration for each
+crypto service.
+
+CSM0029
+when creating a service configuration, it shall be possible to configure all
+available and allowed schemes and underlying cryptographic primitives.
+
+CSM0030
+It shall be checked during configuration that only valid service configurations
+are chosen.
+
+CSM0031
+It shall be possible to configure synchronous or asynchronous job processing.
+
+CSM0032
+if asynchronous - each service configuration shall contain a callback function.
+
+CSM0033
+if asynchronous - it shall be possible to configure interruption of job
+processing.
+
+CSM0035
+when synchronous - the interface functions shall immediately compute the result.
+
+CSM0036
+if asynchronous - interface functions shall only hand over the necessary
+information to the service. actual computation shall be done by the main
+function.
+
+CSM0037
+if asynchronous - for each request, a notification of the caller, after a job
+completion, shall be a configurable option.
+
+CSM0038
+The Csm_MainFunction() shall perform the processing of the services.
+
+CSM0039
+The users of the CSM shall be notified when a requested cryptographic service
+has been processed, by calling the callback function.
+
+CSM0648
+interruption of job processing only possible if asynchronous.
+
+CSM0649
+if interruption possible - provide a configuration option to configure maximum
+time a process is allowed to run.
+
+CSM0650
+minimum value of this time limit is implementation dependent.
+
+CSM0651
+if interruption possible - during execution of a service, CSM and CRY shall
+check if the computation shall be interrupted.
+
+CSM0652
+the computation of a service shall be interrupted, if computation time has
+reached the configured time limit.
+
+CSM0653
+the computation of a service shall be interrupted, if the user calls the
+function Csm_Interruption(). In that case the time until interruption shall not
+exceed the minimum time limit.
+
+CSM0654
+if interruption - the service shall return to the main function.
+
+CSM0655
+if the computation of a service was interrupted - it shall be resumed with the
+next call of the main function.
+
+CSM0656
+if interruption - it affects all running services. it is only possible to
+configure interruption globally for all services.
+
+-Design notes-------------------------------------------------------------------
+CSM0734
+services which do not expect arbitrary amounts of user data, only have to
+provide API CSM_<service>(). these services shall be handled as simple function
+calls.
+services which do expect arbitrary amounts of user data, shall provide APIs
+CSM_<service>Start(), Csm_<service>Update() and Csm_<service>Finish().
+
+-Start-------
+
+CSM0046
+the application calls Csm_<service>Start - passing a valid service configuration
+as argument. The start function shall check the validity of the configuration it
+receives.
+
+CSM0537
+if an instance of this service is already being processed when called, the
+function shall return CSM_E_BUSY.
+
+CSM0047
+when synchronous - if no instance of this service is being processed - the
+function shall configure the CSM immediately, set the status of the current
+service to active, and return the status of the service.
+
+CSM0048
+if asynchronous - and not busy, the function shall return with CSM_E_OK.
+the main function shall process the actual initialization and set the status of
+the current service to active. after completing the initialization the main
+function shall call the callback function.
+
+-Update-------
+
+CSM0050
+The application calls the Csm_<service>Update(), passing data which is necessary
+for the computation of the service to the update function. the update function
+shall check whether the current service is already initialized.
+
+CSM0657
+if the service has not been initialized before the function shall return with
+CSM_E_NOT_OK.
+
+CSM0051
+The CSM shall assume that the data provided to Csm_<service>Update will not
+change until it returns in case of synchronous processing, or until the callback
+function is called in case of asynchronous processing.
+
+CSM0052
+when synchronous - if already initialized, the update function shall immediately
+process the given data, set the status of the current service again to active,
+and return the status of the update.
+
+CSM0053
+if asynchronous - and initialized, the update function shall return CSM_E_OK.
+the main function shall process the actual data update and set the status of the
+service again to active. after completing the update the main function shall
+call the callback function.
+
+CSM0054
+CSM shall allow the application to call the update function arbitrarily often.
+
+-Finish-------
+
+CSM0056
+The application calls the Csm_<service>Finish, passing the result buffer and
+optional data which is necessary for the finishing of the cryptographic service
+to the finish function. the finish function shall check whether the current
+service is already initialized.
+
+CSM0658
+if service has not been initialized before, the finish function shall return
+CSM_E_NOT_OK.
+
+CSM0057
+The CSM shall assume that the data provided to Csm_<service>Finish will not
+change until it returns in case of synchronous processing, or until the callback
+function is called in case of asynchronous processing.
+
+CSM0058
+when synchronous - if already initialized, the finish function shall immediately
+process the given data, finish the computation of the current cryptographic
+service, store the result of the service in the result buffer, set the status of
+the service to idle, and return the status of the finishing.
+
+CSM0059
+if asynchronous - and initialized, the finish function shall return with
+CSM_E_OK. The main function shall process the actual result computation and
+storage, and set the status of the service to idle. After completing this
+computation the main function shall call the callback function.
+
+-7.3 Version check--------------------------------------------------------------
+
+CSM0060
+The CSM module shall perform Inter Module Checks to avoid integration of
+incompatible files.
+The imported included files shall be checked by preprocessing directives.
+
+-7.4 Error classification-------------------------------------------------------
+
+CSM0538
+Values for production code Event Ids are assigned externally by the
+configuration of the Dem. They are published in the file Dem.h.
+
+CSM0664
+Development error values are of type uint8.
+
+-7.5 Error detection------------------------------------------------------------
+
+CSM0062
+detection of development error shall be configurable (ON/OFF) at compile time.
+a switch shall activate or deactivate detection of all development errors.
+
+CSM0063
+if the switch is enabled, API parameters shall be checked in the order in which
+they are passed.
+
+CSM0065
+detection of production code errors cannot be switched off.
+
+CSM0488
+If development error detection is enabled and an error is detected, the desired
+service shall return with CSM_E_NOT_OK.
+
+CSM0489, CSM0539 (table)
+A table specifies which DET error values shall be reported for each API call.
+
+-7.6 Error notification---------------------------------------------------------
+
+CSM0066
+Production errors shall be reported to the DEM.
+
+CSM0067
+Detected development errors shall be reported to the Det_ReportError service if
+the switch is enabled.
+
+CSM0774
+If CSM detects a security policy violation, a production error shall be reported
+to DEM, and a service return code shall be sent.
+
+-7.7 Debugging concept----------------------------------------------------------
+
+CSM0696
+Each variable that shall be accessible by AUTOSAR Debugging, shall be defined as
+global variable.
+
+CSM0697
+All type definitions of variables which shall be debugged, shall be accessible
+by header file Csm.h
+
+CSM0698
+The declaration of variables in the header file shall be possible to calculate
+the size of the variables by C-language "sizeof".
+
+CSM0699
+Variables available for debugging shall be described in the respective Basic
+Software Module Description.
+
+CSM0542
+The states of the CSM state machine shall be available for debugging.
+
+-8 API specification------------------------------------------------------------
+
+CSM0068, CSM0069, CSM0073, CSM0691, CSM0074, CSM0728, CSM0075, CSM0079, CSM0080,
+CSM0082, CSM0086, CSM0087
+API types
+
+CSM0646, CSM0659, CSM0705, CSM0706, CSM0707, CSM0647, CSM0089, CSM0094, CSM0101,
+CSM0661, CSM0108, CSM0114, CSM0121, CSM0662, CSM0128, CSM0134, CSM0141, CSM0149,
+CSM0156, CSM0163, .... en shitload med fler krav
+
+API functions.
