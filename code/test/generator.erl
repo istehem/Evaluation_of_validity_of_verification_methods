@@ -19,3 +19,14 @@ sets_gen(Size) ->
   frequency([{1, sets_gen(0)},
 	     {4, {call, sets, union, [Smaller, Smaller]}},
 	     {6, {call, sets, add_element, [int(), Smaller]}}]).
+
+gen_tree() -> ?SIZED(Size, gen_tree(Size)).
+
+gen_tree(0) -> {call,gb_trees,empty,[]};
+gen_tree(N) -> frequency([{1,gen_tree(0)},
+                          {6,{call,gb_trees,enter,[N,int(),gen_tree(N-1)]}}
+                         ]).
+
+prop_tree() -> ?FORALL(T,gen_tree(),
+               ?IMPLIES(gb_trees:size(eval(T)) >= 10,
+                        eqc:collect(gb_trees:size(eval(T)),true))).
