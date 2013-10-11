@@ -7,5 +7,9 @@ report.pdf
 *.toc
 *.out
 *.beam
+csm.app.src
+csm_app.erl
+csm_sup.erl
+.deps_plt
 vancouver.bst
 review.pdf

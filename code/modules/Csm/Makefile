@@ -23,13 +23,14 @@ DEPS=erts kernel stdlib
 # =============================================================================
 # Verify that the programs we need to run are installed on this system
 # =============================================================================
-ERL = $(shell which erl)
+ERL = "$(shell which erl)"
 
 ifeq ($(ERL),)
 $(error "Erlang not available on this system")
 endif
 
-REBAR=$(shell which rebar)
+
+REBAR="$(shell which rebar).cmd"
 
 ifeq ($(REBAR),)
 $(error "Rebar not available on this system")
