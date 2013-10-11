@@ -1,2 +1,5 @@
 ebin
+doc
+test
+logs
 .eunit
