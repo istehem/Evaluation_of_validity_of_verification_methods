@@ -1,3 +1,3 @@
 -module(cry_AsymPrivateKeyWrapAsym).
--include("inc/Cry_AsymPrivateKeyWrapAsym.hrl").
--include("../Csm/inc/Csm_Cbk.hrl").
+-include("inc/cry_AsymPrivateKeyWrapAsym.hrl").
+-include("../Csm/inc/csm_Cbk.hrl").

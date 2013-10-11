@@ -1,2 +1,2 @@
--include("Csm_Types.hrl").
--include("Rte_Csm_Type.hrl").
+-include("csm_Types.hrl").
+-include("rte_Csm_Type.hrl").

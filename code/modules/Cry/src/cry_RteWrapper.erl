@@ -1,3 +1,3 @@
 -module(cry_RteWrapper).
--include("inc/Cry_RteWrapper.hrl").
--include("../Csm/inc/Csm_Cbk.hrl").
+-include("inc/cry_RteWrapper.hrl").
+-include("../Csm/inc/csm_Cbk.hrl").

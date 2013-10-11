@@ -1,3 +1,3 @@
 -module(cry_MacGenerate).
--include("inc/Cry_MacGenerate.hrl").
--include("../Csm/inc/Csm_Cbk.hrl").
+-include("inc/cry_MacGenerate.hrl").
+-include("../Csm/inc/csm_Cbk.hrl").

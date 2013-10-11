@@ -1,3 +1,3 @@
 -module(cry_KeyDerive).
--include("inc/Cry_KeyDerive.hrl").
--include("../Csm/inc/Csm_Cbk.hrl").
+-include("inc/cry_KeyDerive.hrl").
+-include("../Csm/inc/csm_Cbk.hrl").

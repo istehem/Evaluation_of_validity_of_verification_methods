@@ -1,3 +1,3 @@
 -module(cry_RandomSeed).
--include("inc/Cry_RandomSeed.hrl").
--include("../Csm/inc/Csm_Cbk.hrl").
+-include("inc/cry_RandomSeed.hrl").
+-include("../Csm/inc/csm_Cbk.hrl").

@@ -1,3 +1,3 @@
 -module(cry_KeyExchangeCalcPubVal).
--include("inc/Cry_KeyExchangeCalcPubVal.hrl").
--include("../Csm/inc/Csm_Cbk.hrl").
+-include("inc/cry_KeyExchangeCalcPubVal.hrl").
+-include("../Csm/inc/csm_Cbk.hrl").

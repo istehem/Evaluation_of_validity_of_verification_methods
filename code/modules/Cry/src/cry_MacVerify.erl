@@ -1,3 +1,3 @@
 -module(cry_MacVerify).
--include("inc/Cry_MacVerify.hrl").
--include("../Csm/inc/Csm_Cbk.hrl").
+-include("inc/cry_MacVerify.hrl").
+-include("../Csm/inc/csm_Cbk.hrl").

@@ -1,3 +1,3 @@
 -module(cry_SymKeyExtract).
--include("inc/Cry_SymKeyExtract.hrl").
--include("../Csm/inc/Csm_Cbk.hrl").
+-include("inc/cry_SymKeyExtract.hrl").
+-include("../Csm/inc/csm_Cbk.hrl").
