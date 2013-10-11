@@ -1,0 +1,3 @@
+-module(cry_SignatureGenerate).
+-include("inc/Cry_SignatureGenerate.hrl").
+-include("../Csm/inc/Csm_Cbk.hrl").

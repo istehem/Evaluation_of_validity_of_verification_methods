@@ -1,0 +1,3 @@
+-module(cry_KeyDeriveSymKey).
+-include("inc/Cry_KeyDeriveSymKey.hrl").
+-include("../Csm/inc/Csm_Cbk.hrl").

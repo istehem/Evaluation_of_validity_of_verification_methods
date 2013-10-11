@@ -1,0 +1,3 @@
+-module(cry_Checksum).
+-include("inc/Cry_Checksum.hrl").
+-include("../Csm/inc/Csm_Cbk.hrl").

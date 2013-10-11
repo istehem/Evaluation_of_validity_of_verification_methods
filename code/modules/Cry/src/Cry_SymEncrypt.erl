@@ -1,0 +1,3 @@
+-module(cry_SymEncrypt).
+-include("inc/Cry_SymEncrypt.hrl").
+-include("../Csm/inc/Csm_Cbk.hrl").

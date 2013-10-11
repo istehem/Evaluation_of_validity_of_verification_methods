@@ -1,0 +1,3 @@
+-module(cry_SymKeyWrapSym).
+-include("inc/Cry_SymKeyWrapSym.hrl").
+-include("../Csm/inc/Csm_Cbk.hrl").

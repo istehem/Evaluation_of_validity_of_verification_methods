@@ -1,0 +1,3 @@
+-module(cry_KeyExchangeCalcSecret).
+-include("inc/Cry_KeyExchangeCalcSecret.hrl").
+-include("../Csm/inc/Csm_Cbk.hrl").

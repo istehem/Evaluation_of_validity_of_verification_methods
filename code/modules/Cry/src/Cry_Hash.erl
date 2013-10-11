@@ -1,0 +1,3 @@
+-module(cry_Hash).
+-include("inc/Cry_Hash.hrl").
+-include("../Csm/inc/Csm_Cbk.hrl").

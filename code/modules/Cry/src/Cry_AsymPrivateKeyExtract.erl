@@ -1,0 +1,3 @@
+-module(cry_AsymPrivateKeyExtract).
+-include("inc/Cry_AsymPrivateKeyExtract.hrl").
+-include("../Csm/inc/Csm_Cbk.hrl").
