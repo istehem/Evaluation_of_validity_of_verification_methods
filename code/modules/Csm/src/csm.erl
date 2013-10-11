@@ -1,2 +1,2 @@
--module('Csm').
+-module(csm).
 -include("inc/Dem.hrl").

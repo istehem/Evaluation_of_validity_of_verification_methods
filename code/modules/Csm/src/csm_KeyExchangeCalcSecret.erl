@@ -1,4 +1,4 @@
--module(Csm_KeyExchangeCalcSecret).
+-module(csm_KeyExchangeCalcSecret).
 -include("inc/Csm.hrl").
 -include("inc/Rte_Csm.hrl").
 -include("inc/Csm_Cfg.hrl").

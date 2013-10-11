@@ -1,4 +1,4 @@
--module(Csm_AsymPrivateKeyWrapSym).
+-module(csm_KeyExchangeCalcPubVal).
 -include("inc/Csm.hrl").
 -include("inc/Rte_Csm.hrl").
 -include("inc/Csm_Cfg.hrl").
@@ -7,4 +7,4 @@
 -include("inc/SchM_Csm.hrl").
 -include("inc/MemMap.hrl").
 %-include("inc/Det.hrl"). % OPTIONAL
--include("../Cry/inc/Cry_AsymPrivateKeyWrapSym.hrl").
+-include("../Cry/inc/Cry_KeyExchangeCalcPubVal.hrl").

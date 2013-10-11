@@ -1,4 +1,4 @@
--module(Csm_AsymPrivateKeyExtract).
+-module(csm_SymDecrypt).
 -include("inc/Csm.hrl").
 -include("inc/Rte_Csm.hrl").
 -include("inc/Csm_Cfg.hrl").
@@ -7,4 +7,4 @@
 -include("inc/SchM_Csm.hrl").
 -include("inc/MemMap.hrl").
 %-include("inc/Det.hrl"). % OPTIONAL
--include("../Cry/inc/Cry_AsymPrivateKeyExtract.hrl").
+-include("../Cry/inc/Cry_SymDecrypt.hrl").
