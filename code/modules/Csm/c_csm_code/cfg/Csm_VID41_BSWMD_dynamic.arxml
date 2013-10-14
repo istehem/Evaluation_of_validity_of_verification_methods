@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+NOTE! This file is generated. Do not edit!
+Generator: Picea Csm V2.1.0-Delivery-Build77
+ -->
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://autosar.org/schema/r4.0 AUTOSAR_4-0-3.xsd">
+   <AR-PACKAGES>
+      <AR-PACKAGE>
+         <SHORT-NAME>PICEA</SHORT-NAME>
+         <AR-PACKAGES>
+            <AR-PACKAGE>
+               <SHORT-NAME>BswMd</SHORT-NAME>
+               <ELEMENTS>
+                  <BSW-MODULE-ENTRY>
+                     <SHORT-NAME>Csm_MainFunction</SHORT-NAME>
+                     <SERVICE-ID>01</SERVICE-ID>
+                     <IS-SYNCHRONOUS>true</IS-SYNCHRONOUS>
+                     <CALL-TYPE>SCHEDULED</CALL-TYPE>
+                     <EXECUTION-CONTEXT>TASK</EXECUTION-CONTEXT>
+                     <SW-SERVICE-IMPL-POLICY>STANDARD</SW-SERVICE-IMPL-POLICY>
+                  </BSW-MODULE-ENTRY>
+                  <BSW-MODULE-DESCRIPTION>
+                     <SHORT-NAME>Csm</SHORT-NAME>
+                     <LONG-NAME>
+                        <L-4 L="FOR-ALL">Crypto Service Manager</L-4>
+                     </LONG-NAME>
+                     <MODULE-ID>110</MODULE-ID>
+                     <INTERNAL-BEHAVIORS>
+                        <BSW-INTERNAL-BEHAVIOR>
+                           <SHORT-NAME>BSWBehavior_Csm</SHORT-NAME>
+                           <ENTITYS>
+                              <BSW-SCHEDULABLE-ENTITY UUID="5cf8c8b3-3f69-4612-818c-229a0e0929b3">
+                                 <SHORT-NAME>Csm_MainFunction</SHORT-NAME>
+                                 <IMPLEMENTED-ENTRY-REF DEST="BSW-MODULE-ENTRY">/PICEA/BswMd/Csm_MainFunction</IMPLEMENTED-ENTRY-REF>
+                              </BSW-SCHEDULABLE-ENTITY>
+                           </ENTITYS>
+                           <EVENTS>
+                              <BSW-TIMING-EVENT>
+                                 <SHORT-NAME>Evt_Csm_MainFunction</SHORT-NAME>
+                                 <LONG-NAME>
+                                    <L-4 L="FOR-ALL">Evt_Csm_MainFunction</L-4>
+                                 </LONG-NAME>
+                                 <STARTS-ON-EVENT-REF DEST="BSW-SCHEDULABLE-ENTITY">/PICEA/BswMd/Csm/BSWBehavior_Csm/Csm_MainFunction</STARTS-ON-EVENT-REF>
+                                 <PERIOD>1000</PERIOD>
+                              </BSW-TIMING-EVENT>
+                           </EVENTS>
+                        </BSW-INTERNAL-BEHAVIOR>
+                     </INTERNAL-BEHAVIORS>
+                  </BSW-MODULE-DESCRIPTION>
+               </ELEMENTS>
+            </AR-PACKAGE>
+         </AR-PACKAGES>
+      </AR-PACKAGE>
+   </AR-PACKAGES>
+</AUTOSAR>
