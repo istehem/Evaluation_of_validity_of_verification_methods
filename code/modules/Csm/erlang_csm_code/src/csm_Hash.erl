@@ -9,9 +9,9 @@
 %-include("inc/det.hrl"). % OPTIONAL
 -include("../Cry/inc/cry_Hash.hrl").
 
-csm_HashStart(CfgId) when IsStarted == true ->
+csm_HashStart({true, _, CfgId}) ->% when IsStarted == true ->
   csm_E_NOT_OK;
-csm_HashStart(CfgId) when IsActive == false ->
+csm_HashStart({_, false, CfgId}) -> % when IsActive == false ->
   IsStarted = true,
   IsActive = true,
   csm_E_OK;
