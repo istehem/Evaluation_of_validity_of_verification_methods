@@ -15,6 +15,8 @@
 # under the License.
 #
 
+SHELL = C:/cygwin/bin/sh.exe
+
 ERLFLAGS= -pa $(CURDIR)/.eunit -pa $(CURDIR)/ebin -pa $(CURDIR)/deps/*/ebin
 
 DEPS_PLT=$(CURDIR)/.deps_plt
@@ -71,7 +73,7 @@ $(DEPS_PLT):
 	   --apps $(DEPS) -r deps
 
 dialyzer: $(DEPS_PLT)
-	dialyzer --fullpath --plt $(DEPS_PLT) -Wrace_conditions -r ./ebin
+	- dialyzer --fullpath --plt $(DEPS_PLT) -Wrace_conditions -r ./ebin
 
 typer:
 	typer --plt $(DEPS_PLT) -r ./src
