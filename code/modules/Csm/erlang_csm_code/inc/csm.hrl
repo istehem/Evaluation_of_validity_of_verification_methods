@@ -1,2 +1,0 @@
--include("csm_Types.hrl").
--include("rte_Csm_Type.hrl").
