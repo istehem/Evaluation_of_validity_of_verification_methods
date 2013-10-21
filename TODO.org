@@ -1,0 +1,5 @@
+
+* Se över [/]
+** TODO cover - library for coverage
+** TODO meck - mocking library
+** TODO proper - quickcheck inspired property-based testing
