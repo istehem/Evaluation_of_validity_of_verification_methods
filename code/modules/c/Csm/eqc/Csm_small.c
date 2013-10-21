@@ -1,0 +1,41 @@
+
+void Csm_Init();
+
+typedef enum Driver_Status_Tag
+{
+   CSM_NOT_INITIALIZED,
+   CSM_INITIALIZED
+} Csm_StatusType;
+typedef enum Service_Type_Tag
+{
+   HASH,
+   MAC_GENERATE,
+   MAC_VERIFY,
+   RANDOM_SEED,
+   RANDOM_GENERATE,
+   SYM_BLOCK_ENCRYPT,
+   SYM_BLOCK_DECRYPT,
+   SYM_ENCRYPT,
+   SYM_DECRYPT,
+   ASYM_ENCRYPT,
+   ASYM_DECRYPT,
+   SIGNATURE_GENERATE,
+   SIGNATURE_VERIFY,
+   CHECKSUM,
+   KEY_DERIVE,
+   KEY_DERIVE_SYM_KEY,
+   KEY_EXCHANGE_CALC_PUBVAL,
+   KEY_EXCHG_CALC_SECRET,
+   KEY_EXCHG_CALC_SYM_KEY,
+   SYM_KEY_EXTRACT,
+   SYM_KEY_WRAP_SYM,
+   SYM_KEY_WRAP_ASYM,
+   ASYM_PUBLIC_KEY_EXTRACT,
+   ASYM_PRIVATE_KEY_EXTRACT,
+   ASYM_PRIVATE_KEY_WRAP_SYM,
+   ASYM_PRIVATE_KEY_WRAP_ASYM,
+   UNUSED /* This has been added to remove warning for the check (ASYM_PRIVATE_KEY_WRAP_ASYM+1) */
+} Csm_ServiceType;
+
+Csm_ServiceType Csm_Service;
+Csm_StatusType Csm_Init_Status;
