@@ -7,6 +7,10 @@
 #define MAX_NO_HASH_CONFIGS   2
 #define E_OK     0x00
 
+typedef unsigned char uint8;
+typedef unsigned int uint32;
+typedef unsigned char boolean;
+
 typedef unsigned char Std_ReturnType;
 
 Std_ReturnType Det_ReportError(unsigned short int, unsigned char, unsigned char, unsigned char);
@@ -73,8 +77,6 @@ typedef struct CsmHashConfig_Tag
 //extern CONST(Csm_HashConfig, CSM_CONST) CsmHashConfig[MAX_NO_HASH_CONFIGS];
 CONST(Csm_HashConfig, CSM_CONST) CsmHashConfig[MAX_NO_HASH_CONFIGS];
 
-void Csm_Init();
-Csm_ReturnType Csm_Hashstart(Csm_ConfigIdType);
 
 //void Csm_MainFunction();
 //void Csm_Interruption();
@@ -117,3 +119,23 @@ typedef enum Service_Type_Tag
 
 Csm_ServiceType Csm_Service;
 Csm_StatusType Csm_Init_Status;
+
+
+void Csm_Init();
+
+
+Csm_ReturnType Csm_Hashstart(Csm_ConfigIdType);
+Csm_ReturnType Csm_HashUpdate(
+   Csm_ConfigIdType cfgId,
+   const uint8* dataPtr,
+   uint32 dataLength
+   );
+Csm_ReturnType Csm_HashFinish(
+   Csm_ConfigIdType cfgId,
+   uint8* resultPtr,
+   uint32* resultLengthPtr,
+   boolean TruncationIsAllowed
+);
+
+//eqc_c:start(csm,[{c_src, "eqc/Csm_small.c"},{additional_files, ["out/Csm.o","out/Csm_Hash.o"]}]) .
+
