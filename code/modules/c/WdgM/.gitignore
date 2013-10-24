@@ -1,0 +1,11 @@
+*.o
+src/
+inc/
+rte/
+gcc/
+cfg/
+out/
+make/
+generated_cfg/
+*.xml
+*.exe
