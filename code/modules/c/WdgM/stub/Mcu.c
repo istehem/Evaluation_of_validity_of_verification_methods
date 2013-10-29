@@ -1,0 +1,3 @@
+
+void Mcu_PerformReset()
+{}

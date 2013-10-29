@@ -9,22 +9,23 @@
 #define E_OK     0x00
 #define TRUE        1
 
-typedef unsigned char uint8;
-typedef unsigned short int uint16;
-typedef unsigned int uint32;
-typedef unsigned char boolean;
+// typedef unsigned char uint8;
+// typedef unsigned short int uint16;
+// typedef unsigned int uint32;
+// typedef unsigned char boolean;
 
-typedef uint8    WdgM_ModeType;
+// typedef uint8    WdgM_ModeType;
+#define WDGM_SMALL
+
+#include "../stub/SchM_WdgM.h"
+#include "../stub/Det.h"
+#include "../stub/Dem.h"
+#include "../stub/Rte.h"
+#include "../stub/Mcu.h"
+#include "../stub/WdgIf.h"
+
 typedef uint16   WdgM_CheckpointIdType;
 typedef uint16   WdgM_SupervisedEntityIdType;
-
-typedef enum WdgIf_Mode_Tag
-{
-   WDGIF_OFF_MODE   = 0,
-   WDGIF_SLOW_MODE  = 1,
-   WDGIF_FAST_MODE  = 2
-}WdgIf_ModeType;
-typedef WdgIf_ModeType WdgM_WdgModeType;
 
 typedef enum WdgM_ActivationStatus_Tag
 {
@@ -117,127 +118,12 @@ typedef struct WdgM_Config_Tag
    P2CONST(WdgM_ModeInfoType,AUTOMATIC,WDGM_APPL_CONST) wdgmModeTablePtr;  /**< Pointer to mode parameters */
 }WdgM_ConfigType;
 
-
-typedef uint8 Rte_ModeType_WdgMMode;
-
-typedef unsigned char Std_ReturnType;
-
-Std_ReturnType Det_ReportError(unsigned short int, unsigned char, unsigned char, unsigned char);
-Std_ReturnType Det_ReportError(unsigned short int a, unsigned char b, unsigned char c, unsigned char d)
-{
-  return E_OK;
-}
-
-struct Rte_PDS_WdgM_WdgM_IndividualMode_P
-{
-   P2FUNC(Std_ReturnType, RTE_CODE, Switch_currentMode)(uint8 mode);
-};
-
-typedef struct Rte_CDS_WdgM_Tag
-{
-   /* Data Handles section. -----------------------*/
-   /* Per-instance Memory Handles section. --------*/
-   /* Inter-runnable Variable Handles section. ----*/
-   /* Calibration Parameter Handles section. ------*/
-   /* Exclusive-area API section. -----------------*/
-   /* Port API section. ---------------------------*/
-   struct Rte_PDS_WdgM_WdgM_IndividualMode_P mode000;
-   struct Rte_PDS_WdgM_WdgM_IndividualMode_P mode001;
-   struct Rte_PDS_WdgM_WdgM_IndividualMode_P mode002;
-   struct Rte_PDS_WdgM_WdgM_IndividualMode_P mode003;
-   struct Rte_PDS_WdgM_WdgM_IndividualMode_P mode004;
-   /* Inter Runnable Variable API section. --------*/
-   /* Inter Runnable Triggering API section. ------*/
-   /* Vendor specific section. --------------------*/
-} Rte_CDS_WdgM;
-
-CONSTP2CONST(Rte_CDS_WdgM, RTE_CONST, RTE_APPL_CONST) Rte_Inst_WdgM;
-
-FUNC(void,WDGIF_CODE) WdgIf_SetTriggerCondition /* FROM WDGIF WdgIf.c */
-(
-   VAR(unsigned char,AUTOMATIC) DeviceIndex,
-   VAR(unsigned short int,AUTOMATIC) Timeout
-)
-{
-/*    VAR(boolean,AUTOMATIC) no_error = TRUE; */
-/*    WdgIfAssertWrongIdRange(WDGIF_TRIGGER_SID, (DeviceIndex >= (uint8)WDGIF_NUMBER_OF_DEVICES), no_error); */
-/*    if(TRUE == no_error) */
-/*    { */
-/* #if (1 == WDGIF_NUMBER_OF_DEVICES ) */
-/*       WdgIf_CallTrigger(Timeout); */
-/* #else */
-/*       /\* PRQA S 3689 ++ */
-/*        * Range of DeviceIndex is checked in the above function WdgIfAssertWrongIdRange */
-/*        *\/ */
-/*       (*WdgIf_TriggerFctPtr[DeviceIndex])(Timeout); */
-/*       /\* PRQA S 3689 --*\/ */
-/* #endif */
-/*    } */
-/*    else */
-/*    { */
-/*    } */
-}
-
-FUNC(Std_ReturnType,WDGIF_CODE) WdgIf_SetMode /* FROM WDGIF WdgIf.c */
-(
-   VAR(uint8,AUTOMATIC) DeviceIndex,
-   VAR(WdgIf_ModeType,AUTOMATIC) WdgMode
-)
-{
-   Std_ReturnType status = E_OK;
-/*    VAR(boolean,AUTOMATIC) no_error = TRUE; */
-
-/*    WdgIfAssertWrongIdRange(WDGIF_SETMODE_SID, (DeviceIndex >= (uint8)WDGIF_NUMBER_OF_DEVICES), no_error); */
-/*    if (TRUE == no_error) */
-/*    { */
-/* #if (1 == WDGIF_NUMBER_OF_DEVICES) */
-/*       status = WdgIf_CallSetMode(WdgMode); */
-/* #else */
-/*       /\* PRQA S 3689 ++ */
-/*        * Range of DeviceIndex is checked in the above function WdgIfAssertWrongIdRange */
-/*        *\/ */
-/*       status = (*WdgIf_ModeFctPtr[DeviceIndex])(WdgMode); */
-/*       /\* PRQA S 3689 --*\/ */
-/* #endif */
-/*    } */
-/*    else */
-/*    { */
-/*       status = E_NOT_OK; */
-/*    } */
-
-   return status;
-}
-
-
-
-FUNC(void,WDGM_CODE) Dem_ReportErrorStatus(){}
-
-FUNC(void,WDGM_CODE) Mcu_PerformReset(){}
-
-FUNC(Std_ReturnType,WDGM_CODE) Rte_Switch_WdgM_globalmode_currentMode(
-  VAR(Rte_ModeType_WdgMMode,AUTOMATIC) a
-){}
-
-
-FUNC(void,WDGM_CODE) SchM_Enter_WdgM_EaAliveCountProtect(){}
-FUNC(void,WDGM_CODE) SchM_Exit_WdgM_EaAliveCountProtect(){}
-FUNC(void,WDGM_CODE) SchM_Enter_WdgM_EaSupervisionCycleProtect(){}
-FUNC(void,WDGM_CODE) SchM_Exit_WdgM_EaSupervisionCycleProtect(){}
-FUNC(void,WDGM_CODE) SchM_Enter_WdgM_EaGlobalStatusProtect(){}
-FUNC(void,WDGM_CODE) SchM_Exit_WdgM_EaGlobalStatusProtect(){}
-FUNC(void,WDGM_CODE) SchM_Enter_WdgM_EaAliveSupResultProtect(){}
-FUNC(void,WDGM_CODE) SchM_Exit_WdgM_EaAliveSupResultProtect(){}
-FUNC(void,WDGM_CODE) SchM_Enter_WdgM_EaDeadlineSupResultProtect(){}
-FUNC(void,WDGM_CODE) SchM_Exit_WdgM_EaDeadlineSupResultProtect(){}
-FUNC(void,WDGM_CODE) SchM_Enter_WdgM_EaLogicalSupResultProtect(){}
-FUNC(void,WDGM_CODE) SchM_Exit_WdgM_EaLogicalSupResultProtect(){}
-FUNC(void,WDGM_CODE) SchM_Enter_WdgM_EaActivityFlagProtect(){}
-FUNC(void,WDGM_CODE) SchM_Exit_WdgM_EaActivityFlagProtect(){}
-FUNC(void,WDGM_CODE) SchM_Enter_WdgM_EaDeadlineTimerProtect(){}
-FUNC(void,WDGM_CODE) SchM_Exit_WdgM_EaDeadlineTimerProtect(){}
-FUNC(void,WDGM_CODE) SchM_Enter_WdgM_EaEntStatusProtect(){}
-FUNC(void,WDGM_CODE) SchM_Exit_WdgM_EaEntStatusProtect(){}
-
+#include "../stub/SchM_WdgM.c"
+#include "../stub/Dem.c"
+#include "../stub/Mcu.c"
+#include "../stub/WdgIf.c"
+#include "../stub/Rte.c"
+#include "../stub/Det.c"
 
 void WdgM_Init(const WdgM_ConfigType* ConfigPtr);
 static FUNC(void,WDGM_CODE) WdgM_CalculeteGlobalStatus(void);

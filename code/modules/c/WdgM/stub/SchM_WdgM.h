@@ -1,0 +1,19 @@
+
+void SchM_Enter_WdgM_EaAliveCountProtect(void);
+void SchM_Exit_WdgM_EaAliveCountProtect(void);
+void SchM_Enter_WdgM_EaSupervisionCycleProtect(void);
+void SchM_Exit_WdgM_EaSupervisionCycleProtect(void);
+void SchM_Enter_WdgM_EaGlobalStatusProtect(void);
+void SchM_Exit_WdgM_EaGlobalStatusProtect(void);
+void SchM_Enter_WdgM_EaAliveSupResultProtect(void);
+void SchM_Exit_WdgM_EaAliveSupResultProtect(void);
+void SchM_Enter_WdgM_EaDeadlineSupResultProtect(void);
+void SchM_Exit_WdgM_EaDeadlineSupResultProtect(void);
+void SchM_Enter_WdgM_EaLogicalSupResultProtect(void);
+void SchM_Exit_WdgM_EaLogicalSupResultProtect(void);
+void SchM_Enter_WdgM_EaActivityFlagProtect(void);
+void SchM_Exit_WdgM_EaActivityFlagProtect(void);
+void SchM_Enter_WdgM_EaDeadlineTimerProtect(void);
+void SchM_Exit_WdgM_EaDeadlineTimerProtect(void);
+void SchM_Enter_WdgM_EaEntStatusProtect(void);
+void SchM_Exit_WdgM_EaEntStatusProtect(void);

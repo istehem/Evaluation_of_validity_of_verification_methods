@@ -1,0 +1,4 @@
+
+void Dem_ReportErrorStatus()
+{
+}
