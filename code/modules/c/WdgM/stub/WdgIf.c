@@ -1,3 +1,6 @@
+#include "Std_Types.h"
+#include "WdgIf.h"
+
 FUNC(void,WDGIF_CODE) WdgIf_SetTriggerCondition /* FROM WDGIF WdgIf.c */
 (
    VAR(unsigned char,AUTOMATIC) DeviceIndex,

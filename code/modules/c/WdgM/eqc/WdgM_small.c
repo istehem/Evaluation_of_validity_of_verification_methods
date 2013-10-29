@@ -14,7 +14,6 @@
 // typedef unsigned int uint32;
 // typedef unsigned char boolean;
 
-// typedef uint8    WdgM_ModeType;
 #define WDGM_SMALL
 
 #include "../stub/SchM_WdgM.h"
