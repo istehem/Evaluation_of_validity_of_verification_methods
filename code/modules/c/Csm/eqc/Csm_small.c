@@ -120,7 +120,22 @@ typedef enum Service_Type_Tag
 Csm_ServiceType Csm_Service;
 Csm_StatusType Csm_Init_Status;
 
+/*
+FUNC(Csm_ReturnType,CSM_CODE)SHAHashStart1 (P2CONST(void,CSM_CONST,CSM_APPL_CONST) cfgPtr);
+FUNC(Csm_ReturnType,CSM_CODE)SHAHashUpdate1(P2CONST(void,CSM_CONST,CSM_APPL_CONST) cfgPtr,
+                                                    P2CONST(uint8,CSM_CONST,CSM_APPL_CONST) dataPtr,
+                                                    VAR(uint32, CSM_VAR)dataLength);
+FUNC(Csm_ReturnType,CSM_CODE) SHAHashFinish1(P2CONST(void,CSM_CONST,CSM_APPL_CONST) cfgPtr,
+                                                    P2VAR(uint8,CSM_VAR,CSM_APPL_DATA) ResultPtr,
+                                                    P2VAR (uint32, CSM_VAR, CSM_APPL_DATA) resultLengthPtr);
 
+static CONST (HashConfigType,CSM_CONST) Hash_Prim1_configPtr =
+{
+   &SHAHashStart1,
+   &SHAHashUpdate1,
+   &SHAHashFinish1
+};
+*/
 void Csm_Init();
 
 
