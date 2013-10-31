@@ -223,7 +223,7 @@ continue. Possible Erlang and QuickCheck is not suited for our goals.
 More information about this can be found on the Gantt scheme
 represented below.
 
-\begin{ganttchart}[vgrid={dotted}, today=8, today label={Current week}, today offset=.5]{1}{20}
+\begin{ganttchart}[vgrid={dotted}, today=9, today label={Current week}, today offset=.5]{1}{20}
   \setganttlinklabel{s-s}{}
   \setganttlinklabel{f-s}{}
   \gantttitle{2013}{17}\gantttitle{2014}{3} \\
@@ -232,25 +232,24 @@ represented below.
   \ganttbar[name=planning]{Planning}{1}{2} \\
   \ganttbar[name=research]{Research}{2}{5}\\
   \ganttbar[name=semiformal]{Semi formal verification}{2}{5}\\
-  \ganttgroup[inline, group top shift=1.1, group left shift=0.4, group label font=\normalsize, group height=0.1]{Course}{2}{6}\\
-  \ganttbar[name=course]{QuviQ Erlang course}{5}{5}\\
-  \ganttbar[name=firsttest]{First test}{5}{5}\\
-  \ganttbar[name=analysis]{Analysis of other tools}{2}{3}\ganttbar[name=analysis2]{}{5}{5}\\
-  \ganttbar[name=decision]{Decision of technique}{6}{6} \\
-  \ganttbar[name=implementation]{Implementation}{7}{10} \\
-  \ganttbar[name=evaluation]{Evaluation of results}{11}{12}\\
-  \ganttbar[name=focus]{Focus on thesis}{13}{15}\\
+%  \ganttgroup[inline, group top shift=1.1, group left shift=0.4, group label font=\normalsize, group height=0.1]{Course}{2}{8}\\
+  \ganttbar[name=course]{QuviQ Erlang course}{8}{9}\\
+  \ganttbar[name=analysis]{Analysis of other tools}{2}{3}\\
+  \ganttbar[name=decision]{Decision of technique}{4}{4} \\
+  \ganttbar[name=firsttest]{First test}{5}{6}\\
+  \ganttbar[name=implementation]{Implementation}{8}{11} \\
+  \ganttbar[name=evaluation]{Evaluation of results}{12}{13}\\
+  \ganttbar[name=focus]{Focus on thesis}{14}{15}\\
   \ganttmilestone[name=mecel]{Presentation to Mecel}{16}\\
   \ganttbar[name=polish]{Polish}{17}{20}\\
   \ganttbar[name=opposition]{Opposition}{17}{20}\\
   \ganttmilestone[name=chalmers]{Presentation to Chalmers}{20}\\
   \ganttbar{Thesis}{1}{20}
   \ganttlink{semiformal}{course} % semi formal - erlang course
-  \ganttlink[link type=s-s]{course}{firsttest} % erlang course - first test
-  \ganttlink[link type=f-s]{analysis}{firsttest} % other tools - first test
-  \ganttlink[link type=f-s]{firsttest}{analysis2} % first test - other tools (end)
-  \ganttlink[link type=f-s]{analysis2}{decision} % other tools - decision
-  \ganttlink[link type=f-s]{decision}{implementation} % decision - implementation
+  \ganttlink[link type=f-s]{firsttest}{course} % erlang course - first test
+  \ganttlink[link type=f-s]{analysis}{decision} % other tools - first test
+  \ganttlink[link type=f-s]{decision}{firsttest} % first test - other tools (end)
+  \ganttlink[link type=f-s]{firsttest}{implementation} % decision - implementation
   \ganttlink[link type=f-s]{implementation}{evaluation} % implementation - evaluation
 %  \ganttlink[link type=f-s]{evaluation}{focus} % evaluation - focus on thesis
   \ganttlink{focus}{mecel} % focus on thesis - presentation to mecel

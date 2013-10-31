@@ -1,16 +1,16 @@
-//typedef uint8 WdgIf_ModeType;
+typedef uint8 WdgIf_ModeType;
 
-/* #define WDGIF_OFF_MODE 0 */
-/* #define WDGIF_SLOW_MODE 1 */
-/* #define WDGIF_FAST_MODE 2 */
+#define WDGIF_OFF_MODE 0
+#define WDGIF_SLOW_MODE 1
+#define WDGIF_FAST_MODE 2
 
-typedef enum WdgIf_Mode_Tag
-{
-   WDGIF_OFF_MODE   = 0,
-   WDGIF_SLOW_MODE  = 1,
-   WDGIF_FAST_MODE  = 2
-}WdgIf_ModeType;
-typedef WdgIf_ModeType WdgM_WdgModeType;
+/* typedef enum WdgIf_Mode_Tag */
+/* { */
+/*    WDGIF_OFF_MODE   = 0, */
+/*    WDGIF_SLOW_MODE  = 1, */
+/*    WDGIF_FAST_MODE  = 2 */
+/* }WdgIf_ModeType; */
+/* typedef WdgIf_ModeType WdgM_WdgModeType; */
 
 
 /* FUNC(void,WDGIF_CODE) WdgIf_SetTriggerCondition /\* FROM WDGIF WdgIf.c *\/ */
