@@ -7,7 +7,7 @@
 	  supervision_cycle,
 	  version_check_foreign_module,
 	  version_info_api,
-	  caller_ids}).
+	  caller_ids=[]}).
 
 -record(tst_cfg1, {
 	  initial_mode_id}).
