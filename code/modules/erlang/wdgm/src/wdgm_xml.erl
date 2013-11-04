@@ -33,8 +33,7 @@ config(Cfg) ->
 		version_check_foreign_module   = get_value("_/WdgMGeneral/WdgMVersionCheckForeignModule", WdgM),
 		version_info_api   = get_value("_/WdgMGeneral/WdgMVersionInfoApi", WdgM),
 		caller_ids         = get_values("_/WdgMGeneral/WdgMCallerIds/WdgMCallerId", WdgM) },
-  Mode = get_value("_/Tst_Cfg1/InitialMode", WdgM),
-  Mode_container = get_container("_/Tst_Cfg1/"++Mode, WdgM),
+  Mode = get_value("_/Tst_Cfg1/WdgMInitialMode", WdgM),
   #tst_cfg1{
-     initial_mode_id = get_value("_/WdgMModeId", Mode_container)
+     initial_mode_id = get_value(Mode ++ "/WdgMModeId", Cfg)
     }.
