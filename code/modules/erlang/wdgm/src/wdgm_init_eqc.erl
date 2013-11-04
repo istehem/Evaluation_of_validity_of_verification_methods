@@ -7,7 +7,7 @@
 
 -include("wdgm_config.hrl").
 -define(C_CODE, wdgm_wrapper).
--include_lib("wdgm_wrapper.hrl").
+-include_lib("../ebin/wdgm_wrapper.hrl").
 
 -record('SupervisedEntityMonitorTable', {supervision_entities=[]}). %% [{status, {logicalS, deadlineS, aliveS}}]
 

@@ -14,8 +14,11 @@
 
 -export([config/1, start/0]).
 
+config_file() ->
+        wdgm_eqc:getPath(["c","WdgM","cfg","examples"]) ++ "WdgM_VID41_ExampleConfiguration_001_cfg1.arxml".
+
 start() ->
-  Cfg = "../cfg/examples/WdgM_VID41_ExampleConfiguration_001_cfg1.arxml",
+  Cfg = config_file(),
   car:start(Cfg, [wdgm]),
   car_config:config().
 
