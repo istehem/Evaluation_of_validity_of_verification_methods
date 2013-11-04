@@ -29,7 +29,7 @@ init() -> case eqc_c:running() of
           end.
 
 get_mode() ->
-        Mp = eqc_c:alloc(unsigned_char),
+        Mp = eqc_c:alloc("uint8"),
         R = wdgm_wrapper:'WdgM_GetMode'(Mp),
         {R,eqc_c:deref(Mp)}.
 
@@ -39,17 +39,11 @@ set_mode(UI8_mode,UI16_callerId) ->
         wdgm_wrapper:'WdgM_SetMode'(UI8_mode,UI16_callerId).
 
 get_global_status() ->
-   Sp = eqc_c:alloc({enum,'WdgM_GlobalStaus_Tag'}),
+   Sp = eqc_c:alloc("WdgM_GlobalStatusType"),
    R  = wdgm_wrapper:'WdgM_GetGlobalStatus'(Sp),
    {R,eqc_c:deref(Sp)}.
 
 get_local_status(UI16_SEID) ->
-        Sp = eqc_c:alloc({enum,'WdgM_LocalStatus_Tag'}),
+        Sp = eqc_c:alloc("WdgM_LocalStatusType"),
         R  = wdgm_wrapper:'WdgM_GetLocalStatus'(UI16_SEID,Sp),
         {R,eqc_c:deref(Sp)}.
-
-
-
-
-
-
