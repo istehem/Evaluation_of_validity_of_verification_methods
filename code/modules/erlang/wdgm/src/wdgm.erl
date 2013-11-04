@@ -22,3 +22,34 @@ start() ->
                                                            lib_dir() ++ "SchM_WdgM.o",
                                                            lib_dir() ++ "WdgIf.o",
                                                            lib_dir() ++ "WdgM.o"]}]).
+
+init() -> case eqc_c:running() of
+                  true -> wdgm_wrapper:'WdgM_Init'(eqc_c:address_of('Tst_Cfg1'));
+                  _    -> c_not_started
+          end.
+
+get_mode() ->
+        Mp = eqc_c:alloc(unsigned_char),
+        R = wdgm_wrapper:'WdgM_GetMode'(Mp),
+        {R,eqc_c:deref(Mp)}.
+
+%% segfault if first parameter other then 2
+%% callerId works for oneof {0 .. 2}
+set_mode(UI8_mode,UI16_callerId) ->
+        wdgm_wrapper:'WdgM_SetMode'(UI8_mode,UI16_callerId).
+
+get_global_status() ->
+   Sp = eqc_c:alloc({enum,'WdgM_GlobalStaus_Tag'}),
+   R  = wdgm_wrapper:'WdgM_GetGlobalStatus'(Sp),
+   {R,eqc_c:deref(Sp)}.
+
+get_local_status(UI16_SEID) ->
+        Sp = eqc_c:alloc({enum,'WdgM_LocalStatus_Tag'}),
+        R  = wdgm_wrapper:'WdgM_GetLocalStatus'(UI16_SEID,Sp),
+        {R,eqc_c:deref(Sp)}.
+
+
+
+
+
+
