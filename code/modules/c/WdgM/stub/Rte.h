@@ -11,9 +11,16 @@
 
 #ifdef RTE_STUB
 
-typedef uint8 Rte_ModeType_WdgMMode;
+typedef enum Rte_ModeType_WdgMMode_Tag
+{
+  RTE_MODE_WdgMMode_WDGM_SUPERVISION_OK = 0,
+  RTE_MODE_WdgMMode_WDGM_SUPERVISION_FAILED = 1,
+  RTE_MODE_WdgMMode_WDGM_SUPERVISION_EXPIRED = 2,
+  RTE_MODE_WdgMMode_WDGM_SUPERVISION_DEACTIVATED = 4
+} Rte_ModeType_WdgMMode;
 
 FUNC(Std_ReturnType, RTE_CODE) Rte_Switch_WdgM_globalmode_currentMode(uint8 mode);
+
 struct Rte_PDS_WdgM_WdgM_IndividualMode_P
 {
    P2FUNC(Std_ReturnType, RTE_CODE, Switch_currentMode)(uint8 mode);
