@@ -10,29 +10,28 @@
 -include_lib("../ebin/wdgm_wrapper.hrl").
 
 %-record('SupervisedEntityMonitorTable', {supervision_entities=[]}). %% [{status, {logicalS, deadlineS, aliveS}}]
--record(state, {initialized, currentMode, originalCfg=#wdgm{}}).
+-record(state, {initialized, currentMode, globalstatus, originalCfg=#wdgm{}}).
 
 initial_state() ->
   Rs = wdgm_xml:start(),
   {_, R} = (hd(Rs)), %% why do we get a list of records?
-  S = #state{initialized=false, originalCfg=R},
-  S#state{currentMode=R#wdgm.tst_cfg1#tst_cfg1.initial_mode_id}.
+  #state{initialized=false, currentMode=-1, globalstatus='WDGM_GLOBAL_STATUS_OK', originalCfg=R}.
 
 %% -WdgM_Init-------------------------------------------------------------------
 
-wdgm_init_pre(S) ->
+init_pre(S) ->
   S#state.initialized /= true.
 
-wdgm_init_command(_S) ->
-  {call, ?MODULE, wdgm_init, [eqc_c:address_of('Tst_Cfg1')]}.
+init_command(_S) ->
+  {call, ?MODULE, init, [eqc_c:address_of('Tst_Cfg1')]}.
 
-wdgm_init(Ptr) ->
+init(Ptr) ->
   ?C_CODE:'WdgM_Init'(Ptr).
 
-wdgm_init_next(S, _Ret, _Args) ->
-  S#state{initialized=true}.
+init_next(S, _Ret, _Args) ->
+  S#state{initialized=true, currentMode=S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id}.
 
-wdgm_init_post(S, _Args, _Ret) ->
+init_post(S, _Args, _Ret) ->
   check_supervisionstatus(eqc_c:value_of('WdgM_SupervisedEntityMonitorTable')) andalso
     eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' andalso
     eqc_c:value_of('WdgM_CurrentMode') == S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id.
@@ -41,47 +40,47 @@ wdgm_init_post(S, _Args, _Ret) ->
 
 %% -WdgM_GetMode----------------------------------------------------------------
 
-get_mode_pre(S) ->
-  (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-   S#state.initialized == true) orelse
-    not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect.
+getmode_pre(S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
+   (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+    S#state.initialized == true).
 
-get_mode_command(_S) ->
-  {call, ?MODULE, get_mode, []}.
+getmode_command(_S) ->
+  {call, ?MODULE, getmode, []}.
 
-get_mode() ->
+getmode() ->
   Mp = eqc_c:alloc("uint8"),
   R = ?C_CODE:'WdgM_GetMode'(Mp),
   {R,eqc_c:deref(Mp)}.
 
-get_mode_post(S, _Args, {R, Mode}) ->
+getmode_post(S, _Args, {R, Mode}) ->
   (R == 0 andalso Mode == S#state.currentMode)
     orelse R == 1.
 %%    additional checks if wdgmdeverrordetect is enabled
 
 %% -WdgM_SetMode----------------------------------------------------------------
 
-set_mode_pre(S) ->
-  (eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' orelse
-   eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_FAILED') andalso
-    ((S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-      S#state.initialized == true) orelse
-     not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect).
+setmode_pre(S) ->
+  (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
+   S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED') andalso
+    (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
+    (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+       S#state.initialized == true)).
 
-set_mode_command(S) ->
-  {call, ?MODULE, set_mode, [choose(0,2), oneof(S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)]}.
+setmode_command(S) ->
+  {call, ?MODULE, setmode, [choose(0,2), oneof(S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)]}.
 %% Available modes: WDGIF_OFF_MODE:0, WDGIF_SLOW_MODE:1, WDGIF_FAST_MODE:2
 
-set_mode(UI8_mode,UI16_callerId) ->
+setmode(UI8_mode,UI16_callerId) ->
         ?C_CODE:'WdgM_SetMode'(UI8_mode,UI16_callerId).
 
-set_mode_post(S, [M, _Cid], Ret) ->
+setmode_post(S, [M, _Cid], Ret) ->
   case Ret of
     0 -> eq(M, eqc_c:value_of('WdgM_CurrentMode'));
-    1 -> eq(M, S#state.currentMode)
+    1 -> M == S#state.currentMode orelse eq(S#state.currentMode, -1)
   end.
 
-set_mode_next(S, Ret, [M, _Cid]) ->
+setmode_next(S, Ret, [M, _Cid]) ->
   case Ret of
     0 -> S#state{currentMode = M};
     _ -> S
@@ -89,7 +88,141 @@ set_mode_next(S, Ret, [M, _Cid]) ->
 
 %% -WdgM_DeInit-----------------------------------------------------------------
 
+deinit_pre(S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
+  (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+     S#state.initialized == true).
 
+deinit_command(_S) ->
+  {call, ?MODULE, deinit, []}.
+
+deinit() ->
+  ?C_CODE:'WdgM_DeInit'().
+
+%% [WDGM154] should check something with WdgM_SetMode
+deinit_post(_S, _Args, _Ret) ->
+  true.
+
+deinit_next(S, _Ret, _Args) ->
+  S#state{initialized = false, globalstatus='WDGM_GLOBAL_STATUS_OK', currentMode=-1}.
+
+%% -WdgM_CheckpointReached------------------------------------------------------
+
+checkpointreached_pre(S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
+  (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+    S#state.initialized == true).
+
+checkpointreached_command(_S) ->
+  {call, ?MODULE, checkpointreached, [oneof([0,2]), choose(0,2)]}.
+
+%% uint16 SupervisedEntityIdType, uint16 CheckpointIdType
+checkpointreached(SeID, CPId) ->
+  ?C_CODE:'WdgM_CheckpointReached'(SeID, CPId).
+
+checkpointreached_post(_S, _Args, Ret) ->
+  Ret == 0 orelse Ret == 1.
+
+checkpointreached_next(S, _Ret, _Args) ->
+  S.
+
+%% -WdgM_UpdateAliveCounter-----------------------------------------------------
+%% Deprecated
+
+%% -WdgM_GetLocalStatus---------------------------------------------------------
+
+getlocalstatus_pre(S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
+  (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+    S#state.initialized == true).
+
+getlocalstatus_command(_S) ->
+  {call, ?MODULE, getlocalstatus, [oneof([0,2])]}.
+
+getlocalstatus(UI16_SEID) ->
+  Sp = eqc_c:alloc("WdgM_LocalStatusType"),
+  R  = ?C_CODE:'WdgM_GetLocalStatus'(UI16_SEID, Sp),
+  {R,eqc_c:deref(Sp)}.
+
+getlocalstatus_post(_S, _Args, _Ret) ->
+  true.
+
+getlocalstatus_next(S, _Ret, _Args) ->
+  S.
+
+%% -WdgM_GetGlobalStatus--------------------------------------------------------
+
+getglobalstatus_pre(S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
+  (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+    S#state.initialized == true).
+
+getglobalstatus_command(_S) ->
+  {call, ?MODULE, getglobalstatus, []}.
+
+getglobalstatus() ->
+  Sp = eqc_c:alloc("WdgM_GlobalStatusType"),
+  R = ?C_CODE:'WdgM_GetGlobalStatus'(Sp),
+  {R, eqc_c:deref(Sp)}.
+
+getglobalstatus_post(S, _Args, Ret) ->
+  case Ret of
+    {0, R} -> eq(R, S#state.globalstatus);
+    {1, _} -> S#state.initialized == false andalso
+		S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK'
+	      %% [WDGM344] should also check if pointer is null
+	      %% [WDGM258] should optionally check if pointer is null
+  end.
+
+getglobalstatus_next(S, _Ret, _Args) ->
+  S.
+
+%% -WdgM_PerformReset-----------------------------------------------------------
+
+performreset_pre(S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
+  (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+    S#state.initialized == true).
+
+performreset_command (_S) ->
+  {call, ?MODULE, performreset, []}.
+
+performreset() ->
+  ?C_CODE:'WdgM_PerformReset'().
+
+
+performreset_post(_S, _Args, _Ret) ->
+  true.
+
+performreset_next(S, _Ret, _Args) ->
+  S.
+
+%% -WdgM_GetFirstExpiredSEID----------------------------------------------------
+
+getfirstexpiredseid_pre(_S) ->
+  true.
+
+getfirstexpiredseid_command(_S) ->
+  {call, ?MODULE, getfirstexpiredseid, []}.
+
+getfirstexpiredseid() ->
+  Sp = eqc_c:alloc("WdgM_SupervisedEntityIdType"),
+  R = ?C_CODE:'WdgM_GetFirstExpiredSEID'(Sp),
+  {R, eqc_c:deref(Sp)}.
+
+getfirstexpiredseid_post(_S, _Args, Ret) ->
+  case Ret of
+    {0, _} -> true;
+    {1, _} -> true
+  end.
+
+getfirstexpiredseid_next(S, _Ret, _Args) ->
+  S.
+
+
+%% -----------------------------------------------------------------------------
+%% -----------------------------------------------------------------------------
+%% -----------------------------------------------------------------------------
 %% -Helper-functions------------------------------------------------------------
 
 check_supervisionstatus([]) -> true;
