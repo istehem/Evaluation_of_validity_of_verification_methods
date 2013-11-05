@@ -10,13 +10,18 @@
 -include_lib("../ebin/wdgm_wrapper.hrl").
 
 %-record('SupervisedEntityMonitorTable', {supervision_entities=[]}). %% [{status, {logicalS, deadlineS, aliveS}}]
--record(state, {initialized, currentMode}).
+-record(state, {initialized, currentMode, originalCfg=#wdgm{}}).
 
 initial_state() ->
-%  wdgm_xml:start(),
-  #state{initialized=false, currentMode=#tst_cfg1.initial_mode_id}.
+  Rs = wdgm_xml:start(),
+  {_, R} = (hd(Rs)), %% why do we get a list of records?
+  S = #state{initialized=false, originalCfg=R},
+  S#state{currentMode=R#wdgm.tst_cfg1#tst_cfg1.initial_mode_id}.
 
 %% -WdgM_Init-------------------------------------------------------------------
+
+wdgm_init_pre(S) ->
+  S#state.initialized /= true.
 
 wdgm_init_command(_S) ->
   {call, ?MODULE, wdgm_init, [eqc_c:address_of('Tst_Cfg1')]}.
@@ -27,18 +32,19 @@ wdgm_init(Ptr) ->
 wdgm_init_next(S, _Ret, _Args) ->
   S#state{initialized=true}.
 
-wdgm_init_post(_S, _Args, _Ret) ->
+wdgm_init_post(S, _Args, _Ret) ->
   check_supervisionstatus(eqc_c:value_of('WdgM_SupervisedEntityMonitorTable')) andalso
     eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' andalso
-    eqc_c:value_of('WdgM_CurrentMode') == #tst_cfg1.initial_mode_id.
+    eqc_c:value_of('WdgM_CurrentMode') == S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id.
 %% andalso
 %%    additional checks if wdgmdeverrordetect is enabled
 
 %% -WdgM_GetMode----------------------------------------------------------------
 
-get_mode_pre(_S) ->
-  true.
-%%  S#state.initialized == true.
+get_mode_pre(S) ->
+  (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+   S#state.initialized == true) orelse
+    not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect.
 
 get_mode_command(_S) ->
   {call, ?MODULE, get_mode, []}.
@@ -55,13 +61,15 @@ get_mode_post(S, _Args, {R, Mode}) ->
 
 %% -WdgM_SetMode----------------------------------------------------------------
 
-set_mode_pre(_S) ->
-  eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' orelse
-    eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_FAILED'.
-%%  S#state.initialized == true.
+set_mode_pre(S) ->
+  (eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' orelse
+   eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_FAILED') andalso
+    ((S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+      S#state.initialized == true) orelse
+     not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect).
 
-set_mode_command(_S) ->
-  {call, ?MODULE, set_mode, [choose(0,2), oneof(#wdgmgeneral.caller_ids)]}.
+set_mode_command(S) ->
+  {call, ?MODULE, set_mode, [choose(0,2), oneof(S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)]}.
 %% Available modes: WDGIF_OFF_MODE:0, WDGIF_SLOW_MODE:1, WDGIF_FAST_MODE:2
 
 set_mode(UI8_mode,UI16_callerId) ->
@@ -69,8 +77,8 @@ set_mode(UI8_mode,UI16_callerId) ->
 
 set_mode_post(S, [M, _Cid], Ret) ->
   case Ret of
-    0 -> M == eqc_c:value_of('WdgM_CurrentMode');
-    1 -> M == S#state.currentMode
+    0 -> eq(M, eqc_c:value_of('WdgM_CurrentMode'));
+    1 -> eq(M, S#state.currentMode)
   end.
 
 set_mode_next(S, Ret, [M, _Cid]) ->
@@ -79,6 +87,7 @@ set_mode_next(S, Ret, [M, _Cid]) ->
     _ -> S
   end.
 
+%% -WdgM_DeInit-----------------------------------------------------------------
 
 
 %% -Helper-functions------------------------------------------------------------
@@ -106,6 +115,7 @@ prop_wdgm_init() ->
 	  end,
 	  ?FORALL(Cmds, commands(?MODULE),
 		  begin
+		    eqc_c:restart(),
 		    {H,S,Res} = run_commands(?MODULE,Cmds),
 		    pretty_commands(?MODULE,Cmds,{H,S,Res},
 				    aggregate(command_names(Cmds),
