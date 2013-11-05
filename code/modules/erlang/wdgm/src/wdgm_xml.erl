@@ -22,7 +22,7 @@ start() ->
   car:start(Cfg, [wdgm]),
   car_config:config().
 
-a_config(Cfg) ->
+config(Cfg) ->
   WdgM = get_container("_/WdgM", Cfg),
   General = #wdgmgeneral{ defensive_behavior = get_value("_/WdgMGeneral/WdgMDefensiveBehavior", WdgM),
 			  dem_stopped_supervision_report = get_value("_/WdgMGeneral/WdgMDemStoppedSupervisionReport", WdgM),
@@ -32,9 +32,7 @@ a_config(Cfg) ->
 			  supervision_cycle  = get_value("_/WdgMGeneral/WdgMSupervisionCycle", WdgM),
 			  version_check_foreign_module   = get_value("_/WdgMGeneral/WdgMVersionCheckForeignModule", WdgM),
 			  version_info_api   = get_value("_/WdgMGeneral/WdgMVersionInfoApi", WdgM),
-			  caller_ids         = get_values("_/WdgMGeneral/WdgMCallerIds/WdgMCallerId", WdgM) }.
-b_config(Cfg) ->
-  WdgM = get_container("_/WdgM", Cfg),
+			  caller_ids         = get_values("_/WdgMGeneral/WdgMCallerIds/WdgMCallerId", WdgM) },
   Mode = get_value("_/Tst_Cfg1/WdgMInitialMode", WdgM),
   Test = #tst_cfg1{
 	    initial_mode_id = get_value(Mode ++ "/WdgMModeId", Cfg)
