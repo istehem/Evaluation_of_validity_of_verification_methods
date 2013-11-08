@@ -10,9 +10,10 @@
 -include("wdgm_config.hrl").
 -include_lib("car/include/car_xml.hrl").
 
--import(car_xml, [get_container/2, get_value/2, get_values/2]).
+-import(car_xml, [get_container/2, get_containers_by_def/2, get_value/2, get_values/2]).
 
--export([config/1, start/0]).
+-compile(export_all).
+%-export([config_file/0, config/1, start/0, get_modes/0]).
 
 config_file() ->
         wdgm_eqc:getPath(["c","WdgM","cfg","examples"]) ++ "WdgM_VID41_ExampleConfiguration_001_cfg1.arxml".
@@ -37,4 +38,5 @@ config(Cfg) ->
   Test = #tst_cfg1{
 	    initial_mode_id = get_value(Mode ++ "/WdgMModeId", Cfg)
 	   },
+%  Names = [N || {container, N, _XmlRef, _Hash, _Type, _Params, _Children, _Na, _Cont} <- car_xml:remove_children(car_xml:get_containers_by_def("WdgMMode", Cfg))],
   #wdgm{wdgmgeneral=General, tst_cfg1=Test}.

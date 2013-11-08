@@ -10,7 +10,7 @@
 -include_lib("../ebin/wdgm_wrapper.hrl").
 
 %-record('SupervisedEntityMonitorTable', {supervision_entities=[]}). %% [{status, {logicalS, deadlineS, aliveS}}]
--record(state, {initialized, currentMode, globalstatus, originalCfg=#wdgm{}}).
+-record(state, {initialized, currentMode, globalstatus, originalCfg=#wdgm{}, alivecounter=0, timer_status}).
 
 initial_state() ->
   Rs = wdgm_xml:start(),
@@ -67,14 +67,15 @@ setmode_pre(S) ->
     (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
        S#state.initialized == true)).
 
-setmode_command(S) ->
-  {call, ?MODULE, setmode, [choose(0,2), oneof(S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)]}.
+setmode_command(_S) ->
+  {call, ?MODULE, setmode, [choose(0,2), choose(1,2)]}.
 %% Available modes: WDGIF_OFF_MODE:0, WDGIF_SLOW_MODE:1, WDGIF_FAST_MODE:2
 
 setmode(UI8_mode,UI16_callerId) ->
         ?C_CODE:'WdgM_SetMode'(UI8_mode,UI16_callerId).
 
-setmode_post(S, [M, _Cid], Ret) ->
+setmode_post(S, [M, Cid], Ret) ->
+  lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids) andalso
   case Ret of
     0 -> eq(M, eqc_c:value_of('WdgM_CurrentMode'));
     1 -> M == S#state.currentMode orelse eq(S#state.currentMode, -1)
@@ -114,17 +115,36 @@ checkpointreached_pre(S) ->
     S#state.initialized == true).
 
 checkpointreached_command(_S) ->
-  {call, ?MODULE, checkpointreached, [oneof([0,2]), choose(0,2)]}.
+  {call, ?MODULE, checkpointreached, [choose(0,5), choose(0,31)]}.
 
 %% uint16 SupervisedEntityIdType, uint16 CheckpointIdType
 checkpointreached(SeID, CPId) ->
   ?C_CODE:'WdgM_CheckpointReached'(SeID, CPId).
 
-checkpointreached_post(_S, _Args, Ret) ->
-  Ret == 0 orelse Ret == 1.
+checkpointreached_post(S, [SeID, CPId], Ret) ->
+  case Ret of
+    1 -> S#state.initialized /= true orelse
+	   not wdgm_config_params:is_supervised_entity_for_checkpoint(SeID, CPId) orelse
+	   not wdgm_config_params:is_activated_supervised_entity_in_mode(S#state.currentMode, SeID);
+    0 -> true
+  end.
 
-checkpointreached_next(S, _Ret, _Args) ->
-  S.
+checkpointreached_next(S, _Ret, [_SeId, CPId]) ->
+  case S#state.initialized of
+    true ->
+      NewS = S#state{alivecounter=S#state.alivecounter+1},
+      New2S = case lists:member(CPId, lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end, wdgm_config_params:get_DS_startcheckpoints_for_mode(NewS#state.currentMode))) of
+		true -> NewS#state{timer_status = 'WDGM_START'};
+		false -> NewS
+	      end,
+      case lists:member(CPId, lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end, wdgm_config_params:get_DS_stopcheckpoints_for_mode(New2S#state.currentMode))) of
+	true -> New2S#state{timer_status = 'WDGM_STOP'};
+	false -> New2S
+      end;
+    false -> S
+  end.
+
+
 
 %% -WdgM_UpdateAliveCounter-----------------------------------------------------
 %% Deprecated
