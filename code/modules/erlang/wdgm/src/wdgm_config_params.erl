@@ -52,6 +52,9 @@ get_SE_id(CheckpointRef) ->
 get_checkpoint_id(CheckpointRef) ->
   car_xml:get_value("WdgMCheckpointId", car_xml:get_container(CheckpointRef, ?CFG)).
 
+get_CPs_of_SE(SeID) ->
+  [car_xml:get_value("WdgMCheckpointId", X) || X <- car_xml:get_containers_by_def("WdgMCheckpoint", wdgm_config_params:get_supervised_entity(SeID))].
+
 get_DS_startcheckpoints_for_mode(ModeId) ->
   [car_xml:get_value("WdgMDeadlineStartRef", X) || X <- get_deadline_supervision(ModeId)].
 

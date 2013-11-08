@@ -10,12 +10,21 @@
 -include_lib("../ebin/wdgm_wrapper.hrl").
 
 %-record('SupervisedEntityMonitorTable', {supervision_entities=[]}). %% [{status, {logicalS, deadlineS, aliveS}}]
--record(state, {initialized, currentMode, globalstatus, originalCfg=#wdgm{}, alivecounter=0, timer_status}).
+-record(state, {initialized,
+		currentMode,
+		globalstatus,
+		originalCfg=#wdgm{},
+		aliveCP,
+		timer_status,
+	       errormsg}).
 
 initial_state() ->
   Rs = wdgm_xml:start(),
   {_, R} = (hd(Rs)), %% why do we get a list of records?
-  #state{initialized=false, currentMode=-1, globalstatus='WDGM_GLOBAL_STATUS_OK', originalCfg=R}.
+  #state{initialized=false,
+	 currentMode=-1,
+	 globalstatus='WDGM_GLOBAL_STATUS_OK',
+	 originalCfg=R}.
 
 %% -WdgM_Init-------------------------------------------------------------------
 
@@ -28,15 +37,18 @@ init_command(_S) ->
 init(Ptr) ->
   ?C_CODE:'WdgM_Init'(Ptr).
 
-init_next(S, _Ret, _Args) ->
-  S#state{initialized=true, currentMode=S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id}.
-
 init_post(S, _Args, _Ret) ->
   check_supervisionstatus(eqc_c:value_of('WdgM_SupervisedEntityMonitorTable')) andalso
     eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' andalso
     eqc_c:value_of('WdgM_CurrentMode') == S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id.
 %% andalso
 %%    additional checks if wdgmdeverrordetect is enabled
+
+init_next(S, _Ret, _Args) ->
+  ModeId = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
+  S#state{initialized=true,
+	  currentMode=ModeId,
+	 aliveCP=lists:map(fun (X) -> {wdgm_config_params:get_checkpoint_id(X),0} end, wdgm_config_params:get_AS_checkpoints_for_mode(ModeId))}.
 
 %% -WdgM_GetMode----------------------------------------------------------------
 
@@ -68,8 +80,7 @@ setmode_pre(S) ->
        S#state.initialized == true)).
 
 setmode_command(_S) ->
-  {call, ?MODULE, setmode, [choose(0,2), choose(1,2)]}.
-%% Available modes: WDGIF_OFF_MODE:0, WDGIF_SLOW_MODE:1, WDGIF_FAST_MODE:2
+  {call, ?MODULE, setmode, [choose(0,3), choose(1,2)]}.
 
 setmode(UI8_mode,UI16_callerId) ->
         ?C_CODE:'WdgM_SetMode'(UI8_mode,UI16_callerId).
@@ -83,7 +94,9 @@ setmode_post(S, [M, Cid], Ret) ->
 
 setmode_next(S, Ret, [M, _Cid]) ->
   case Ret of
-    0 -> S#state{currentMode = M};
+    0 -> S#state{currentMode = M,
+	 aliveCP=lists:map(fun (X) -> {wdgm_config_params:get_checkpoint_id(X),0} end,
+	  		   wdgm_config_params:get_AS_checkpoints_for_mode(M))};
     _ -> S
   end.
 
@@ -115,25 +128,59 @@ checkpointreached_pre(S) ->
     S#state.initialized == true).
 
 checkpointreached_command(_S) ->
-  {call, ?MODULE, checkpointreached, [choose(0,5), choose(0,31)]}.
+  {call, ?MODULE, checkpointreached,
+   ?LET(SeID, choose(0,4), checkpoint_gen(SeID))}.
+
+checkpoint_gen(SeID) ->
+  [SeID, oneof(wdgm_config_params:get_CPs_of_SE(SeID)++[999])].
 
 %% uint16 SupervisedEntityIdType, uint16 CheckpointIdType
 checkpointreached(SeID, CPId) ->
   ?C_CODE:'WdgM_CheckpointReached'(SeID, CPId).
 
-checkpointreached_post(S, [SeID, CPId], Ret) ->
+checkpointreached_post(S, Args=[_SeID, CPId], Ret) ->
   case Ret of
-    1 -> S#state.initialized /= true orelse
-	   not wdgm_config_params:is_supervised_entity_for_checkpoint(SeID, CPId) orelse
-	   not wdgm_config_params:is_activated_supervised_entity_in_mode(S#state.currentMode, SeID);
-    0 -> true
-  end.
+    1 -> checkpoint_postcondition(S, Args);
+    0 -> case eqc_c:value_of('WdgM_CurrentConfigPtr') of
+	   CfgPtr = {ptr, _, _} ->
+	     case eqc_c:deref(CfgPtr) of
+	       {_,_,_,ModePtr} ->
+		 case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, 4)) of
+		   {_,_,_,AliveSupCount,_,_,_,AliveSupPtr,_,_,_,_} ->
+		     case findKeyIndex(CPId, 6, eqc_c:read_array(AliveSupPtr, AliveSupCount)) of
+		       not_found -> %% checkpoint does not exist in alive supervision
+				true;
+		       Idx -> %% checkpoint exists but need to check it
+			 element(3, lists:nth(Idx,
+					      eqc_c:read_array(element(4, eqc_c:value_of('WdgM_MonitorTableRef')),
+							       AliveSupCount)))
+			   == element(2, lists:nth(Idx, S#state.aliveCP))+1
+		     end;
+		   _ -> true
+		 end;
+	       _ -> true
+	     end;
+	   _ -> true
+	 end
+    end.
 
-checkpointreached_next(S, _Ret, [_SeId, CPId]) ->
-  case S#state.initialized of
+checkpoint_postcondition(S, [SeID, CPId]) ->
+  S#state.initialized /= true orelse
+    not wdgm_config_params:is_supervised_entity_for_checkpoint(SeID, CPId) orelse
+    not wdgm_config_params:is_activated_supervised_entity_in_mode(S#state.currentMode, SeID).
+
+checkpointreached_next(S, _Ret, [SeID, CPId]) ->
+  case not checkpoint_postcondition(S, [SeID, CPId]) of
     true ->
-      NewS = S#state{alivecounter=S#state.alivecounter+1},
-      New2S = case lists:member(CPId, lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end, wdgm_config_params:get_DS_startcheckpoints_for_mode(NewS#state.currentMode))) of
+      NewS = case lists:keyfind(CPId, 1, S#state.aliveCP) of
+	       false -> S;
+	       Elem -> AliveCPs = lists:keyreplace(CPId, 1, S#state.aliveCP,
+						   {CPId, element(2, Elem)+1}),
+		       S#state{aliveCP=AliveCPs}
+	     end,
+      New2S = case lists:member(CPId,
+				lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end,
+					  wdgm_config_params:get_DS_startcheckpoints_for_mode(NewS#state.currentMode))) of
 		true -> NewS#state{timer_status = 'WDGM_START'};
 		false -> NewS
 	      end,
@@ -259,6 +306,21 @@ check_supervision_results({_, _, 'WDGM_LOCAL_STATUS_OK', _, 'WDGM_CORRECT', 'WDG
 check_supervision_results(_) ->
   false.
 
+findKeyIndex(E, P, Ls) -> findKeyIndex(E, P, Ls, 1).
+findKeyIndex(_, _, [], _) -> not_found;
+findKeyIndex(Elem, P, [Tuple|Ls],N) -> case element(P, Tuple) of
+					 Elem -> N;
+					 _ -> findKeyIndex(Elem, P, Ls, N+1)
+				       end.
+
+
+
+%% -Frequency-------------------------------------------------------------------
+
+-spec weight(S :: eqc_statem:symbolic_state(), Command :: atom()) -> integer().
+weight(_S, setmode) -> 4;
+weight(_S, checkpointreached) -> 4;
+weight(_S, _Cmd) -> 1.
 
 %% -Properties------------------------------------------------------------------
 
