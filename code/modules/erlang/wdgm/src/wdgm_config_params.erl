@@ -80,8 +80,8 @@ is_supervised_entity_for_checkpoint(SeID, CPId) ->
 					  car_xml:get_value("WdgMSupervisedEntityId", X) == SeID]])).
 
 is_activated_supervised_entity_in_mode(ModeID, SeID) ->
-  is_activated_SE_in_AS(ModeID,SeID) andalso
-    is_activated_SE_in_DS(ModeID,SeID) andalso
+  is_activated_SE_in_AS(ModeID,SeID) orelse
+    is_activated_SE_in_DS(ModeID,SeID) orelse
     is_activated_SE_in_ELS(ModeID,SeID).
 
 

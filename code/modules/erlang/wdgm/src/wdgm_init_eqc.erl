@@ -169,8 +169,8 @@ checkpoint_postcondition(S, [SeID, CPId]) ->
     not wdgm_config_params:is_supervised_entity_for_checkpoint(SeID, CPId) orelse
     not wdgm_config_params:is_activated_supervised_entity_in_mode(S#state.currentMode, SeID).
 
-checkpointreached_next(S, _Ret, [SeID, CPId]) ->
-  case not checkpoint_postcondition(S, [SeID, CPId]) of
+checkpointreached_next(S, _Ret, Args = [_SeID, CPId]) ->
+  case not checkpoint_postcondition(S, Args) of
     true ->
       NewS = case lists:keyfind(CPId, 1, S#state.aliveCP) of
 	       false -> S;
@@ -188,7 +188,7 @@ checkpointreached_next(S, _Ret, [SeID, CPId]) ->
 	true -> New2S#state{timer_status = 'WDGM_STOP'};
 	false -> New2S
       end;
-    false -> S
+    false -> S#state{errormsg="LOLOLOL"}
   end.
 
 
@@ -318,8 +318,9 @@ findKeyIndex(Elem, P, [Tuple|Ls],N) -> case element(P, Tuple) of
 %% -Frequency-------------------------------------------------------------------
 
 -spec weight(S :: eqc_statem:symbolic_state(), Command :: atom()) -> integer().
-weight(_S, setmode) -> 4;
-weight(_S, checkpointreached) -> 4;
+weight(_S, setmode) -> 1;
+weight(_S, checkpointreached) -> 3;
+weight(_S, init) -> 1;
 weight(_S, _Cmd) -> 1.
 
 %% -Properties------------------------------------------------------------------
