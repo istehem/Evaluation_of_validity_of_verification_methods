@@ -166,8 +166,8 @@ checkpointreached_post(S, Args=[_SeID, CPId], Ret) ->
 
 checkpoint_postcondition(S, [SeID, CPId]) ->
   S#state.initialized /= true orelse
-    not wdgm_config_params:is_supervised_entity_for_checkpoint(SeID, CPId) orelse
-    not wdgm_config_params:is_activated_supervised_entity_in_mode(S#state.currentMode, SeID).
+    not lists:member(CPId, wdgm_config_params:get_CPs_of_SE(SeID)) orelse
+    not wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SeID).
 
 checkpointreached_next(S, _Ret, Args = [_SeID, CPId]) ->
   case not checkpoint_postcondition(S, Args) of

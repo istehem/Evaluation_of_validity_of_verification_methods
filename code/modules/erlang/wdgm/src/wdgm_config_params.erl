@@ -5,9 +5,8 @@
 -define(CFG, car_xml:file(wdgm_xml:config_file())).
 
 get_modes() ->
-  [{car_xml:get_value("WdgMModeId", Cg), Name}
-   || Cg = {container, Name, _XmlRef, _Hash, _Type, _Params, _Children, _Na, _Cont}
-	<- car_xml:get_containers_by_def("WdgMMode", ?CFG)].
+  [{car_xml:get_value("WdgMModeId", Cg), element(2, Cg)}
+   || Cg <- car_xml:get_containers_by_def("WdgMMode", ?CFG)].
 
 get_mode(Id) ->
   {_, N} = lists:keyfind(Id, 1, get_modes()),
@@ -65,20 +64,10 @@ get_checkpoints_for_mode(ModeId, Which) ->
   [car_xml:get_value(WS, X) || X <- Ls].
 
 
-is_supervised_entity_for_checkpoint(SeID, CPId) ->
-  lists:member(CPId,
-	       lists:flatten([car_xml:get_values("WdgMCheckpointId", Y)
-			      || Y <- [car_xml:get_containers_by_def("WdgMCheckpoint", X)
-				       || X <- car_xml:get_containers_by_def(
-						 "WdgMSupervisedEntity",
-						 ?CFG),
-					  car_xml:get_value("WdgMSupervisedEntityId", X) == SeID]])).
-
-is_activated_supervised_entity_in_mode(ModeID, SeID) ->
+is_activated_SE_in_mode(ModeID, SeID) ->
   is_activated_SE_in_AS(ModeID,SeID) orelse
     is_activated_SE_in_DS(ModeID,SeID) orelse
     is_activated_SE_in_ELS(ModeID,SeID).
-
 
 is_activated_SE_in_AS(ModeId, SeID) ->
   lists:member(SeID, lists:map(fun get_SE_id/1, get_checkpoints_for_mode(ModeId, 'AS'))).
