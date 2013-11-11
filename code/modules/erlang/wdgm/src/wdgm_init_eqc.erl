@@ -48,7 +48,7 @@ init_next(S, _Ret, _Args) ->
   ModeId = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
   S#state{initialized=true,
 	  currentMode=ModeId,
-	 aliveCP=lists:map(fun (X) -> {wdgm_config_params:get_checkpoint_id(X),0} end, wdgm_config_params:get_AS_checkpoints_for_mode(ModeId))}.
+	 aliveCP=lists:map(fun (X) -> {wdgm_config_params:get_checkpoint_id(X),0} end, wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))}.
 
 %% -WdgM_GetMode----------------------------------------------------------------
 
@@ -96,7 +96,7 @@ setmode_next(S, Ret, [M, _Cid]) ->
   case Ret of
     0 -> S#state{currentMode = M,
 	 aliveCP=lists:map(fun (X) -> {wdgm_config_params:get_checkpoint_id(X),0} end,
-	  		   wdgm_config_params:get_AS_checkpoints_for_mode(M))};
+	  		   wdgm_config_params:get_checkpoints_for_mode(M, 'AS'))};
     _ -> S
   end.
 
@@ -180,15 +180,15 @@ checkpointreached_next(S, _Ret, Args = [_SeID, CPId]) ->
 	     end,
       New2S = case lists:member(CPId,
 				lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end,
-					  wdgm_config_params:get_DS_startcheckpoints_for_mode(NewS#state.currentMode))) of
+					  wdgm_config_params:get_checkpoints_for_mode(NewS#state.currentMode, 'DSstart'))) of
 		true -> NewS#state{timer_status = 'WDGM_START'};
 		false -> NewS
 	      end,
-      case lists:member(CPId, lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end, wdgm_config_params:get_DS_stopcheckpoints_for_mode(New2S#state.currentMode))) of
+      case lists:member(CPId, lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end, wdgm_config_params:get_checkpoints_for_mode(New2S#state.currentMode, 'DSstop'))) of
 	true -> New2S#state{timer_status = 'WDGM_STOP'};
 	false -> New2S
       end;
-    false -> S#state{errormsg="LOLOLOL"}
+    false -> S
   end.
 
 
