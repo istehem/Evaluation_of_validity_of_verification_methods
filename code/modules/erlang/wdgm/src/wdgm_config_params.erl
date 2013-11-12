@@ -41,13 +41,13 @@ get_localstatusparams(ModeId) ->
   get_supervision_function(ModeId, "WdgMLocalStatusParams").
 
 get_LSP_failedtolerance(ModeId, SEid) ->
-  [car_xml:get_value("WdgMFailedAliveSupervisionRefCycleTol",LSP)
-   || LSP <- wdgm_config_params:get_localstatusparams(ModeId),
-      car_xml:get_value("WdgMSupervisedEntityId",
-                        car_xml:get_container(car_xml:get_value("WdgMLocalStatusSupervisedEntityRef",
-                                                                LSP),
-                                              car_xml:file(wdgm_xml:config_file())))
-        ==SEid].
+  hd([car_xml:get_value("WdgMFailedAliveSupervisionRefCycleTol",LSP)
+      || LSP <- wdgm_config_params:get_localstatusparams(ModeId),
+         car_xml:get_value("WdgMSupervisedEntityId",
+                           car_xml:get_container(car_xml:get_value("WdgMLocalStatusSupervisedEntityRef",
+                                                                   LSP),
+                                                 car_xml:file(wdgm_xml:config_file())))
+           ==SEid]).
 
 get_SE_id(CheckpointRef) ->
   car_xml:get_value("WdgMSupervisedEntityId", car_xml:parent(car_xml:get_container(CheckpointRef, ?CFG), ?CFG)).

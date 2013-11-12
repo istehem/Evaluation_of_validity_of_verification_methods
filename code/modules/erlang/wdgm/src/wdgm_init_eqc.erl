@@ -20,7 +20,7 @@
                 timer_status,
                 expiredSEid,
                 expiredsupervisioncycles=0,
-                errormsg}).
+                errormsg=[]}).
 -record(alive, {cpid,
                 alive_counter=0}).
 -record(deadline, {startCP,
@@ -28,10 +28,10 @@
                    timer_status,
                    timestamp=0}).
 -record(supervisedentity, {seid,
-                           localstatus,
-                           localalivestatus,
-                           localdeadlinestatus,
-                           locallogicalstatus,
+                           localstatus='WDGM_LOCAL_STATUS_OK',
+                           localalivestatus='WDGM_CORRECT',
+                           localdeadlinestatus='WDGM_CORRECT',
+                           locallogicalstatus='WDGM_CORRECT',
                            failed_reference_supervision_cycles=0,
                            supervision_cycles=0}).
 
@@ -67,14 +67,13 @@ init_next(S, _Ret, _Args) ->
           currentMode=ModeId,
           supervisedentities=lists:map(fun (X) ->
                                            #supervisedentity{seid=X,
-                                                             localalivestatus=undefined,
+                                                             localalivestatus='WDGM_CORRECT',
                                                              supervision_cycles=0}
                                        end,
                                        wdgm_config_params:get_SEs_from_LS(ModeId)),
           deadlineTable=lists:map(fun ({X, Y}) ->
                                       #deadline{startCP=wdgm_config_params:get_checkpoint_id(X),
                                                 stopCP=wdgm_config_params:get_checkpoint_id(Y),
-                                                timer_status=undefined,
                                                 timestamp=0}
                                   end,
                                   wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'DS')),
@@ -87,9 +86,10 @@ init_next(S, _Ret, _Args) ->
 %% -WdgM_GetMode----------------------------------------------------------------
 
 getmode_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-                                                                       S#state.initialized == true).
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+    orelse
+      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+       S#state.initialized == true).
 
 getmode_command(_S) ->
   {call, ?MODULE, getmode, []}.
@@ -108,10 +108,12 @@ getmode_post(S, _Args, {R, Mode}) ->
 
 setmode_pre(S) ->
   (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
-   S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED') andalso
-                                                          (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-                                                                                                                               (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-                                                                                                                                S#state.initialized == true)).
+   S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED')
+    andalso
+      (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+       orelse
+         (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+          S#state.initialized == true)).
 
 setmode_command(_S) ->
   {call, ?MODULE, setmode, [choose(0,3), choose(1,2)]}.
@@ -140,9 +142,10 @@ setmode_next(S, Ret, [M, _Cid]) ->
 %% -WdgM_DeInit-----------------------------------------------------------------
 
 deinit_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-                                                                       S#state.initialized == true).
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+    orelse
+      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+       S#state.initialized == true).
 
 deinit_command(_S) ->
   {call, ?MODULE, deinit, []}.
@@ -160,9 +163,10 @@ deinit_next(S, _Ret, _Args) ->
 %% -WdgM_CheckpointReached------------------------------------------------------
 
 checkpointreached_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-                                                                       S#state.initialized == true).
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+    orelse
+      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+       S#state.initialized == true).
 
 checkpointreached_command(_S) ->
   {call, ?MODULE, checkpointreached,
@@ -364,7 +368,7 @@ mainfunction_post(_S, _Args, _Ret) ->
 mainfunction_next(S, _Ret, _Args) ->
   S2 = S#state{deadlineTable=[case X#deadline.timer_status of
                                 'WDGM_STOP' -> X#deadline{timestamp=0};
-                                _ -> X#deadline{timestamp=X#deadline.timestamp+1}
+                                _           -> X#deadline{timestamp=X#deadline.timestamp+1}
                               end
                               || X <- S#state.deadlineTable]},
   calculate_global_status(S2).
@@ -413,8 +417,8 @@ monitor_active_entity(CurrentS) ->
                   calculate_local_status(State, SEid)
               end,
               S,
-              [SEX || SEX <- wdgm_config_params:get_SEs_from_LS(S#state.currentMode),
-                     wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SEX)]).
+              [SE || SE <- wdgm_config_params:get_SEs_from_LS(S#state.currentMode),
+                     wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SE)]).
 
 calculate_local_status(S, SEid) ->
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
@@ -484,12 +488,13 @@ calculate_alive_supervision(S, AS) ->
   {Ret, NewS} = calculate_new_alive_supervision_status(S,AS),
   CPref = car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS), %% TODO: lyft ur
   SEid = wdgm_config_params:get_SE_id(CPref),
-  CurrentASStatus = (lists:keyfind(SEid, 2, S#state.supervisedentities))#supervisedentity.localstatus,
+  CurrentASStatus = (lists:keyfind(SEid, 2, S#state.supervisedentities))#supervisedentity.localalivestatus,
   case {Ret, CurrentASStatus} of
     {'WDGM_CORRECT', 'WDGM_INCORRECT'} -> alive_reference_cycle_is_ok(NewS, SEid);
     {'WDGM_CORRECT', 'WDGM_CORRECT'}   -> alive_reference_cycle_is_same(NewS, SEid);
     _                                  -> alive_reference_cycle_is_fail(NewS, SEid)
   end.
+
 
 alive_reference_cycle_is_ok(S, SEid) ->
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
@@ -540,16 +545,14 @@ calculate_new_alive_supervision_status(S, AS) ->
                                       SRC,
                                       car_xml:get_value("WdgMExpectedAliveIndications", AS)), %% TODO: lyft ur
                case
-                 I >= car_xml:get_value("WdgMMaxMargin", AS) andalso  %% TODO: lyft ur
-                 I =< car_xml:get_value("WdgMMinMargin", AS) %% TODO: lyft ur
+                 I =< car_xml:get_value("WdgMMaxMargin", AS) andalso  %% TODO: lyft ur
+                 I >= -car_xml:get_value("WdgMMinMargin", AS) %% TODO: lyft ur
                of
                  true -> 'WDGM_CORRECT';
                  _    -> 'WDGM_INCORRECT'
                end;
              _ -> 'WDGM_CORRECT'
            end,
-
-%%%%%%%%%%
 
   {Status, S#state{supervisedentities=
             lists:keyreplace(SEid, 2, S#state.supervisedentities, NewSE#supervisedentity{localalivestatus=Status})}}.
