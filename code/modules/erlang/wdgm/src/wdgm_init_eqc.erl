@@ -408,13 +408,13 @@ monitor_active_entity(CurrentS) ->
                   CurrentS,
                   %% doesn't check if SE is activated in mode
                   wdgm_config_params:get_alive_supervision(CurrentS#state.currentMode)),
-  io:fwrite(":::::::::\n~p\n", [S]),
+
   lists:foldl(fun (SEid, State) ->
                   calculate_local_status(State, SEid)
               end,
               S,
-              [SE || SE <- wdgm_config_params:get_SEs_from_LS(S#state.currentMode),
-                     wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SE)]).
+              [SEX || SEX <- wdgm_config_params:get_SEs_from_LS(S#state.currentMode),
+                     wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SEX)]).
 
 calculate_local_status(S, SEid) ->
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
@@ -440,10 +440,11 @@ calculate_local_status(S, SEid) ->
 
 local_status_is_ok(S, SEid) ->
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  lists:keyreplace(SEid,
-                   2,
-                   S#state.supervisedentities,
-                   SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_OK'}).
+  S#state{supervisedentities=
+            lists:keyreplace(SEid,
+                             2,
+                             S#state.supervisedentities,
+                             SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_OK'})}.
 deadline_or_logical_status_is_fail(S, SEid) ->
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
   ExpiredSEid =
@@ -451,17 +452,19 @@ deadline_or_logical_status_is_fail(S, SEid) ->
       undefined -> SEid;
       Expired -> Expired
     end,
-  (lists:keyreplace(SEid,
-                    2,
-                    S#state.supervisedentities,
-                    SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_EXPIRED'}))
-    #state{expiredSEid=ExpiredSEid}.
+  S#state{expiredSEid=ExpiredSEid,
+          supervisedentities=
+            lists:keyreplace(SEid,
+                             2,
+                             S#state.supervisedentities,
+                             SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_EXPIRED'})}.
 alive_status_fail_but_tolerance_ok(S, SEid) ->
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  lists:keyreplace(SEid,
-                   2,
-                   S#state.supervisedentities,
-                   SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_FAILED'}).
+  S#state{supervisedentities=
+            lists:keyreplace(SEid,
+                             2,
+                             S#state.supervisedentities,
+                             SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_FAILED'})}.
 alive_status_fail_and_tolerance_fail(S, SEid) ->
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
   ExpiredSEid =
@@ -469,12 +472,12 @@ alive_status_fail_and_tolerance_fail(S, SEid) ->
       undefined -> SEid;
       Expired -> Expired
     end,
-  (lists:keyreplace(SEid,
-                    2,
-                    S#state.supervisedentities,
-                    SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_EXPIRED'}))
-    #state{expiredSEid=ExpiredSEid}.
-
+  S#state{expiredSEid=ExpiredSEid,
+          supervisedentities=
+            lists:keyreplace(SEid,
+                             2,
+                             S#state.supervisedentities,
+                             SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_EXPIRED'})}.
 
 
 calculate_alive_supervision(S, AS) ->
