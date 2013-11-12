@@ -9,33 +9,36 @@
 -define(C_CODE, wdgm_wrapper).
 -include_lib("../ebin/wdgm_wrapper.hrl").
 
-%-record('SupervisedEntityMonitorTable', {supervision_entities=[]}). %% [{status, {logicalS, deadlineS, aliveS}}]
+%% -record('SupervisedEntityMonitorTable', {supervision_entities=[]}). %% [{status, {logicalS, deadlineS, aliveS}}]
 -record(state, {initialized,
-		currentMode,
-		globalstatus,
-		originalCfg=#wdgm{},
-		aliveTable,
-		deadlineTable,
-		supervisedentities,
-		timer_status,
-	       errormsg}).
+                currentMode,
+                globalstatus,
+                originalCfg=#wdgm{},
+                aliveTable,
+                deadlineTable,
+                supervisedentities,
+                timer_status,
+                errormsg}).
 -record(deadline, {startCP,
-		   stopCP,
-		   timer_status,
-		   timestamp}).
+                   stopCP,
+                   timer_status,
+                   timestamp}).
 -record(supervisedentity, {seid,
-			   localalivestatus,
-			   supervision_cycles}).
+                           localstatus,
+                           localalivestatus,
+                           localdeadlinestatus,
+                           localexternallogicalstatus,
+                           supervision_cycles}).
 -record(alive, {cpid,
-		alive_counter}).
+                alive_counter}).
 
 initial_state() ->
   Rs = wdgm_xml:start(),
   {_, R} = (hd(Rs)), %% why do we get a list of records?
   #state{initialized=false,
-	 currentMode=-1,
-	 globalstatus='WDGM_GLOBAL_STATUS_OK',
-	 originalCfg=R}.
+         currentMode=-1,
+         globalstatus='WDGM_GLOBAL_STATUS_OK',
+         originalCfg=R}.
 
 %% -WdgM_Init-------------------------------------------------------------------
 
@@ -58,32 +61,32 @@ init_post(S, _Args, _Ret) ->
 init_next(S, _Ret, _Args) ->
   ModeId = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
   S#state{initialized=true,
-	  currentMode=ModeId,
-	  supervisedentities=lists:map(fun (X) ->
-					   #supervisedentity{seid=X,
-							     localalivestatus=undefined,
-							     supervision_cycles=0}
-				       end,
-				       wdgm_config_params:get_SE_from_LS(ModeId)),
-	  deadlineTable=lists:map(fun ({X, Y}) ->
-				      #deadline{startCP=wdgm_config_params:get_checkpoint_id(X),
-						stopCP=wdgm_config_params:get_checkpoint_id(Y),
-						timer_status=undefined,
-						timestamp=0}
-				  end,
-				  wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'DS')),
-	  aliveTable=lists:map(fun (X) ->
-				   #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
-					  alive_counter=0}
-			       end,
-			       wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))}.
+          currentMode=ModeId,
+          supervisedentities=lists:map(fun (X) ->
+                                           #supervisedentity{seid=X,
+                                                             localalivestatus=undefined,
+                                                             supervision_cycles=0}
+                                       end,
+                                       wdgm_config_params:get_SE_from_LS(ModeId)),
+          deadlineTable=lists:map(fun ({X, Y}) ->
+                                      #deadline{startCP=wdgm_config_params:get_checkpoint_id(X),
+                                                stopCP=wdgm_config_params:get_checkpoint_id(Y),
+                                                timer_status=undefined,
+                                                timestamp=0}
+                                  end,
+                                  wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'DS')),
+          aliveTable=lists:map(fun (X) ->
+                                   #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
+                                          alive_counter=0}
+                               end,
+                               wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))}.
 
 %% -WdgM_GetMode----------------------------------------------------------------
 
 getmode_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-   (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-    S#state.initialized == true).
+                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+                                                                       S#state.initialized == true).
 
 getmode_command(_S) ->
   {call, ?MODULE, getmode, []}.
@@ -103,31 +106,31 @@ getmode_post(S, _Args, {R, Mode}) ->
 setmode_pre(S) ->
   (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
    S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED') andalso
-    (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-    (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-       S#state.initialized == true)).
+                                                          (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
+                                                                                                                               (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+                                                                                                                                S#state.initialized == true)).
 
 setmode_command(_S) ->
   {call, ?MODULE, setmode, [choose(0,3), choose(1,2)]}.
 
 setmode(UI8_mode,UI16_callerId) ->
-        ?C_CODE:'WdgM_SetMode'(UI8_mode,UI16_callerId).
+  ?C_CODE:'WdgM_SetMode'(UI8_mode,UI16_callerId).
 
 setmode_post(S, [M, Cid], Ret) ->
   lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids) andalso
-  case Ret of
-    0 -> eq(M, eqc_c:value_of('WdgM_CurrentMode'));
-    1 -> M == S#state.currentMode orelse eq(S#state.currentMode, -1)
-  end.
+    case Ret of
+      0 -> eq(M, eqc_c:value_of('WdgM_CurrentMode'));
+      1 -> M == S#state.currentMode orelse eq(S#state.currentMode, -1)
+    end.
 
 setmode_next(S, Ret, [M, _Cid]) ->
   case Ret of
     0 -> S#state{currentMode = M,
-		 aliveTable=lists:map(fun (X) ->
-				       #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
-					      alive_counter=0}
-				   end,
-				   wdgm_config_params:get_checkpoints_for_mode(M, 'AS'))};
+                 aliveTable=lists:map(fun (X) ->
+                                          #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
+                                                 alive_counter=0}
+                                      end,
+                                      wdgm_config_params:get_checkpoints_for_mode(M, 'AS'))};
     _ -> S
   end.
 
@@ -135,8 +138,8 @@ setmode_next(S, Ret, [M, _Cid]) ->
 
 deinit_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-  (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-     S#state.initialized == true).
+                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+                                                                       S#state.initialized == true).
 
 deinit_command(_S) ->
   {call, ?MODULE, deinit, []}.
@@ -155,8 +158,8 @@ deinit_next(S, _Ret, _Args) ->
 
 checkpointreached_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-  (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-    S#state.initialized == true).
+                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+                                                                       S#state.initialized == true).
 
 checkpointreached_command(_S) ->
   {call, ?MODULE, checkpointreached,
@@ -173,27 +176,27 @@ checkpointreached_post(S, Args=[_SeID, CPId], Ret) ->
   case Ret of
     1 -> checkpoint_postcondition(S, Args);
     0 -> case eqc_c:value_of('WdgM_CurrentConfigPtr') of
-	   CfgPtr = {ptr, _, _} ->
-	     case eqc_c:deref(CfgPtr) of
-	       {_,_,_,ModePtr} ->
-		 case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, 4)) of
-		   {_,_,_,AliveSupCount,_,_,_,AliveSupPtr,_,_,_,_} ->
-		     case findKeyIndex(CPId, 6, eqc_c:read_array(AliveSupPtr, AliveSupCount)) of
-		       not_found -> %% checkpoint does not exist in alive supervision
-				true;
-		       Idx -> %% checkpoint exists but need to check it
-			 element(3, lists:nth(Idx,
-					      eqc_c:read_array(element(4, eqc_c:value_of('WdgM_MonitorTableRef')),
-							       AliveSupCount)))
-			   == (lists:nth(Idx, S#state.aliveTable))#alive.alive_counter+1
-		     end;
-		   _ -> true
-		 end;
-	       _ -> true
-	     end;
-	   _ -> true
-	 end
-    end.
+           CfgPtr = {ptr, _, _} ->
+             case eqc_c:deref(CfgPtr) of
+               {_,_,_,ModePtr} ->
+                 case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, 4)) of
+                   {_,_,_,AliveSupCount,_,_,_,AliveSupPtr,_,_,_,_} ->
+                     case findKeyIndex(CPId, 6, eqc_c:read_array(AliveSupPtr, AliveSupCount)) of
+                       not_found -> %% checkpoint does not exist in alive supervision
+                         true;
+                       Idx -> %% checkpoint exists but need to check it
+                         element(3, lists:nth(Idx,
+                                              eqc_c:read_array(element(4, eqc_c:value_of('WdgM_MonitorTableRef')),
+                                                               AliveSupCount)))
+                           == (lists:nth(Idx, S#state.aliveTable))#alive.alive_counter+1
+                     end;
+                   _ -> true
+                 end;
+               _ -> true
+             end;
+           _ -> true
+         end
+  end.
 
 checkpoint_postcondition(S, [SeID, CPId]) ->
   S#state.initialized /= true orelse
@@ -204,23 +207,23 @@ checkpointreached_next(S, _Ret, Args = [_SeID, CPId]) ->
   case not checkpoint_postcondition(S, Args) of
     true ->
       NewS = case lists:keyfind(CPId, 1, S#state.aliveTable) of
-	       false -> S;
-	       _ -> AliveTable = [case X#alive.cpid of
-				       CPId -> X#alive{alive_counter=X#alive.alive_counter+1};
-				       _ -> X
-				     end
-				     || X <- S#state.aliveTable],
-		       S#state{aliveTable=AliveTable}
-	     end,
+               false -> S;
+               _ -> AliveTable = [case X#alive.cpid of
+                                    CPId -> X#alive{alive_counter=X#alive.alive_counter+1};
+                                    _ -> X
+                                  end
+                                  || X <- S#state.aliveTable],
+                    S#state{aliveTable=AliveTable}
+             end,
       New2S = case lists:member(CPId,
-				lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end,
-					  wdgm_config_params:get_checkpoints_for_mode(NewS#state.currentMode, 'DSstart'))) of
-		true -> NewS#state{timer_status = 'WDGM_START'};
-		false -> NewS
-	      end,
+                                lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end,
+                                          wdgm_config_params:get_checkpoints_for_mode(NewS#state.currentMode, 'DSstart'))) of
+                true -> NewS#state{timer_status = 'WDGM_START'};
+                false -> NewS
+              end,
       case lists:member(CPId, lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end, wdgm_config_params:get_checkpoints_for_mode(New2S#state.currentMode, 'DSstop'))) of
-	true -> New2S#state{timer_status = 'WDGM_STOP'};
-	false -> New2S
+        true -> New2S#state{timer_status = 'WDGM_STOP'};
+        false -> New2S
       end;
     false -> S
   end.
@@ -234,8 +237,8 @@ checkpointreached_next(S, _Ret, Args = [_SeID, CPId]) ->
 
 getlocalstatus_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-  (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-    S#state.initialized == true).
+                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+                                                                       S#state.initialized == true).
 
 getlocalstatus_command(_S) ->
   {call, ?MODULE, getlocalstatus, [oneof([0,2])]}.
@@ -255,8 +258,8 @@ getlocalstatus_next(S, _Ret, _Args) ->
 
 getglobalstatus_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-  (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-    S#state.initialized == true).
+                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+                                                                       S#state.initialized == true).
 
 getglobalstatus_command(_S) ->
   {call, ?MODULE, getglobalstatus, []}.
@@ -270,9 +273,9 @@ getglobalstatus_post(S, _Args, Ret) ->
   case Ret of
     {0, R} -> eq(R, S#state.globalstatus);
     {1, _} -> S#state.initialized == false andalso
-		S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK'
-	      %% [WDGM344] should also check if pointer is null
-	      %% [WDGM258] should optionally check if pointer is null
+                S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK'
+              %% [WDGM344] should also check if pointer is null
+              %% [WDGM258] should optionally check if pointer is null
   end.
 
 getglobalstatus_next(S, _Ret, _Args) ->
@@ -282,8 +285,8 @@ getglobalstatus_next(S, _Ret, _Args) ->
 
 performreset_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-  (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-    S#state.initialized == true).
+                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+                                                                       S#state.initialized == true).
 
 performreset_command (_S) ->
   {call, ?MODULE, performreset, []}.
@@ -336,31 +339,31 @@ mainfunction_post(_S, _Args, _Ret) ->
   case eqc_c:value_of('WdgM_CurrentConfigPtr') of
     CfgPtr = {ptr, _, _} ->
       case eqc_c:deref(CfgPtr) of
-	{_,_,_,ModePtr} ->
-	  case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, 4)) of
-	    {_,_,_,_,_DeadlineSupCount,_,_,_,_DeadlineSupPtr,_,_,_} -> true;
-	      %% case findKeyIndex(CPId, 6, eqc_c:read_array(DeadlineSupPtr, DeadlineSupCount)) of
-	      %% 	not_found -> %% checkpoint does not exist in alive supervision
-	      %% 	  true;
-	      %% 	Idx -> %% checkpoint exists but need to check it
-	      %% 	  element(3, lists:nth(Idx,
-	      %% 			       eqc_c:read_array(element(4, eqc_c:value_of('WdgM_MonitorTableRef')),
-	      %% 						DeadlineSupCount)))
-	      %% 	    == element(2, lists:nth(Idx, S#state.deadlineTable))+1
-	      %% end;
-	    _ -> true
-	  end;
-	_ -> true
+        {_,_,_,ModePtr} ->
+          case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, 4)) of
+            {_,_,_,_,_DeadlineSupCount,_,_,_,_DeadlineSupPtr,_,_,_} -> true;
+            %% case findKeyIndex(CPId, 6, eqc_c:read_array(DeadlineSupPtr, DeadlineSupCount)) of
+            %%  not_found -> %% checkpoint does not exist in alive supervision
+            %%    true;
+            %%  Idx -> %% checkpoint exists but need to check it
+            %%    element(3, lists:nth(Idx,
+            %%           eqc_c:read_array(element(4, eqc_c:value_of('WdgM_MonitorTableRef')),
+            %%       DeadlineSupCount)))
+            %%      == element(2, lists:nth(Idx, S#state.deadlineTable))+1
+            %% end;
+            _ -> true
+          end;
+        _ -> true
       end;
     _ -> true
   end.
 
 mainfunction_next(S, _Ret, _Args) ->
   S#state{deadlineTable=[case X#deadline.timer_status of
-			   'WDGM_STOP' -> X#deadline{timestamp=0};
-			   _ -> X#deadline{timestamp=X#deadline.timestamp+1}
-			 end
-			 || X <- S#state.deadlineTable]}.
+                           'WDGM_STOP' -> X#deadline{timestamp=0};
+                           _ -> X#deadline{timestamp=X#deadline.timestamp+1}
+                         end
+                         || X <- S#state.deadlineTable]}.
 
 
 %% -----------------------------------------------------------------------------
@@ -369,12 +372,13 @@ mainfunction_next(S, _Ret, _Args) ->
 %% -Helper-functions------------------------------------------------------------
 
 calculate_global_status(S) ->
-  lists:foldl(fun (AS, NewS) -> monitor_active_entity(NewS, AS) end,
-	      S,
-	      wdgm_config_params:get_alive_supervision(S#state.currentMode)).
+  monitor_active_entity(S).
 
-monitor_active_entity(S, AS) ->
-  NewS = calculate_alive_supervision(S, AS).
+monitor_active_entity(OldS) ->
+  S = lists:foldl(fun (AS, State) -> calculate_alive_supervision(State, AS) end,
+                  OldS,
+                  wdgm_config_params:get_alive_supervision(OldS#state.currentMode)),
+  lists:foldl(fun(AS,NewS) ->  end,).
 
 calculate_alive_supervision(S, AS) ->
   CPref = car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS), %% TODO: lyft ur
@@ -383,22 +387,22 @@ calculate_alive_supervision(S, AS) ->
   NewSE = SE#supervisedentity{supervision_cycles=SE#supervisedentity.supervision_cycles+1},
   SRC = car_xml:get_value("WdgMSupervisionReferenceCycle", AS), %% TODO: lyft ur
   Status = case NewSE#supervisedentity.supervision_cycles >= SRC of
-	     true ->
-	       CPid = wdgm_config_params:get_checkpoint_id(CPref),
-	       CPstate = lists:keyfind(CPid, 1, S#state.aliveTable),
-	       I = algo_alive_correct(CPstate#alive.alive_counter,
-			NewSE#supervisedentity.supervision_cycles,
-			SRC,
-			car_xml:get_value("WdgMExpectedAliveIndications", AS)), %% TODO: lyft ur
-	       case I >= car_xml:get_value("WdgMMaxMargin", AS) andalso  %% TODO: lyft ur
-		 I =< car_xml:get_value("WdgMMinMargin", AS) of %% TODO: lyft ur
-		 true -> 'WDGM_CORRECT';
-		 _    -> 'WDGM_INCORRECT'
-	       end;
-	     _ -> 'WDGM_CORRECT'
-	   end,
+             true ->
+               CPid = wdgm_config_params:get_checkpoint_id(CPref),
+               CPstate = lists:keyfind(CPid, 1, S#state.aliveTable),
+               I = algo_alive_correct(CPstate#alive.alive_counter,
+                                      NewSE#supervisedentity.supervision_cycles,
+                                      SRC,
+                                      car_xml:get_value("WdgMExpectedAliveIndications", AS)), %% TODO: lyft ur
+               case I >= car_xml:get_value("WdgMMaxMargin", AS) andalso  %% TODO: lyft ur
+                 I =< car_xml:get_value("WdgMMinMargin", AS) of %% TODO: lyft ur
+                 true -> 'WDGM_CORRECT';
+                 _    -> 'WDGM_INCORRECT'
+               end;
+             _ -> 'WDGM_CORRECT'
+           end,
   S#state{supervisedentities=
-	    lists:keyreplace(SEid, 1, S#state.supervisedentities, NewSE#supervisedentity{localalivestatus=Status})}.
+            lists:keyreplace(SEid, 1, S#state.supervisedentities, NewSE#supervisedentity{localalivestatus=Status})}.
 
 algo_alive_correct(AliveCounter, SupervisionCycles, SRC, EAI) ->
   AliveCounter-SupervisionCycles+(SRC-EAI).
@@ -422,9 +426,9 @@ check_supervision_results(_) ->
 findKeyIndex(E, P, Ls) -> findKeyIndex(E, P, Ls, 1).
 findKeyIndex(_, _, [], _) -> not_found;
 findKeyIndex(Elem, P, [Tuple|Ls],N) -> case element(P, Tuple) of
-					 Elem -> N;
-					 _ -> findKeyIndex(Elem, P, Ls, N+1)
-				       end.
+                                         Elem -> N;
+                                         _ -> findKeyIndex(Elem, P, Ls, N+1)
+                                       end.
 
 
 
@@ -440,16 +444,16 @@ weight(_S, _Cmd) -> 1.
 
 prop_wdgm_init() ->
   ?SETUP( fun () -> start(),
-		    fun () -> ok end
-	  end,
-	  ?FORALL(Cmds, commands(?MODULE),
-		  begin
-		    eqc_c:restart(),
-		    {H,S,Res} = run_commands(?MODULE,Cmds),
-		    pretty_commands(?MODULE,Cmds,{H,S,Res},
-				    aggregate(command_names(Cmds),
-					      Res == ok))
-		  end)).
+                    fun () -> ok end
+          end,
+          ?FORALL(Cmds, commands(?MODULE),
+                  begin
+                    eqc_c:restart(),
+                    {H,S,Res} = run_commands(?MODULE,Cmds),
+                    pretty_commands(?MODULE,Cmds,{H,S,Res},
+                                    aggregate(command_names(Cmds),
+                                              Res == ok))
+                  end)).
 
 start () ->
   wdgm_eqc:start().
