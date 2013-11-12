@@ -14,9 +14,20 @@
 		currentMode,
 		globalstatus,
 		originalCfg=#wdgm{},
-		aliveCP,
+		aliveTable,
+		deadlineTable,
+		supervisedentities,
 		timer_status,
 	       errormsg}).
+-record(deadline, {startCP,
+		   stopCP,
+		   timer_status,
+		   timestamp}).
+-record(supervisedentity, {seid,
+			   localalivestatus,
+			   supervision_cycles}).
+-record(alive, {cpid,
+		alive_counter}).
 
 initial_state() ->
   Rs = wdgm_xml:start(),
@@ -48,7 +59,24 @@ init_next(S, _Ret, _Args) ->
   ModeId = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
   S#state{initialized=true,
 	  currentMode=ModeId,
-	 aliveCP=lists:map(fun (X) -> {wdgm_config_params:get_checkpoint_id(X),0} end, wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))}.
+	  supervisedentities=lists:map(fun (X) ->
+					   #supervisedentity{seid=X,
+							     localalivestatus=undefined,
+							     supervision_cycles=0}
+				       end,
+				       wdgm_config_params:get_SE_from_LS(ModeId)),
+	  deadlineTable=lists:map(fun ({X, Y}) ->
+				      #deadline{startCP=wdgm_config_params:get_checkpoint_id(X),
+						stopCP=wdgm_config_params:get_checkpoint_id(Y),
+						timer_status=undefined,
+						timestamp=0}
+				  end,
+				  wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'DS')),
+	  aliveTable=lists:map(fun (X) ->
+				   #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
+					  alive_counter=0}
+			       end,
+			       wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))}.
 
 %% -WdgM_GetMode----------------------------------------------------------------
 
@@ -95,8 +123,11 @@ setmode_post(S, [M, Cid], Ret) ->
 setmode_next(S, Ret, [M, _Cid]) ->
   case Ret of
     0 -> S#state{currentMode = M,
-	 aliveCP=lists:map(fun (X) -> {wdgm_config_params:get_checkpoint_id(X),0} end,
-	  		   wdgm_config_params:get_checkpoints_for_mode(M, 'AS'))};
+		 aliveTable=lists:map(fun (X) ->
+				       #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
+					      alive_counter=0}
+				   end,
+				   wdgm_config_params:get_checkpoints_for_mode(M, 'AS'))};
     _ -> S
   end.
 
@@ -154,7 +185,7 @@ checkpointreached_post(S, Args=[_SeID, CPId], Ret) ->
 			 element(3, lists:nth(Idx,
 					      eqc_c:read_array(element(4, eqc_c:value_of('WdgM_MonitorTableRef')),
 							       AliveSupCount)))
-			   == element(2, lists:nth(Idx, S#state.aliveCP))+1
+			   == (lists:nth(Idx, S#state.aliveTable))#alive.alive_counter+1
 		     end;
 		   _ -> true
 		 end;
@@ -172,11 +203,14 @@ checkpoint_postcondition(S, [SeID, CPId]) ->
 checkpointreached_next(S, _Ret, Args = [_SeID, CPId]) ->
   case not checkpoint_postcondition(S, Args) of
     true ->
-      NewS = case lists:keyfind(CPId, 1, S#state.aliveCP) of
+      NewS = case lists:keyfind(CPId, 1, S#state.aliveTable) of
 	       false -> S;
-	       Elem -> AliveCPs = lists:keyreplace(CPId, 1, S#state.aliveCP,
-						   {CPId, element(2, Elem)+1}),
-		       S#state{aliveCP=AliveCPs}
+	       _ -> AliveTable = [case X#alive.cpid of
+				       CPId -> X#alive{alive_counter=X#alive.alive_counter+1};
+				       _ -> X
+				     end
+				     || X <- S#state.aliveTable],
+		       S#state{aliveTable=AliveTable}
 	     end,
       New2S = case lists:member(CPId,
 				lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end,
@@ -286,11 +320,90 @@ getfirstexpiredseid_post(_S, _Args, Ret) ->
 getfirstexpiredseid_next(S, _Ret, _Args) ->
   S.
 
+%% -WdgM_MainFunction-----------------------------------------------------------
+
+mainfunction_pre(S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior andalso
+    S#state.initialized == true.
+
+mainfunction_command(_S) ->
+  {call, ?MODULE, mainfunction, []}.
+
+mainfunction() ->
+  ?C_CODE:'WdgM_MainFunction'().
+
+mainfunction_post(_S, _Args, _Ret) ->
+  case eqc_c:value_of('WdgM_CurrentConfigPtr') of
+    CfgPtr = {ptr, _, _} ->
+      case eqc_c:deref(CfgPtr) of
+	{_,_,_,ModePtr} ->
+	  case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, 4)) of
+	    {_,_,_,_,_DeadlineSupCount,_,_,_,_DeadlineSupPtr,_,_,_} -> true;
+	      %% case findKeyIndex(CPId, 6, eqc_c:read_array(DeadlineSupPtr, DeadlineSupCount)) of
+	      %% 	not_found -> %% checkpoint does not exist in alive supervision
+	      %% 	  true;
+	      %% 	Idx -> %% checkpoint exists but need to check it
+	      %% 	  element(3, lists:nth(Idx,
+	      %% 			       eqc_c:read_array(element(4, eqc_c:value_of('WdgM_MonitorTableRef')),
+	      %% 						DeadlineSupCount)))
+	      %% 	    == element(2, lists:nth(Idx, S#state.deadlineTable))+1
+	      %% end;
+	    _ -> true
+	  end;
+	_ -> true
+      end;
+    _ -> true
+  end.
+
+mainfunction_next(S, _Ret, _Args) ->
+  S#state{deadlineTable=[case X#deadline.timer_status of
+			   'WDGM_STOP' -> X#deadline{timestamp=0};
+			   _ -> X#deadline{timestamp=X#deadline.timestamp+1}
+			 end
+			 || X <- S#state.deadlineTable]}.
+
 
 %% -----------------------------------------------------------------------------
 %% -----------------------------------------------------------------------------
 %% -----------------------------------------------------------------------------
 %% -Helper-functions------------------------------------------------------------
+
+calculate_global_status(S) ->
+  lists:foldl(fun (AS, NewS) -> monitor_active_entity(NewS, AS) end,
+	      S,
+	      wdgm_config_params:get_alive_supervision(S#state.currentMode)).
+
+monitor_active_entity(S, AS) ->
+  NewS = calculate_alive_supervision(S, AS).
+
+calculate_alive_supervision(S, AS) ->
+  CPref = car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS), %% TODO: lyft ur
+  SEid = wdgm_config_params:get_SE_id(CPref),
+  SE = lists:keyfind(SEid, 1, S#state.supervisedentities),
+  NewSE = SE#supervisedentity{supervision_cycles=SE#supervisedentity.supervision_cycles+1},
+  SRC = car_xml:get_value("WdgMSupervisionReferenceCycle", AS), %% TODO: lyft ur
+  Status = case NewSE#supervisedentity.supervision_cycles >= SRC of
+	     true ->
+	       CPid = wdgm_config_params:get_checkpoint_id(CPref),
+	       CPstate = lists:keyfind(CPid, 1, S#state.aliveTable),
+	       I = algo_alive_correct(CPstate#alive.alive_counter,
+			NewSE#supervisedentity.supervision_cycles,
+			SRC,
+			car_xml:get_value("WdgMExpectedAliveIndications", AS)), %% TODO: lyft ur
+	       case I >= car_xml:get_value("WdgMMaxMargin", AS) andalso  %% TODO: lyft ur
+		 I =< car_xml:get_value("WdgMMinMargin", AS) of %% TODO: lyft ur
+		 true -> 'WDGM_CORRECT';
+		 _    -> 'WDGM_INCORRECT'
+	       end;
+	     _ -> 'WDGM_CORRECT'
+	   end,
+  S#state{supervisedentities=
+	    lists:keyreplace(SEid, 1, S#state.supervisedentities, NewSE#supervisedentity{localalivestatus=Status})}.
+
+algo_alive_correct(AliveCounter, SupervisionCycles, SRC, EAI) ->
+  AliveCounter-SupervisionCycles+(SRC-EAI).
+
+
 
 check_supervisionstatus([]) -> true;
 check_supervisionstatus([L|Ls]) ->
@@ -319,7 +432,7 @@ findKeyIndex(Elem, P, [Tuple|Ls],N) -> case element(P, Tuple) of
 
 -spec weight(S :: eqc_statem:symbolic_state(), Command :: atom()) -> integer().
 weight(_S, setmode) -> 1;
-weight(_S, checkpointreached) -> 3;
+weight(_S, checkpointreached) -> 1;
 weight(_S, init) -> 1;
 weight(_S, _Cmd) -> 1.
 

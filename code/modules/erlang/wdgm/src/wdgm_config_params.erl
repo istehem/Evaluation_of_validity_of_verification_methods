@@ -23,6 +23,11 @@ get_supervised_entity(Id) ->
   car_xml:get_container(N, car_xml:get_containers_by_def(
 			     "WdgMSupervisedEntity", ?CFG)).
 
+get_SEs_from_LS(ModeId) ->
+  [car_xml:get_value("WdgMSupervisedEntityId",
+		     car_xml:get_container(X, car_xml:file(wdgm_xml:config_file())))
+   || X <- wdgm_config_params:get_checkpoints_for_mode(ModeId, 'LSP')].
+
 get_supervision_function(ModeId, Which) ->
   car_xml:get_containers_by_def(Which, element(7, get_mode(ModeId))).
 get_deadline_supervision(ModeId) ->
@@ -31,6 +36,9 @@ get_alive_supervision(ModeId) ->
   get_supervision_function(ModeId, "WdgMAliveSupervision").
 get_externallogical_supervision(ModeId) ->
   get_supervision_function(ModeId, "WdgMExternalLogicalSupervision").
+
+get_localstatusparams(ModeId) ->
+  get_supervision_function(ModeId, "WdgMLocalStatusParams").
 
 
 get_SE_id(CheckpointRef) ->
@@ -43,6 +51,14 @@ get_CPs_of_SE(SeID) ->
   [car_xml:get_value("WdgMCheckpointId", X) || X <- car_xml:get_containers_by_def("WdgMCheckpoint", wdgm_config_params:get_supervised_entity(SeID))].
 
 
+get_double_checkpoints_for_mode(ModeId, Which) ->
+  case Which of
+    'DS' ->
+      [{car_xml:get_value("WdgMDeadlineStartRef", X),
+	car_xml:get_value("WdgMDeadlineStopRef", X)} || X <- get_deadline_supervision(ModeId)];
+    'ELS' ->
+      undefined
+  end.
 get_checkpoints_for_mode(ModeId, Which) ->
   case Which of
     'AS' ->
@@ -59,7 +75,10 @@ get_checkpoints_for_mode(ModeId, Which) ->
       Ls = get_externallogical_supervision(ModeId);
     'ELSfinal' ->
       WS = "WdgMExternalCheckpointFinalRef",
-      Ls = get_externallogical_supervision(ModeId)
+      Ls = get_externallogical_supervision(ModeId);
+    'LSP' ->
+      WS = "WdgMLocalStatusSupervisedEntityRef",
+      Ls = get_localstatusparams(ModeId)
   end,
   [car_xml:get_value(WS, X) || X <- Ls].
 
