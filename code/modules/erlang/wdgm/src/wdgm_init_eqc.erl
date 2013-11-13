@@ -396,8 +396,9 @@ calculate_global_status(CurrentS) ->
       _         -> 'WDGM_GLOBAL_STATUS_OK'
     end,
 
-  case ExpiredSEs of
-    true -> update_expired_state(S#state{globalstatus=GlobalStatus_Temp});
+  case {S#state.globalstatus, ExpiredSEs} of
+    {'WDGM_GLOBAL_STATUS_STOPPED',_} -> S;
+    {_, true} -> update_expired_state(S#state{globalstatus=GlobalStatus_Temp});
     _    -> S#state{globalstatus=GlobalStatus_Temp}
   end.
 
