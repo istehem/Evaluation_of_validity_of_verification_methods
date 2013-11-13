@@ -14,12 +14,11 @@
                 currentMode=-1,
                 globalstatus='WDGM_GLOBAL_STATUS_OK',
                 originalCfg=#wdgm{},
+                expiredSEid,
+                expiredsupervisioncycles=0,
                 aliveTable,
                 deadlineTable,
                 supervisedentities,
-                timer_status,
-                expiredSEid,
-                expiredsupervisioncycles=0,
                 errormsg}).
 -record(alive, {cpid,
                 alive_counter=0}).
@@ -217,7 +216,7 @@ checkpoint_postcondition(S, [SeID, CPId]) ->
 checkpointreached_next(S, _Ret, Args = [_SeID, CPId]) ->
   case not checkpoint_postcondition(S, Args) of
     true ->
-      NewS = case lists:keyfind(CPId, 1, S#state.aliveTable) of
+      NewS = case lists:keyfind(CPId, 2, S#state.aliveTable) of
                false -> S;
                _ -> AliveTable = [case X#alive.cpid of
                                     CPId -> X#alive{alive_counter=X#alive.alive_counter+1};
@@ -226,15 +225,32 @@ checkpointreached_next(S, _Ret, Args = [_SeID, CPId]) ->
                                   || X <- S#state.aliveTable],
                     S#state{aliveTable=AliveTable}
              end,
-      New2S = case lists:member(CPId,
-                                lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end,
-                                          wdgm_config_params:get_checkpoints_for_mode(NewS#state.currentMode, 'DSstart'))) of
-                true -> NewS#state{timer_status = 'WDGM_START'};
-                false -> NewS
+      DeadlineStart = lists:keyfind(CPId, 2, NewS#state.deadlineTable),
+      New2S = case DeadlineStart
+                %% lists:member(CPId,
+                %%              lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end,
+                %%                        wdgm_config_params:get_checkpoints_for_mode(NewS#state.currentMode,
+                %%                                                                    'DSstart')))
+              of
+                false -> NewS;
+                _ -> NewS#state{deadlineTable=lists:keyreplace(CPId,
+                                                     3,
+                                                     NewS#state.deadlineTable,
+                                                     DeadlineStart#deadline{timer_status = 'WDGM_START'})}
               end,
-      case lists:member(CPId, lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end, wdgm_config_params:get_checkpoints_for_mode(New2S#state.currentMode, 'DSstop'))) of
-        true -> New2S#state{timer_status = 'WDGM_STOP'};
-        false -> New2S
+      DeadlineStop = lists:keyfind(CPId, 3, NewS#state.deadlineTable),
+      case DeadlineStop
+        %% lists:member(CPId,
+        %%              lists:map(fun (X) -> wdgm_config_params:get_checkpoint_id(X) end,
+        %%                        wdgm_config_params:get_checkpoints_for_mode(New2S#state.currentMode,
+        %%                                                                    'DSstop')))
+      of
+        false -> New2S;
+        _ ->
+          New2S#state{deadlineTable=lists:keyreplace(CPId,
+                                                     3,
+                                                     New2S#state.deadlineTable,
+                                                     DeadlineStop#deadline{timer_status = 'WDGM_STOP'})}
       end;
     false -> S
   end.
@@ -396,9 +412,10 @@ calculate_global_status(CurrentS) ->
       _         -> 'WDGM_GLOBAL_STATUS_OK'
     end,
 
-  case {S#state.globalstatus, ExpiredSEs} of
+  case {S#state.globalstatus, GlobalStatus_Temp} of
     {'WDGM_GLOBAL_STATUS_STOPPED',_} -> S;
-    {_, true} -> update_expired_state(S#state{globalstatus=GlobalStatus_Temp});
+    {'WDGM_GLOBAL_STATUS_FAILED', 'WDGM_GLOBAL_STATUS_FAILED'} -> S;
+    {_, 'WDGM_GLOBAL_STATUS_EXPIRED'} -> update_expired_state(S#state{globalstatus=GlobalStatus_Temp});
     _    -> S#state{globalstatus=GlobalStatus_Temp}
   end.
 
