@@ -10,9 +10,9 @@
 -include_lib("../ebin/wdgm_wrapper.hrl").
 
 %% -record('SupervisedEntityMonitorTable', {supervision_entities=[]}). %% [{status, {logicalS, deadlineS, aliveS}}]
--record(state, {initialized,
-                currentMode,
-                globalstatus,
+-record(state, {initialized=false,
+                currentMode=-1,
+                globalstatus='WDGM_GLOBAL_STATUS_OK',
                 originalCfg=#wdgm{},
                 aliveTable,
                 deadlineTable,
@@ -20,7 +20,7 @@
                 timer_status,
                 expiredSEid,
                 expiredsupervisioncycles=0,
-                errormsg=[]}).
+                errormsg}).
 -record(alive, {cpid,
                 alive_counter=0}).
 -record(deadline, {startCP,
@@ -38,10 +38,7 @@
 initial_state() ->
   Rs = wdgm_xml:start(),
   {_, R} = (hd(Rs)), %% why do we get a list of records?
-  #state{initialized=false,
-         currentMode=-1,
-         globalstatus='WDGM_GLOBAL_STATUS_OK',
-         originalCfg=R}.
+  #state{originalCfg=R}.
 
 %% -WdgM_Init-------------------------------------------------------------------
 
@@ -62,26 +59,28 @@ init_post(S, _Args, _Ret) ->
 %%    additional checks if wdgmdeverrordetect is enabled
 
 init_next(S, _Ret, _Args) ->
+  Rs = wdgm_xml:start(),
+  {_, R} = (hd(Rs)), %% why do we get a list of records?
   ModeId = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
-  S#state{initialized=true,
-          currentMode=ModeId,
-          supervisedentities=lists:map(fun (X) ->
-                                           #supervisedentity{seid=X,
-                                                             localalivestatus='WDGM_CORRECT',
-                                                             supervision_cycles=0}
-                                       end,
-                                       wdgm_config_params:get_SEs_from_LS(ModeId)),
-          deadlineTable=lists:map(fun ({X, Y}) ->
-                                      #deadline{startCP=wdgm_config_params:get_checkpoint_id(X),
-                                                stopCP=wdgm_config_params:get_checkpoint_id(Y),
-                                                timestamp=0}
-                                  end,
-                                  wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'DS')),
-          aliveTable=lists:map(fun (X) ->
-                                   #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
-                                          alive_counter=0}
-                               end,
-                               wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))}.
+  #state{initialized=true,
+         currentMode=ModeId,
+         originalCfg=R,
+         supervisedentities=lists:map(fun (X) ->
+                                          #supervisedentity{seid=X,
+                                                            supervision_cycles=0}
+                                      end,
+                                      wdgm_config_params:get_SEs_from_LS(ModeId)),
+         deadlineTable=lists:map(fun ({X, Y}) ->
+                                     #deadline{startCP=wdgm_config_params:get_checkpoint_id(X),
+                                               stopCP=wdgm_config_params:get_checkpoint_id(Y),
+                                               timestamp=0}
+                                 end,
+                                 wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'DS')),
+         aliveTable=lists:map(fun (X) ->
+                                  #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
+                                         alive_counter=0}
+                              end,
+                              wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))}.
 
 %% -WdgM_GetMode----------------------------------------------------------------
 
@@ -131,6 +130,11 @@ setmode_post(S, [M, Cid], Ret) ->
 setmode_next(S, Ret, [M, _Cid]) ->
   case Ret of
     0 -> S#state{currentMode = M,
+                 supervisedentities=lists:map(fun (X) ->
+                                                  #supervisedentity{seid=X,
+                                                                    supervision_cycles=0}
+                                              end,
+                                              wdgm_config_params:get_SEs_from_LS(M)),
                  aliveTable=lists:map(fun (X) ->
                                           #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
                                                  alive_counter=0}
@@ -291,9 +295,10 @@ getglobalstatus_next(S, _Ret, _Args) ->
 %% -WdgM_PerformReset-----------------------------------------------------------
 
 performreset_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-                                                                       S#state.initialized == true).
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+    orelse
+      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+       S#state.initialized == true).
 
 performreset_command (_S) ->
   {call, ?MODULE, performreset, []}.
@@ -381,9 +386,9 @@ mainfunction_next(S, _Ret, _Args) ->
 
 calculate_global_status(CurrentS) ->
   S = monitor_active_entity(CurrentS),
-%%%  ExpiredSEs = lists:keymember('WDGM_LOCAL_STATUS_EXPIRED', 2, S#state.supervisedentities),
+%%%  ExpiredSEs = lists:keymember('WDGM_LOCAL_STATUS_EXPIRED', 3, S#state.supervisedentities),
   ExpiredSEs = S#state.expiredSEid /= undefined,
-  FailedSEs = lists:keymember('WDGM_LOCAL_STATUS_FAILED', 2, S#state.supervisedentities),
+  FailedSEs = lists:keymember('WDGM_LOCAL_STATUS_FAILED', 3, S#state.supervisedentities),
   GlobalStatus_Temp =
     case {ExpiredSEs, FailedSEs} of
       {true, _} -> 'WDGM_GLOBAL_STATUS_EXPIRED';
