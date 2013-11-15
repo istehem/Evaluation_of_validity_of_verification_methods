@@ -10,29 +10,7 @@
 -include_lib("../ebin/wdgm_wrapper.hrl").
 
 %% -record('SupervisedEntityMonitorTable', {supervision_entities=[]}). %% [{status, {logicalS, deadlineS, aliveS}}]
--record(state, {initialized=false,
-                currentMode=-1,
-                globalstatus='WDGM_GLOBAL_STATUS_OK',
-                originalCfg=#wdgm{},
-                expiredSEid,
-                expiredsupervisioncycles=0,
-                aliveTable,
-                deadlineTable,
-                supervisedentities,
-                errormsg}).
--record(alive, {cpid,
-                alive_counter=0}).
--record(deadline, {startCP,
-                   stopCP,
-                   timer_status,
-                   timestamp=0}).
--record(supervisedentity, {seid,
-                           localstatus='WDGM_LOCAL_STATUS_OK',
-                           localalivestatus='WDGM_CORRECT',
-                           localdeadlinestatus='WDGM_CORRECT',
-                           locallogicalstatus='WDGM_CORRECT',
-                           failed_reference_supervision_cycles=0,
-                           supervision_cycles=0}).
+
 
 initial_state() ->
   Rs = wdgm_xml:start(),

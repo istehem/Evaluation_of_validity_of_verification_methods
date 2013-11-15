@@ -104,3 +104,19 @@ is_activated_SE_in_DS(ModeId, SeID) ->
 is_activated_SE_in_ELS(ModeId, SeID) ->
   lists:member(SeID, lists:map(fun get_SE_id/1, get_checkpoints_for_mode(ModeId, 'ELSinit')
 			                      ++get_checkpoints_for_mode(ModeId, 'ELSfinal'))).
+
+
+%%%% used by wdgm_Main
+
+get_AS_for_CP(ModeId, CPid) ->
+    [{car_xml:get_value("WdgMSupervisionReferenceCycle", AS),
+      car_xml:get_value("WdgMExpectedAliveIndications", AS),
+      car_xml:get_value("WdgMMinMargin", AS),
+      car_xml:get_value("WdgMMaxMargin", AS)
+     }
+     || AS <- get_alive_supervision(ModeId),
+        CPid == get_checkpoint_id(car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS))].
+
+get_SEid_from_CP(ModeId, CPid) ->
+    [get_SE_id(CPref) || AS <- get_alive_supervision(ModeId), CPref = car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS),
+                         CPid == get_checkpoint_id(CPref)].
