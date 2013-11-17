@@ -1,0 +1,28 @@
+INIT
+[WDGM298] for all deadline start cps, set respective timestamp=0
+
+[WDGM296] for all logical supervisions set activity flag=false
+
+CHECKPOINTREACHED
+[WDGM228] when checkpoint reached for a given deadline start cp, record the timestamp
+[WDGM229] when checkpoint reached for a given deadline end cp, and timestamp <>0, measure the difference and set the timestamp=0
+[WDGM294] if the difference is not within WdgMDeadlineMin and WdgMDeadlineMax, then set the status to WDGM_INCORRECT for this deadline
+          otherwise set status to WDGM_CORRECT
+[WDGM299] for cps that is not a deadline start or stop cp, ignore
+
+[WDGM295] identify which logical graph a given cp belongs to
+[WDGM246] for each external and internal graph, store the cp that is most resently reported
+          if the activity flag=true, for each new cp check that the transition between stored and new cp is allowed
+[WDGM274] verify that cp belonging to internal graph is correct by,
+          activity flag=false, cp=initial cp -> 'WDGM_CORRECT'
+          activity flag=false, cp /= initial -> 'WDGM_INCORRECT'
+          activity flag=true, new cp is successor of stored cp (WdgMInternalTransition) -> 'WDGM_CORRECT'
+          activity flag=true, not successor -> 'WDGM_INCORRECT'
+[WDGM252] verify that cp belonging to external graph is correct by,
+          activity flag=false, cp=initial cp -> 'WDGM_CORRECT'
+          activity flag=false, cp /= initial -> 'WDGM_INCORRECT'
+          activity flag=true, new cp is successor of stored cp (WdgMExternalTransition) -> 'WDGM_CORRECT'
+          activity flag=true, not successor -> 'WDGM_INCORRECT'
+[WDGM332] if 'WDGM_CORRECT' and activity flag=false -> set activity flag=true
+[WDGM331] if 'WDGM_CORRECT' and cp is the last one -> set activity flag=false
+[WDGM297] for cps that does not belong to a logical graph, ignore

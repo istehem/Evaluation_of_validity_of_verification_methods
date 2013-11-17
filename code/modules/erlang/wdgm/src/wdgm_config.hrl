@@ -17,12 +17,13 @@
 
 -record(state, {initialized=false,
                 currentMode=-1,
-                globalstatus='WDGM_GLOBAL_STATUS_OK',
+                globalstatus,
                 originalCfg=#wdgm{},
                 expiredSEid,
                 expiredsupervisioncycles=0,
                 aliveTable,
                 deadlineTable,
+                logicalTable,
                 supervisedentities,
                 errormsg}).
 -record(alive, {cpid,
@@ -31,6 +32,9 @@
                    stopCP,
                    timer_status,
                    timestamp=0}).
+-record(logical, {initCP,
+                  stopCP,
+                  activity}).
 -record(supervisedentity, {seid,
                            localstatus='WDGM_LOCAL_STATUS_OK',
                            localalivestatus='WDGM_CORRECT',

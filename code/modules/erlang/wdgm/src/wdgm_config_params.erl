@@ -65,7 +65,8 @@ get_double_checkpoints_for_mode(ModeId, Which) ->
       [{car_xml:get_value("WdgMDeadlineStartRef", X),
 	car_xml:get_value("WdgMDeadlineStopRef", X)} || X <- get_deadline_supervision(ModeId)];
     'ELS' ->
-      undefined
+      [{car_xml:get_value("WdgMExternalLogicalInitialRef", X),
+	car_xml:get_value("WdgMExternalLogicalFinalRef", X)} || X <- get_externallogical_supervision(ModeId)]
   end.
 get_checkpoints_for_mode(ModeId, Which) ->
   case Which of
@@ -118,5 +119,6 @@ get_AS_for_CP(ModeId, CPid) ->
         CPid == get_checkpoint_id(car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS))].
 
 get_SEid_from_CP(ModeId, CPid) ->
-    [get_SE_id(CPref) || AS <- get_alive_supervision(ModeId), CPref = car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS),
+    [get_SE_id(CPref) || AS <- get_alive_supervision(ModeId),
+                         CPref = car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS),
                          CPid == get_checkpoint_id(CPref)].

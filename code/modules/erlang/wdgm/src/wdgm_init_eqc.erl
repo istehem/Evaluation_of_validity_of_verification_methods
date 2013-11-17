@@ -42,17 +42,20 @@ init_next(S, _Ret, _Args) ->
   #state{initialized=true,
          currentMode=ModeId,
          originalCfg=R,
-         supervisedentities=lists:map(fun (X) ->
-                                          #supervisedentity{seid=X,
-                                                            supervision_cycles=0}
-                                      end,
-                                      wdgm_config_params:get_SEs_from_LS(ModeId)),
+         globalstatus='WDGM_GLOBAL_STATUS_OK',
+         supervisedentities=reset_supervised_entities(ModeId),
          deadlineTable=lists:map(fun ({X, Y}) ->
-                                     #deadline{startCP=wdgm_config_params:get_checkpoint_id(X),
-                                               stopCP=wdgm_config_params:get_checkpoint_id(Y),
-                                               timestamp=0}
+                                         #deadline{startCP=wdgm_config_params:get_checkpoint_id(X),
+                                                   stopCP=wdgm_config_params:get_checkpoint_id(Y),
+                                                   timestamp=0}
                                  end,
                                  wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'DS')),
+         logicalTable=lists:map(fun ({X, Y}) ->
+                                        #logical{initCP=wdgm_config_params:get_checkpoint_id(X),
+                                                 finalCP=wdgm_config_params:get_checkpoint_id(Y),
+                                                 activity=false}
+                                end,
+                                wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'LS')),
          aliveTable=lists:map(fun (X) ->
                                   #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
                                          alive_counter=0}
@@ -107,11 +110,7 @@ setmode_post(S, [M, Cid], Ret) ->
 setmode_next(S, Ret, [M, _Cid]) ->
   case Ret of
     0 -> S#state{currentMode = M,
-                 supervisedentities=lists:map(fun (X) ->
-                                                  #supervisedentity{seid=X,
-                                                                    supervision_cycles=0}
-                                              end,
-                                              wdgm_config_params:get_SEs_from_LS(M)),
+                 supervisedentities=reset_supervised_entities(M),
                  aliveTable=lists:map(fun (X) ->
                                           #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
                                                  alive_counter=0}
@@ -139,7 +138,14 @@ deinit_post(_S, _Args, _Ret) ->
   true.
 
 deinit_next(S, _Ret, _Args) ->
-  S#state{initialized = false, globalstatus='WDGM_GLOBAL_STATUS_OK', currentMode=-1}.
+  GlobalStatus =
+    case S#state.globalstatus of
+      'WDGM_GLOBAL_STATUS_OK' -> 'GLOBAL_STATUS_DEACTIVATED';
+      Status -> Status
+    end,
+  S#state{initialized = false,
+          globalstatus=GlobalStatus,
+          currentMode=-1}.
 
 %% -WdgM_CheckpointReached------------------------------------------------------
 
@@ -588,7 +594,26 @@ findKeyIndex(Elem, P, [Tuple|Ls],N) -> case element(P, Tuple) of
                                          _ -> findKeyIndex(Elem, P, Ls, N+1)
                                        end.
 
-
+reset_supervised_entities(ModeID) ->
+    [SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+     case 
+         {SE#supervisedentity.localstatus /= 'WDGM_LOCAL_STATUS_EXPIRED',
+           wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid)}
+     of
+         {true, true} -> #supervisedentity{seid=SEid,
+                                           localalivestatus='WDGM_LOCAL_STATUS_OK',
+                                           localalivestatus='WDGM_CORRECT',
+                                           localdeadlinestatus='WDGM_CORRECT',
+                                           locallogicalstatus='WDGM_CORRECT',
+                                           supervision_cycles=0};
+         {true, false} -> #supervisedentity{seid=SEid,
+                                            localalivestatus='WDGM_LOCAL_STATUS_DEACTIVATED',
+                                            localalivestatus='WDGM_CORRECT',
+                                            localdeadlinestatus='WDGM_CORRECT',
+                                            locallogicalstatus='WDGM_CORRECT',
+                                            supervision_cycles=0}
+     end
+     || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId)].
 
 %% -Frequency-------------------------------------------------------------------
 

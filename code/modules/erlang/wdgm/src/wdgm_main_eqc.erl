@@ -102,11 +102,9 @@ alive_supervision(S, SE) ->
 %% checks if a CP have the correct behaviour.
 check_CP_within_SE(S, CP) ->
     CPstate = lists:keyfind(CP, 2, S#state.aliveTable),
-    SEid = wdgm_config_params:get_SEid_from_CP(CP),
+    SEid = wdgm_config_params:get_SEid_from_CP(S#state.currentMode, CPstate#alive.cpid),
     SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
     {SRC, EAI, MinMargin, MaxMargin} = wdgm_config_params:get_AS_for_CP(S#state.currentMode, CP),
-    SRC = wdgm_config_params:get_SRC(S#state.currentMode, CP), %% TODO: lyft ur
-    EAI = wdgm_config_params:get_EAI(S#state.currentMode, CP), %% TODO: lyft ur
     I = algorithm_for_alive_supervision(CPstate#alive.alive_counter,
                                         SE#supervisedentity.supervision_cycles,
                                         SRC,
@@ -125,10 +123,10 @@ algorithm_for_alive_supervision(AliveCounter, SupervisionCycles, SRC, EAI) ->
 
 %%-DEADLINE SUPERVISION---------------------------------------------------------
 
-deadline_supervision(SE) ->
+deadline_supervision(_SE) ->
     ok.
 
 %%-LOGICAL SUPERVISION----------------------------------------------------------
 
-logical_supervision(SE) ->
+logical_supervision(_SE) ->
     ok.
