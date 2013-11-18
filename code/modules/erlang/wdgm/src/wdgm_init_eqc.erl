@@ -43,7 +43,7 @@ init_next(S, _Ret, _Args) ->
          currentMode=ModeId,
          originalCfg=R,
          globalstatus='WDGM_GLOBAL_STATUS_OK',
-         supervisedentities=reset_supervised_entities(ModeId),
+         supervisedentities=reset_supervised_entities(S, ModeId),
          deadlineTable=lists:map(fun ({X, Y}) ->
                                          #deadline{startCP=wdgm_config_params:get_checkpoint_id(X),
                                                    stopCP=wdgm_config_params:get_checkpoint_id(Y),
@@ -55,7 +55,7 @@ init_next(S, _Ret, _Args) ->
                                                  finalCP=wdgm_config_params:get_checkpoint_id(Y),
                                                  activity=false}
                                 end,
-                                wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'LS')),
+                                wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'ELS')),
          aliveTable=lists:map(fun (X) ->
                                   #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
                                          alive_counter=0}
@@ -104,13 +104,13 @@ setmode_post(S, [M, Cid], Ret) ->
   lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids) andalso
     case Ret of
       0 -> eq(M, eqc_c:value_of('WdgM_CurrentMode'));
-      1 -> M == S#state.currentMode orelse eq(S#state.currentMode, -1)
+      1 -> eq(S#state.currentMode, M) orelse eq(S#state.currentMode, -1)
     end.
 
 setmode_next(S, Ret, [M, _Cid]) ->
   case Ret of
     0 -> S#state{currentMode = M,
-                 supervisedentities=reset_supervised_entities(M),
+                 supervisedentities=reset_supervised_entities(S, M),
                  aliveTable=lists:map(fun (X) ->
                                           #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
                                                  alive_counter=0}
@@ -140,7 +140,7 @@ deinit_post(_S, _Args, _Ret) ->
 deinit_next(S, _Ret, _Args) ->
   GlobalStatus =
     case S#state.globalstatus of
-      'WDGM_GLOBAL_STATUS_OK' -> 'GLOBAL_STATUS_DEACTIVATED';
+      'WDGM_GLOBAL_STATUS_OK' -> 'WDGM_GLOBAL_STATUS_DEACTIVATED';
       Status -> Status
     end,
   S#state{initialized = false,
@@ -247,9 +247,10 @@ checkpointreached_next(S, _Ret, Args = [_SeID, CPId]) ->
 %% -WdgM_GetLocalStatus---------------------------------------------------------
 
 getlocalstatus_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-                                                                       S#state.initialized == true).
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+    orelse
+      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+       S#state.initialized == true).
 
 getlocalstatus_command(_S) ->
   {call, ?MODULE, getlocalstatus, [oneof([0,2])]}.
@@ -268,9 +269,10 @@ getlocalstatus_next(S, _Ret, _Args) ->
 %% -WdgM_GetGlobalStatus--------------------------------------------------------
 
 getglobalstatus_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect orelse
-                                                                      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-                                                                       S#state.initialized == true).
+  (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect)
+    orelse
+      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+       S#state.initialized == true).
 
 getglobalstatus_command(_S) ->
   {call, ?MODULE, getglobalstatus, []}.
@@ -284,9 +286,10 @@ getglobalstatus_post(S, _Args, Ret) ->
   case Ret of
     {0, R} -> eq(R, S#state.globalstatus);
     {1, _} -> S#state.initialized == false andalso
-                S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK'
-              %% [WDGM344] should also check if pointer is null
-              %% [WDGM258] should optionally check if pointer is null
+               (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_DEACTIVATED' orelse
+                S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK')
+              %% [WDGM344] should check if status pointer (Args) is null
+              %% [WDGM258] should optionally check if status pointer is null
   end.
 
 getglobalstatus_next(S, _Ret, _Args) ->
@@ -371,201 +374,195 @@ mainfunction_post(_S, _Args, _Ret) ->
   end.
 
 mainfunction_next(S, _Ret, _Args) ->
-  S2 = S#state{deadlineTable=[case X#deadline.timer_status of
-                                'WDGM_STOP' -> X#deadline{timestamp=0};
-                                _           -> X#deadline{timestamp=X#deadline.timestamp+1}
-                              end
-                              || X <- S#state.deadlineTable]},
-  calculate_global_status(S2).
-
+  wdgm_main_eqc:global_status(S).
 
 %% -----------------------------------------------------------------------------
 %% -----------------------------------------------------------------------------
 %% -----------------------------------------------------------------------------
 %% -Helper-functions------------------------------------------------------------
 
-calculate_global_status(CurrentS) ->
-  S = monitor_active_entity(CurrentS),
-%%%  ExpiredSEs = lists:keymember('WDGM_LOCAL_STATUS_EXPIRED', 3, S#state.supervisedentities),
-  ExpiredSEs = S#state.expiredSEid /= undefined,
-  FailedSEs = lists:keymember('WDGM_LOCAL_STATUS_FAILED', 3, S#state.supervisedentities),
-  GlobalStatus_Temp =
-    case {ExpiredSEs, FailedSEs} of
-      {true, _} -> 'WDGM_GLOBAL_STATUS_EXPIRED';
-      {_, true} -> 'WDGM_GLOBAL_STATUS_FAILED';
-      _         -> 'WDGM_GLOBAL_STATUS_OK'
-    end,
+%% calculate_global_status(CurrentS) ->
+%%   S = monitor_active_entity(CurrentS),
+%% %%%  ExpiredSEs = lists:keymember('WDGM_LOCAL_STATUS_EXPIRED', 3, S#state.supervisedentities),
+%%   ExpiredSEs = S#state.expiredSEid /= undefined,
+%%   FailedSEs = lists:keymember('WDGM_LOCAL_STATUS_FAILED', 3, S#state.supervisedentities),
+%%   GlobalStatus_Temp =
+%%     case {ExpiredSEs, FailedSEs} of
+%%       {true, _} -> 'WDGM_GLOBAL_STATUS_EXPIRED';
+%%       {_, true} -> 'WDGM_GLOBAL_STATUS_FAILED';
+%%       _         -> 'WDGM_GLOBAL_STATUS_OK'
+%%     end,
 
-  case {S#state.globalstatus, GlobalStatus_Temp} of
-    {'WDGM_GLOBAL_STATUS_STOPPED',_} -> S;
-    {'WDGM_GLOBAL_STATUS_FAILED', 'WDGM_GLOBAL_STATUS_FAILED'} -> S;
-    {_, 'WDGM_GLOBAL_STATUS_EXPIRED'} -> update_expired_state(S#state{globalstatus=GlobalStatus_Temp});
-    _    -> S#state{globalstatus=GlobalStatus_Temp}
-  end.
+%%   case {S#state.globalstatus, GlobalStatus_Temp} of
+%%     {'WDGM_GLOBAL_STATUS_STOPPED',_} -> S;
+%%     {'WDGM_GLOBAL_STATUS_FAILED', 'WDGM_GLOBAL_STATUS_FAILED'} -> S;
+%%     {_, 'WDGM_GLOBAL_STATUS_EXPIRED'} -> update_expired_state(S#state{globalstatus=GlobalStatus_Temp});
+%%     _    -> S#state{globalstatus=GlobalStatus_Temp}
+%%   end.
 
-update_expired_state(S) ->
-  ExpiredSupervisionCycleTol = car_xml:get_value("WdgMExpiredSupervisionCycleTol",
-                                                 wdgm_config_params:get_mode(S#state.currentMode)),
-  ExpiredSupervisionCycles = S#state.expiredsupervisioncycles+1,
-  case ExpiredSupervisionCycles > ExpiredSupervisionCycleTol of
-    true -> S#state{globalstatus='WDGM_GLOBAL_STATUS_STOPPED',
-                   expiredsupervisioncycles=0};
-    _    -> S#state{expiredsupervisioncycles=ExpiredSupervisionCycles}
-  end.
-
-
-monitor_active_entity(CurrentS) ->
-  S = lists:foldl(fun (AS, State) -> calculate_alive_supervision(State, AS) end,
-                  CurrentS,
-                  %% doesn't check if SE is activated in mode
-                  wdgm_config_params:get_alive_supervision(CurrentS#state.currentMode)),
-
-  lists:foldl(fun (SEid, State) ->
-                  calculate_local_status(State, SEid)
-              end,
-              S,
-              [SE || SE <- wdgm_config_params:get_SEs_from_LS(S#state.currentMode),
-                     wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SE)]).
-
-calculate_local_status(S, SEid) ->
-  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  Alive = SE#supervisedentity.localalivestatus,
-  Deadline = SE#supervisedentity.localdeadlinestatus,
-  Logical = SE#supervisedentity.locallogicalstatus,
-  case {Alive, Deadline, Logical} of
-    {'WDGM_CORRECT', 'WDGM_CORRECT', 'WDGM_CORRECT'} -> local_status_is_ok(S, SEid);
-    {_, 'WDGM_INCORRECT', _} -> deadline_or_logical_status_is_fail(S, SEid);
-    {_, _, 'WDGM_INCORRECT'} -> deadline_or_logical_status_is_fail(S, SEid);
-    {'WDGM_INCORRECT', _, _} -> FailedRefCycleTol =
-                                  wdgm_config_params:get_LSP_failedtolerance(S#state.currentMode,
-                                                                             SEid),
-                                case
-                                  SE#supervisedentity.failed_reference_supervision_cycles
-                                  =< FailedRefCycleTol
-                                of
-                                  true -> alive_status_fail_but_tolerance_ok(S, SEid);
-                                  _    -> alive_status_fail_and_tolerance_fail(S, SEid)
-                                end;
-    _                         -> alive_status_fail_and_tolerance_fail(S, SEid)
-  end.
-
-local_status_is_ok(S, SEid) ->
-  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  S#state{supervisedentities=
-            lists:keyreplace(SEid,
-                             2,
-                             S#state.supervisedentities,
-                             SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_OK'})}.
-deadline_or_logical_status_is_fail(S, SEid) ->
-  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  ExpiredSEid =
-    case S#state.expiredSEid of
-      undefined -> SEid;
-      Expired -> Expired
-    end,
-  S#state{expiredSEid=ExpiredSEid,
-          supervisedentities=
-            lists:keyreplace(SEid,
-                             2,
-                             S#state.supervisedentities,
-                             SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_EXPIRED'})}.
-alive_status_fail_but_tolerance_ok(S, SEid) ->
-  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  S#state{supervisedentities=
-            lists:keyreplace(SEid,
-                             2,
-                             S#state.supervisedentities,
-                             SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_FAILED'})}.
-alive_status_fail_and_tolerance_fail(S, SEid) ->
-  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  ExpiredSEid =
-    case S#state.expiredSEid of
-      undefined -> SEid;
-      Expired -> Expired
-    end,
-  S#state{expiredSEid=ExpiredSEid,
-          supervisedentities=
-            lists:keyreplace(SEid,
-                             2,
-                             S#state.supervisedentities,
-                             SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_EXPIRED'})}.
+%% update_expired_state(S) ->
+%%   ExpiredSupervisionCycleTol = car_xml:get_value("WdgMExpiredSupervisionCycleTol",
+%%                                                  wdgm_config_params:get_mode(S#state.currentMode)),
+%%   ExpiredSupervisionCycles = S#state.expiredsupervisioncycles+1,
+%%   case ExpiredSupervisionCycles > ExpiredSupervisionCycleTol of
+%%     true -> S#state{globalstatus='WDGM_GLOBAL_STATUS_STOPPED',
+%%                    expiredsupervisioncycles=0};
+%%     _    -> S#state{expiredsupervisioncycles=ExpiredSupervisionCycles}
+%%   end.
 
 
-calculate_alive_supervision(S, AS) ->
-  {Ret, NewS} = calculate_new_alive_supervision_status(S,AS),
-  CPref = car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS), %% TODO: lyft ur
-  SEid = wdgm_config_params:get_SE_id(CPref),
-  CurrentASStatus = (lists:keyfind(SEid, 2, S#state.supervisedentities))#supervisedentity.localalivestatus,
-  case {Ret, CurrentASStatus} of
-    {'WDGM_CORRECT', 'WDGM_INCORRECT'} -> alive_reference_cycle_is_ok(NewS, SEid);
-    {'WDGM_CORRECT', 'WDGM_CORRECT'}   -> alive_reference_cycle_is_same(NewS, SEid);
-    _                                  -> alive_reference_cycle_is_fail(NewS, SEid)
-  end.
+%% monitor_active_entity(CurrentS) ->
+%%   S = lists:foldl(fun (AS, State) -> calculate_alive_supervision(State, AS) end,
+%%                   CurrentS,
+%%                   %% doesn't check if SE is activated in mode
+%%                   wdgm_config_params:get_alive_supervision(CurrentS#state.currentMode)),
+
+%%   lists:foldl(fun (SEid, State) ->
+%%                   calculate_local_status(State, SEid)
+%%               end,
+%%               S,
+%%               [SE || SE <- wdgm_config_params:get_SEs_from_LS(S#state.currentMode),
+%%                      wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SE)]).
+
+%% calculate_local_status(S, SEid) ->
+%%   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+%%   Alive = SE#supervisedentity.localalivestatus,
+%%   Deadline = SE#supervisedentity.localdeadlinestatus,
+%%   Logical = SE#supervisedentity.locallogicalstatus,
+%%   case {Alive, Deadline, Logical} of
+%%     {'WDGM_CORRECT', 'WDGM_CORRECT', 'WDGM_CORRECT'} -> local_status_is_ok(S, SEid);
+%%     {_, 'WDGM_INCORRECT', _} -> deadline_or_logical_status_is_fail(S, SEid);
+%%     {_, _, 'WDGM_INCORRECT'} -> deadline_or_logical_status_is_fail(S, SEid);
+%%     {'WDGM_INCORRECT', _, _} -> FailedRefCycleTol =
+%%                                   wdgm_config_params:get_LSP_failedtolerance(S#state.currentMode,
+%%                                                                              SEid),
+%%                                 case
+%%                                   SE#supervisedentity.failed_reference_supervision_cycles
+%%                                   =< FailedRefCycleTol
+%%                                 of
+%%                                   true -> alive_status_fail_but_tolerance_ok(S, SEid);
+%%                                   _    -> alive_status_fail_and_tolerance_fail(S, SEid)
+%%                                 end;
+%%     _                         -> alive_status_fail_and_tolerance_fail(S, SEid)
+%%   end.
+
+%% local_status_is_ok(S, SEid) ->
+%%   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+%%   S#state{supervisedentities=
+%%             lists:keyreplace(SEid,
+%%                              2,
+%%                              S#state.supervisedentities,
+%%                              SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_OK'})}.
+%% deadline_or_logical_status_is_fail(S, SEid) ->
+%%   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+%%   ExpiredSEid =
+%%     case S#state.expiredSEid of
+%%       undefined -> SEid;
+%%       Expired -> Expired
+%%     end,
+%%   S#state{expiredSEid=ExpiredSEid,
+%%           supervisedentities=
+%%             lists:keyreplace(SEid,
+%%                              2,
+%%                              S#state.supervisedentities,
+%%                              SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_EXPIRED'})}.
+%% alive_status_fail_but_tolerance_ok(S, SEid) ->
+%%   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+%%   S#state{supervisedentities=
+%%             lists:keyreplace(SEid,
+%%                              2,
+%%                              S#state.supervisedentities,
+%%                              SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_FAILED'})}.
+%% alive_status_fail_and_tolerance_fail(S, SEid) ->
+%%   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+%%   ExpiredSEid =
+%%     case S#state.expiredSEid of
+%%       undefined -> SEid;
+%%       Expired -> Expired
+%%     end,
+%%   S#state{expiredSEid=ExpiredSEid,
+%%           supervisedentities=
+%%             lists:keyreplace(SEid,
+%%                              2,
+%%                              S#state.supervisedentities,
+%%                              SE#supervisedentity{localstatus='WDGM_LOCAL_STATUS_EXPIRED'})}.
 
 
-alive_reference_cycle_is_ok(S, SEid) ->
-  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  CurrentCycles = SE#supervisedentity.failed_reference_supervision_cycles,
-  NewLocalAliveStatus =
-    case CurrentCycles =< 1 of
-      true -> 'WDGM_CORRECT';
-      _    -> SE#supervisedentity.localalivestatus
-    end,
-  S#state{supervisedentities=
-            lists:keyreplace(SEid,
-                             2,
-                             S#state.supervisedentities,
-                             SE#supervisedentity{localalivestatus=NewLocalAliveStatus,
-                                                 failed_reference_supervision_cycles=CurrentCycles-1})}.
+%% calculate_alive_supervision(S, AS) ->
+%%   {Ret, NewS} = calculate_new_alive_supervision_status(S,AS),
+%%   CPref = car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS), %% TODO: lyft ur
+%%   SEid = wdgm_config_params:get_SE_id(CPref),
+%%   CurrentASStatus = (lists:keyfind(SEid, 2, S#state.supervisedentities))#supervisedentity.localalivestatus,
+%%   case {Ret, CurrentASStatus} of
+%%     {'WDGM_CORRECT', 'WDGM_INCORRECT'} -> alive_reference_cycle_is_ok(NewS, SEid);
+%%     {'WDGM_CORRECT', 'WDGM_CORRECT'}   -> alive_reference_cycle_is_same(NewS, SEid);
+%%     _                                  -> alive_reference_cycle_is_fail(NewS, SEid)
+%%   end.
 
-alive_reference_cycle_is_same(S, SEid) ->
-  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  S#state{supervisedentities=
-            lists:keyreplace(SEid,
-                             2,
-                             S#state.supervisedentities,
-                             SE#supervisedentity{localalivestatus='WDGM_CORRECT',
-                                                 failed_reference_supervision_cycles=0})}.
 
-alive_reference_cycle_is_fail(S, SEid) ->
-  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  CurrentCycles = SE#supervisedentity.failed_reference_supervision_cycles,
-  S#state{supervisedentities=
-            lists:keyreplace(SEid,
-                             2,
-                             S#state.supervisedentities,
-                             SE#supervisedentity{localalivestatus='WDGM_INCORRECT',
-                                                 failed_reference_supervision_cycles=CurrentCycles+1})}.
+%% alive_reference_cycle_is_ok(S, SEid) ->
+%%   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+%%   CurrentCycles = SE#supervisedentity.failed_reference_supervision_cycles,
+%%   NewLocalAliveStatus =
+%%     case CurrentCycles =< 1 of
+%%       true -> 'WDGM_CORRECT';
+%%       _    -> SE#supervisedentity.localalivestatus
+%%     end,
+%%   S#state{supervisedentities=
+%%             lists:keyreplace(SEid,
+%%                              2,
+%%                              S#state.supervisedentities,
+%%                              SE#supervisedentity{localalivestatus=NewLocalAliveStatus,
+%%                                                  failed_reference_supervision_cycles=CurrentCycles-1})}.
 
-calculate_new_alive_supervision_status(S, AS) ->
-  CPref = car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS), %% TODO: lyft ur
-  SEid = wdgm_config_params:get_SE_id(CPref),
-  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  NewSE = SE#supervisedentity{supervision_cycles=SE#supervisedentity.supervision_cycles+1},
-  SRC = car_xml:get_value("WdgMSupervisionReferenceCycle", AS), %% TODO: lyft ur
-  Status = case NewSE#supervisedentity.supervision_cycles >= SRC of
-             true ->
-               CPid = wdgm_config_params:get_checkpoint_id(CPref),
-               CPstate = lists:keyfind(CPid, 2, S#state.aliveTable),
-               I = algo_alive_correct(CPstate#alive.alive_counter,
-                                      NewSE#supervisedentity.supervision_cycles,
-                                      SRC,
-                                      car_xml:get_value("WdgMExpectedAliveIndications", AS)), %% TODO: lyft ur
-               case
-                 I =< car_xml:get_value("WdgMMaxMargin", AS) andalso  %% TODO: lyft ur
-                 I >= -car_xml:get_value("WdgMMinMargin", AS) %% TODO: lyft ur
-               of
-                 true -> 'WDGM_CORRECT';
-                 _    -> 'WDGM_INCORRECT'
-               end;
-             _ -> 'WDGM_CORRECT'
-           end,
+%% alive_reference_cycle_is_same(S, SEid) ->
+%%   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+%%   S#state{supervisedentities=
+%%             lists:keyreplace(SEid,
+%%                              2,
+%%                              S#state.supervisedentities,
+%%                              SE#supervisedentity{localalivestatus='WDGM_CORRECT',
+%%                                                  failed_reference_supervision_cycles=0})}.
 
-  {Status, S#state{supervisedentities=
-            lists:keyreplace(SEid, 2, S#state.supervisedentities, NewSE#supervisedentity{localalivestatus=Status})}}.
+%% alive_reference_cycle_is_fail(S, SEid) ->
+%%   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+%%   CurrentCycles = SE#supervisedentity.failed_reference_supervision_cycles,
+%%   S#state{supervisedentities=
+%%             lists:keyreplace(SEid,
+%%                              2,
+%%                              S#state.supervisedentities,
+%%                              SE#supervisedentity{localalivestatus='WDGM_INCORRECT',
+%%                                                  failed_reference_supervision_cycles=CurrentCycles+1})}.
 
-algo_alive_correct(AliveCounter, SupervisionCycles, SRC, EAI) ->
-  AliveCounter-SupervisionCycles+(SRC-EAI).
+%% calculate_new_alive_supervision_status(S, AS) ->
+%%   CPref = car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS), %% TODO: lyft ur
+%%   SEid = wdgm_config_params:get_SE_id(CPref),
+%%   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+%%   NewSE = SE#supervisedentity{supervision_cycles=SE#supervisedentity.supervision_cycles+1},
+%%   SRC = car_xml:get_value("WdgMSupervisionReferenceCycle", AS), %% TODO: lyft ur
+%%   Status = case NewSE#supervisedentity.supervision_cycles >= SRC of
+%%              true ->
+%%                CPid = wdgm_config_params:get_checkpoint_id(CPref),
+%%                CPstate = lists:keyfind(CPid, 2, S#state.aliveTable),
+%%                I = algo_alive_correct(CPstate#alive.alive_counter,
+%%                                       NewSE#supervisedentity.supervision_cycles,
+%%                                       SRC,
+%%                                       car_xml:get_value("WdgMExpectedAliveIndications", AS)), %% TODO: lyft ur
+%%                case
+%%                  I =< car_xml:get_value("WdgMMaxMargin", AS) andalso  %% TODO: lyft ur
+%%                  I >= -car_xml:get_value("WdgMMinMargin", AS) %% TODO: lyft ur
+%%                of
+%%                  true -> 'WDGM_CORRECT';
+%%                  _    -> 'WDGM_INCORRECT'
+%%                end;
+%%              _ -> 'WDGM_CORRECT'
+%%            end,
+
+%%   {Status, S#state{supervisedentities=
+%%             lists:keyreplace(SEid, 2, S#state.supervisedentities, NewSE#supervisedentity{localalivestatus=Status})}}.
+
+%% algo_alive_correct(AliveCounter, SupervisionCycles, SRC, EAI) ->
+%%   AliveCounter-SupervisionCycles+(SRC-EAI).
 
 
 
@@ -594,26 +591,59 @@ findKeyIndex(Elem, P, [Tuple|Ls],N) -> case element(P, Tuple) of
                                          _ -> findKeyIndex(Elem, P, Ls, N+1)
                                        end.
 
-reset_supervised_entities(ModeID) ->
-    [SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-     case 
-         {SE#supervisedentity.localstatus /= 'WDGM_LOCAL_STATUS_EXPIRED',
-           wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid)}
-     of
-         {true, true} -> #supervisedentity{seid=SEid,
-                                           localalivestatus='WDGM_LOCAL_STATUS_OK',
-                                           localalivestatus='WDGM_CORRECT',
-                                           localdeadlinestatus='WDGM_CORRECT',
-                                           locallogicalstatus='WDGM_CORRECT',
-                                           supervision_cycles=0};
-         {true, false} -> #supervisedentity{seid=SEid,
-                                            localalivestatus='WDGM_LOCAL_STATUS_DEACTIVATED',
-                                            localalivestatus='WDGM_CORRECT',
-                                            localdeadlinestatus='WDGM_CORRECT',
-                                            locallogicalstatus='WDGM_CORRECT',
-                                            supervision_cycles=0}
-     end
-     || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId)].
+reset_supervised_entities(S, ModeId) ->
+  case S#state.supervisedentities of
+    undefined ->
+      [case
+         wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid)
+       of
+         true ->
+           FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
+           #supervisedentity{seid=SEid,
+                             localstatus='WDGM_LOCAL_STATUS_OK',
+                             localalivestatus='WDGM_CORRECT',
+                             localdeadlinestatus='WDGM_CORRECT',
+                             locallogicalstatus='WDGM_CORRECT',
+                             failed_alive_supervision_cycle_tol=FailedAliveTol,
+                             supervision_cycles=0};
+         false ->
+           FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
+           #supervisedentity{seid=SEid,
+                             localstatus='WDGM_LOCAL_STATUS_DEACTIVATED',
+                             localalivestatus='WDGM_CORRECT',
+                             localdeadlinestatus='WDGM_CORRECT',
+                             locallogicalstatus='WDGM_CORRECT',
+                             failed_alive_supervision_cycle_tol=FailedAliveTol,
+                             supervision_cycles=0}
+       end
+       || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId)];
+    SEs ->
+      [case
+         {(lists:keyfind(SEid, 2, SEs))#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_EXPIRED',
+          wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid)}
+       of
+         {false, true} ->
+           FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
+           #supervisedentity{seid=SEid,
+                             localstatus='WDGM_LOCAL_STATUS_OK',
+                             localalivestatus='WDGM_CORRECT',
+                             localdeadlinestatus='WDGM_CORRECT',
+                             locallogicalstatus='WDGM_CORRECT',
+                             failed_alive_supervision_cycle_tol=FailedAliveTol,
+                             supervision_cycles=0};
+         {false, false} ->
+           FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
+           #supervisedentity{seid=SEid,
+                             localstatus='WDGM_LOCAL_STATUS_DEACTIVATED',
+                             localalivestatus='WDGM_CORRECT',
+                             localdeadlinestatus='WDGM_CORRECT',
+                             locallogicalstatus='WDGM_CORRECT',
+                             failed_alive_supervision_cycle_tol=FailedAliveTol,
+                             supervision_cycles=0};
+         _ -> lists:keyfind(SEid, 2, SEs)
+       end
+       || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId)]
+  end.
 
 %% -Frequency-------------------------------------------------------------------
 
