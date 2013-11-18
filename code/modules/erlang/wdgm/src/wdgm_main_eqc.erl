@@ -16,30 +16,30 @@ global_status(S) ->
   {Status, NewExpiredCycles} = check_global_status({S#state.globalstatus, Failed, Expired}, EXPIRED_TOL, EXPIRED_CYCLES),
   S#state{globalstatus=Status, expiredsupervisioncycles=NewExpiredCycles, supervisedentities=NewSEs}.
 
-check_global_status({'WDGM_GLOBAL_STATUS_OK', false, false}, _, _) ->
-  {'WDGM_GLOBAL_STATUS_OK', 0}; %% [WDGM078]
-check_global_status({'WDGM_GLOBAL_STATUS_OK', true, false}, _, _) ->
-  {'WDGM_GLOBAL_STATUS_FAILED', 0}; %% [WDGM076]
-check_global_status({'WDGM_GLOBAL_STATUS_OK', _, true}, EXPIRED_TOL, _) when EXPIRED_TOL > 0 ->
-  {'WDGM_GLOBAL_STATUS_EXPIRED', 0}; %% [WDGM215]
-check_global_status({'WDGM_GLOBAL_STATUS_OK', _, true}, EXPIRED_TOL, _) when EXPIRED_TOL == 0 ->
-  {'WDGM_GLOBAL_STATUS_STOPPED', 0}; %% [WDGM216]
-check_global_status({'WDGM_GLOBAL_STATUS_FAILED', true, false}, _, _) ->
-  {'WDGM_GLOBAL_STATUS_FAILED', 0}; %% [WDGM217]
-check_global_status({'WDGM_GLOBAL_STATUS_FAILED', false, false}, _, _) ->
-  {'WDGM_GLOBAL_STATUS_OK', 0}; %% [WDGM218]
-check_global_status({'WDGM_GLOBAL_STATUS_FAILED', _, true}, EXPIRED_TOL, _) when EXPIRED_TOL > 0 ->
-  {'WDGM_GLOBAL_STATUS_EXPIRED', 0}; %% [WDGM077]
-check_global_status({'WDGM_GLOBAL_STATUS_FAILED', _, true}, EXPIRED_TOL, _) when EXPIRED_TOL == 0 ->
-  {'WDGM_GLOBAL_STATUS_STOPPED', 0}; %% [WDGM117]
+check_global_status({'WDGM_GLOBAL_STATUS_OK', false, false}, _, EXPIRED_CYCLES) ->
+  {'WDGM_GLOBAL_STATUS_OK', EXPIRED_CYCLES}; %% [WDGM078]
+check_global_status({'WDGM_GLOBAL_STATUS_OK', true, false}, _, EXPIRED_CYCLES) ->
+  {'WDGM_GLOBAL_STATUS_FAILED', EXPIRED_CYCLES}; %% [WDGM076]
+check_global_status({'WDGM_GLOBAL_STATUS_OK', _, true}, EXPIRED_TOL, EXPIRED_CYCLES) when EXPIRED_TOL > 0 ->
+  {'WDGM_GLOBAL_STATUS_EXPIRED', EXPIRED_CYCLES}; %% [WDGM215]
+check_global_status({'WDGM_GLOBAL_STATUS_OK', _, true}, EXPIRED_TOL, EXPIRED_CYCLES) when EXPIRED_TOL == 0 ->
+  {'WDGM_GLOBAL_STATUS_STOPPED', EXPIRED_CYCLES}; %% [WDGM216]
+check_global_status({'WDGM_GLOBAL_STATUS_FAILED', true, false}, _, EXPIRED_CYCLES) ->
+  {'WDGM_GLOBAL_STATUS_FAILED', EXPIRED_CYCLES}; %% [WDGM217]
+check_global_status({'WDGM_GLOBAL_STATUS_FAILED', false, false}, _, EXPIRED_CYCLES) ->
+  {'WDGM_GLOBAL_STATUS_OK', EXPIRED_CYCLES}; %% [WDGM218]
+check_global_status({'WDGM_GLOBAL_STATUS_FAILED', _, true}, EXPIRED_TOL, EXPIRED_CYCLES) when EXPIRED_TOL > 0 ->
+  {'WDGM_GLOBAL_STATUS_EXPIRED', EXPIRED_CYCLES}; %% [WDGM077]
+check_global_status({'WDGM_GLOBAL_STATUS_FAILED', _, true}, EXPIRED_TOL, EXPIRED_CYCLES) when EXPIRED_TOL == 0 ->
+  {'WDGM_GLOBAL_STATUS_STOPPED', EXPIRED_CYCLES}; %% [WDGM117]
 check_global_status({'WDGM_GLOBAL_STATUS_EXPIRED', _, true}, EXPIRED_TOL, EXPIRED_CYCLES) when EXPIRED_CYCLES =< EXPIRED_TOL ->
   {'WDGM_GLOBAL_STATUS_EXPIRED', EXPIRED_CYCLES+1}; %% [WDGM219]
 check_global_status({'WDGM_GLOBAL_STATUS_EXPIRED', _, true}, EXPIRED_TOL, EXPIRED_CYCLES) when EXPIRED_CYCLES > EXPIRED_TOL ->
-  {'WDGM_GLOBAL_STATUS_STOPPED', 0}; %% [WDGM220]
-check_global_status({'WDGM_GLOBAL_STATUS_STOPPED', _, _}, _, _) ->
-  {'WDGM_GLOBAL_STATUS_STOPPED', 0}; %% [WDGM221]
-check_global_status({_, _, _}, _, _) ->
-  {'WDGM_GLOBAL_STATUS_STOPPED', 0}. %% should never get here
+  {'WDGM_GLOBAL_STATUS_STOPPED', EXPIRED_CYCLES}; %% [WDGM220]
+check_global_status({'WDGM_GLOBAL_STATUS_STOPPED', _, _}, _, EXPIRED_CYCLES) ->
+  {'WDGM_GLOBAL_STATUS_STOPPED', EXPIRED_CYCLES}; %% [WDGM221]
+check_global_status({_, _, _}, _, EXPIRED_CYCLES) ->
+  {'WDGM_GLOBAL_STATUS_STOPPED', EXPIRED_CYCLES}. %% should never get here
 
 %%-LOCAL SE STATUS--------------------------------------------------------------
 
@@ -91,7 +91,7 @@ check_local_status({_, _, _, _}, _, FAIL_CYCLES) ->
 %% checks all CPs have the correct behaviour of a SE.
 alive_supervision(S, SE) ->
   CPs_for_SE = wdgm_config_params:get_CPs_of_SE(SE#supervisedentity.seid),
-  Correct = lists:foldl(fun (X, Correct) -> (Correct orelse X == 'WDGM_CORRECT') end,
+  Correct = lists:foldl(fun (X, Correct) -> (Correct andalso X == 'WDGM_CORRECT') end,
                         true,
                         [check_CP_within_SE(S, CPref)
                          || CPref <- wdgm_config_params:get_checkpoints_for_mode(S#state.currentMode, 'AS'),
@@ -124,7 +124,7 @@ check_CP_within_SE(S, CPref) ->
   end.
 
 algorithm_for_alive_supervision(AliveCounter, SupervisionCycles, SRC, EAI) ->
-  AliveCounter-SupervisionCycles+(SRC-EAI).
+  AliveCounter-SupervisionCycles+(SRC-EAI). %% [WDGM074] Stämmer detta?
 
 
 %%-DEADLINE SUPERVISION---------------------------------------------------------

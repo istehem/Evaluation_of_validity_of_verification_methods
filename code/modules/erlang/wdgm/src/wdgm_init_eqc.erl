@@ -103,7 +103,7 @@ setmode(UI8_mode,UI16_callerId) ->
 setmode_post(S, [M, Cid], Ret) ->
   lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids) andalso
     case Ret of
-      0 -> eq(M, eqc_c:value_of('WdgM_CurrentMode'));
+      0 -> eq(M, eqc_c:value_of('WdgM_CurrentMode')); %% failar pga WdgM_CurrentMode inte visar rätt?
       1 -> eq(S#state.currentMode, M) orelse eq(S#state.currentMode, -1)
     end.
 
