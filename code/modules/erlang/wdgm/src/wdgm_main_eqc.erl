@@ -51,47 +51,100 @@ local_SE_status(S, SE) ->
   FAIL_CYCLES = SE#supervisedentity.failed_reference_supervision_cycles,
   {LocalStatus, FailCycles} = check_local_status({SE#supervisedentity.localstatus, AliveRes, DeadlineRes, LogicalRes}, FAIL_TOL, FAIL_CYCLES),
   SE#supervisedentity{localstatus=LocalStatus,
+                      localalivestatus=AliveRes,
                       failed_reference_supervision_cycles=FailCycles}.
 
-check_local_status({'WDGM_LOCAL_STATUS_OK', 'WDGM_CORRECT', 'WDGM_CORRECT', 'WDGM_CORRECT'}, _, FAIL_CYCLES) ->
+check_local_status({'WDGM_LOCAL_STATUS_OK',
+                    'WDGM_CORRECT',
+                    'WDGM_CORRECT',
+                    'WDGM_CORRECT'},
+                   _, FAIL_CYCLES) ->
   {'WDGM_LOCAL_STATUS_OK', FAIL_CYCLES}; %% [WDGM201]
-check_local_status({'WDGM_LOCAL_STATUS_OK', 'WDGM_INCORRECT', 'WDGM_CORRECT', 'WDGM_CORRECT'}, FAIL_TOL, FAIL_CYCLES)
+check_local_status({'WDGM_LOCAL_STATUS_OK',
+                    'WDGM_INCORRECT',
+                    _,
+                    _},
+                   FAIL_TOL, FAIL_CYCLES)
   when FAIL_TOL == 0 ->
   {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}; %% [WDGM202]
-check_local_status({'WDGM_LOCAL_STATUS_OK', 'WDGM_CORRECT', 'WDGM_INCORRECT', 'WDGM_CORRECT'}, _, FAIL_CYCLES) ->
+check_local_status({'WDGM_LOCAL_STATUS_OK',
+                    _,
+                    'WDGM_INCORRECT',
+                    _},
+                   _, FAIL_CYCLES) ->
   {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}; %% [WDGM202]
-check_local_status({'WDGM_LOCAL_STATUS_OK', 'WDGM_CORRECT', 'WDGM_CORRECT', 'WDGM_INCORRECT'}, _, FAIL_CYCLES) ->
+check_local_status({'WDGM_LOCAL_STATUS_OK',
+                    _,
+                    _,
+                    'WDGM_INCORRECT'},
+                   _, FAIL_CYCLES) ->
   {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}; %% [WDGM202]
-check_local_status({'WDGM_LOCAL_STATUS_OK', 'WDGM_INCORRECT', 'WDGM_CORRECT', 'WDGM_CORRECT'}, FAIL_TOL, FAIL_CYCLES)
+check_local_status({'WDGM_LOCAL_STATUS_OK',
+                    'WDGM_INCORRECT',
+                    'WDGM_CORRECT',
+                    'WDGM_CORRECT'},
+                   FAIL_TOL, FAIL_CYCLES)
   when FAIL_TOL > 0 ->
   {'WDGM_LOCAL_STATUS_FAILED', FAIL_CYCLES+1}; %% [WDGM203]
-check_local_status({'WDGM_LOCAL_STATUS_FAILED', 'WDGM_INCORRECT', 'WDGM_CORRECT', 'WDGM_CORRECT'}, FAIL_TOL, FAIL_CYCLES)
+check_local_status({'WDGM_LOCAL_STATUS_FAILED',
+                    'WDGM_INCORRECT',
+                    'WDGM_CORRECT',
+                    'WDGM_CORRECT'},
+                   FAIL_TOL, FAIL_CYCLES)
   when FAIL_CYCLES =< FAIL_TOL ->
   {'WDGM_LOCAL_STATUS_FAILED', FAIL_CYCLES+1}; %% [WDGM204]
-check_local_status({'WDGM_LOCAL_STATUS_FAILED', 'WDGM_CORRECT', 'WDGM_CORRECT', 'WDGM_CORRECT'}, _, FAIL_CYCLES)
+check_local_status({'WDGM_LOCAL_STATUS_FAILED',
+                    'WDGM_CORRECT',
+                    'WDGM_CORRECT',
+                    'WDGM_CORRECT'},
+                   _, FAIL_CYCLES)
   when FAIL_CYCLES > 1 ->
   {'WDGM_LOCAL_STATUS_FAILED', FAIL_CYCLES-1}; %% [WDGM300]
-check_local_status({'WDGM_LOCAL_STATUS_FAILED', 'WDGM_CORRECT', 'WDGM_CORRECT', 'WDGM_CORRECT'}, _, FAIL_CYCLES)
+check_local_status({'WDGM_LOCAL_STATUS_FAILED',
+                    'WDGM_CORRECT',
+                    'WDGM_CORRECT',
+                    'WDGM_CORRECT'},
+                   _, FAIL_CYCLES)
   when FAIL_CYCLES == 1 ->
   {'WDGM_LOCAL_STATUS_OK', FAIL_CYCLES-1}; %% [WDGM205]
-check_local_status({'WDGM_LOCAL_STATUS_FAILED', 'WDGM_INCORRECT', 'WDGM_CORRECT', 'WDGM_CORRECT'}, FAIL_TOL, FAIL_CYCLES)
+check_local_status({'WDGM_LOCAL_STATUS_FAILED',
+                    'WDGM_INCORRECT',
+                    _,
+                    _},
+                   FAIL_TOL, FAIL_CYCLES)
   when FAIL_CYCLES > FAIL_TOL ->
   {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}; %% [WDGM206]
-check_local_status({'WDGM_LOCAL_STATUS_FAILED', 'WDGM_CORRECT', 'WDGM_INCORRECT', 'WDGM_CORRECT'}, _, FAIL_CYCLES) ->
+check_local_status({'WDGM_LOCAL_STATUS_FAILED',
+                    _,
+                    'WDGM_INCORRECT',
+                    _},
+                   _, FAIL_CYCLES) ->
   {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}; %% [WDGM206]
-check_local_status({'WDGM_LOCAL_STATUS_FAILED', 'WDGM_CORRECT', 'WDGM_CORRECT', 'WDGM_INCORRECT'}, _, FAIL_CYCLES) ->
+check_local_status({'WDGM_LOCAL_STATUS_FAILED',
+                    _,
+                    _,
+                    'WDGM_INCORRECT'},
+                   _, FAIL_CYCLES) ->
   {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}; %% [WDGM206]
-check_local_status({'WDGM_LOCAL_STATUS_DEACTIVATED', _, _, _}, _, FAIL_CYCLES) ->
+check_local_status({'WDGM_LOCAL_STATUS_DEACTIVATED',
+                    _, _, _},
+                   _, FAIL_CYCLES) ->
   {'WDGM_LOCAL_STATUS_DEACTIVATED', FAIL_CYCLES}; %% [WDGM208]
-check_local_status({_, _, _, _}, _, FAIL_CYCLES) ->
-  {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}. %% should never get here
+check_local_status({'WDGM_LOCAL_STATUS_EXPIRED',
+                    _, _, _},
+                   _, FAIL_CYCLES) ->
+  {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}; %% [WDGM]
+check_local_status({_, _, _, _},
+                   _, FAIL_CYCLES) ->
+  {'WDGM_LOCAL_STATUS_EXPIRED', 0}. %% should never get here
 
 %%-ALIVE SUPERVISION------------------------------------------------------------
 %% @doc should not do anything with the state, just need it for the checking.
 %% checks all CPs have the correct behaviour of a SE.
 alive_supervision(S, SE) ->
   CPs_for_SE = wdgm_config_params:get_CPs_of_SE(SE#supervisedentity.seid),
-  Correct = lists:foldl(fun (X, Correct) -> (Correct andalso X == 'WDGM_CORRECT') end,
+  Correct = lists:foldl(fun (X, Correct) -> (Correct andalso (X == 'WDGM_CORRECT' orelse
+                                                              X == dontcheckme)) end,
                         true,
                         [check_CP_within_SE(S, CPref)
                          || CPref <- wdgm_config_params:get_checkpoints_for_mode(S#state.currentMode, 'AS'),
@@ -111,20 +164,29 @@ check_CP_within_SE(S, CPref) ->
   SEid = wdgm_config_params:get_SE_id(CPref),
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
   {SRC, EAI, MinMargin, MaxMargin} = hd(wdgm_config_params:get_AS_for_CP(S#state.currentMode, CPid)),
-  I = algorithm_for_alive_supervision(CPstate#alive.alive_counter,
-                                      SE#supervisedentity.supervision_cycles,
-                                      SRC,
-                                      EAI),
-  case
-    I =< MaxMargin andalso
-    I >= -MinMargin
-  of
-    true -> 'WDGM_CORRECT';
-    _ -> 'WDGM_INCORRECT'
+  SC = SE#supervisedentity.supervision_cycles,
+  case SC rem SRC == 0 of
+    true ->
+      I = algorithm_for_alive_supervision(CPstate#alive.alive_counter,
+                                          SC,
+                                          SRC,
+                                          EAI),
+      case
+        I =< MaxMargin andalso
+        I >= -MinMargin
+      of
+        true -> 'WDGM_CORRECT';
+        _ -> 'WDGM_INCORRECT'
+      end;
+    false -> dontcheckme
   end.
 
 algorithm_for_alive_supervision(AliveCounter, SupervisionCycles, SRC, EAI) ->
-  AliveCounter-SupervisionCycles+(SRC-EAI). %% [WDGM074] Stämmer detta?
+  case SupervisionCycles rem SRC == 0 of
+    true -> AliveCounter-EAI;
+    false -> 0
+  end.
+%%  AliveCounter-SupervisionCycles+(SRC-EAI). %% [WDGM074] Stämmer detta?
 
 
 %%-DEADLINE SUPERVISION---------------------------------------------------------

@@ -86,13 +86,10 @@ getmode_post(S, _Args, {R, Mode}) ->
 %% -WdgM_SetMode----------------------------------------------------------------
 
 setmode_pre(S) ->
-  (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
-   S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED')
-    andalso
-      (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
-       orelse
-         (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-          S#state.initialized == true)).
+  (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+   orelse
+     (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+      S#state.initialized == true)).
 
 setmode_command(_S) ->
   {call, ?MODULE, setmode, [choose(0,3), choose(1,2)]}.
@@ -100,22 +97,34 @@ setmode_command(_S) ->
 setmode(UI8_mode,UI16_callerId) ->
   ?C_CODE:'WdgM_SetMode'(UI8_mode,UI16_callerId).
 
-setmode_post(S, [M, Cid], Ret) ->
+setmode_post(S, [ModeId, Cid], Ret) ->
   lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids) andalso
     case Ret of
-      0 -> eq(M, eqc_c:value_of('WdgM_CurrentMode')); %% failar pga WdgM_CurrentMode inte visar rätt?
-      1 -> eq(S#state.currentMode, M) orelse eq(S#state.currentMode, -1)
+      0 -> ModeId == eqc_c:value_of('WdgM_CurrentMode') orelse
+             (S#state.globalstatus == eqc_c:value_of('WdgM_GlobalStatus') andalso
+              S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_OK' andalso
+              S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_FAILED' andalso
+              S#state.currentMode == eqc_c:value_of('WdgM_CurrentMode'));
+      1 -> S#state.currentMode == ModeId orelse S#state.currentMode == -1
     end.
 
-setmode_next(S, Ret, [M, _Cid]) ->
+setmode_next(S, Ret, [ModeId, _Cid]) ->
   case Ret of
-    0 -> S#state{currentMode = M,
-                 supervisedentities=reset_supervised_entities(S, M),
-                 aliveTable=lists:map(fun (X) ->
-                                          #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
-                                                 alive_counter=0}
-                                      end,
-                                      wdgm_config_params:get_checkpoints_for_mode(M, 'AS'))};
+    0 -> case
+           S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
+           S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED'
+         of
+           true ->
+             S#state{currentMode = ModeId,
+                     supervisedentities=reset_supervised_entities(S, ModeId),
+                     aliveTable=lists:map(fun (X) ->
+                                              #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
+                                                     alive_counter=0}
+                                          end,
+                                          wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))};
+           false ->
+             S
+         end;
     _ -> S
   end.
 
