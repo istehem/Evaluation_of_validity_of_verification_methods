@@ -8,3 +8,6 @@
 *.out
 vancouver.bst
 review.pdf
+current_counterexample.eqc
+*_wrapper.hrl
+.eqc-info

@@ -105,6 +105,22 @@ The functional safety concept will be most important in this phase.
 %question formulation?
 %The problem at hand, the assignment
 \section{Objective}
+The first problem at hand is to evaluate what a ``semi formal verification''
+means.
+
+The second problem is to evaluate if QuickCheck can be used to achieve this
+verification.
+
+The third problem, which is a technical problem, is to implement a model for
+AUTOSAR in Erlang.
+
+Then we come to the more academic problems, which is to tweak the generators of
+our test model. Which test cases is interesting in a safety critical point of
+view? Is our model good enough? Can we collapse states that is not interesting?
+
+The last part is to evaluate the solution, is it functional safety? Can we
+measure how big part of the state space we test with an confidence interval?
+
 The objective is to propose and motivate what should be done to be able to
 achieve a semi formal verification. This should include a confidence interval
 for how certain the verification is.
