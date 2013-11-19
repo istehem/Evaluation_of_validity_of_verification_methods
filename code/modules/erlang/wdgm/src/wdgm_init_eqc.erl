@@ -122,10 +122,10 @@ setmode_next(S, Ret, [ModeId, _Cid]) ->
                                                      alive_counter=0}
                                           end,
                                           wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))};
-           false ->
+           false -> %% [WDGM316], [WDGM145]
              S
          end;
-    _ -> S
+    _ -> S %% if WdgIf_SetMode failed set globalstatus='WDGM_GLOBAL_STATUS_STOPPED'? %% [WDGM139]
   end.
 
 %% -WdgM_DeInit-----------------------------------------------------------------
@@ -143,13 +143,16 @@ deinit() ->
   ?C_CODE:'WdgM_DeInit'().
 
 %% [WDGM154] should check something with WdgM_SetMode
-deinit_post(_S, _Args, _Ret) ->
-  true.
+deinit_post(S, _Args, _Ret) ->
+  case S#state.globalstatus of
+    'WDGM_GLOBAL_STATUS_OK' -> eq(eqc_c:value_of('WdgM_GlobalStatus'), 'WDGM_GLOBAL_STATUS_DEACTIVATED');
+    Status -> eq(eqc_c:value_of('WdgM_GlobalStatus'), Status)
+  end.
 
 deinit_next(S, _Ret, _Args) ->
   GlobalStatus =
     case S#state.globalstatus of
-      'WDGM_GLOBAL_STATUS_OK' -> 'WDGM_GLOBAL_STATUS_DEACTIVATED';
+      'WDGM_GLOBAL_STATUS_OK' -> 'WDGM_GLOBAL_STATUS_DEACTIVATED'; %% [WDGM286]
       Status -> Status
     end,
   S#state{initialized = false,
@@ -602,57 +605,42 @@ findKeyIndex(Elem, P, [Tuple|Ls],N) -> case element(P, Tuple) of
 
 reset_supervised_entities(S, ModeId) ->
   case S#state.supervisedentities of
-    undefined ->
-      [case
-         wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid)
-       of
-         true ->
-           FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
-           #supervisedentity{seid=SEid,
-                             localstatus='WDGM_LOCAL_STATUS_OK',
-                             localalivestatus='WDGM_CORRECT',
-                             localdeadlinestatus='WDGM_CORRECT',
-                             locallogicalstatus='WDGM_CORRECT',
-                             failed_alive_supervision_cycle_tol=FailedAliveTol,
-                             supervision_cycles=0};
-         false ->
-           FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
-           #supervisedentity{seid=SEid,
-                             localstatus='WDGM_LOCAL_STATUS_DEACTIVATED',
-                             localalivestatus='WDGM_CORRECT',
-                             localdeadlinestatus='WDGM_CORRECT',
-                             locallogicalstatus='WDGM_CORRECT',
-                             failed_alive_supervision_cycle_tol=FailedAliveTol,
-                             supervision_cycles=0}
-       end
+    undefined -> %% not initialized...
+      [new_SE_record(ModeId,
+                     SEid,
+                     wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid))
        || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId)];
     SEs ->
       [case
-         {(lists:keyfind(SEid, 2, SEs))#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_EXPIRED',
-          wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid)}
+         {wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid),
+         (lists:keyfind(SEid, 2, SEs))#supervisedentity.localstatus /= 'WDGM_LOCAL_STATUS_DEACTIVATED'}
        of
-         {false, true} ->
+         {true, true} -> %% [WDGM182]
            FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
-           #supervisedentity{seid=SEid,
-                             localstatus='WDGM_LOCAL_STATUS_OK',
-                             localalivestatus='WDGM_CORRECT',
-                             localdeadlinestatus='WDGM_CORRECT',
-                             locallogicalstatus='WDGM_CORRECT',
-                             failed_alive_supervision_cycle_tol=FailedAliveTol,
-                             supervision_cycles=0};
-         {false, false} ->
-           FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
-           #supervisedentity{seid=SEid,
-                             localstatus='WDGM_LOCAL_STATUS_DEACTIVATED',
-                             localalivestatus='WDGM_CORRECT',
-                             localdeadlinestatus='WDGM_CORRECT',
-                             locallogicalstatus='WDGM_CORRECT',
-                             failed_alive_supervision_cycle_tol=FailedAliveTol,
-                             supervision_cycles=0};
-         _ -> lists:keyfind(SEid, 2, SEs)
+           (lists:keyfind(SEid, 2, SEs))#supervisedentity{
+             failed_alive_supervision_cycle_tol=FailedAliveTol};
+         {true, false} -> new_SE_record(ModeId, SEid, true); %% [WDGM209];
+         {false, _} -> new_SE_record(ModeId, SEid, false) %% [WDGM207], [WDGM291]
        end
        || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId)]
   end.
+
+new_SE_record(ModeId, SEid, Activated) ->
+  LocalStatus =
+    case Activated of
+      true -> 'WDGM_LOCAL_STATUS_OK';
+      false -> 'WDGM_LOCAL_STATUS_DEACTIVATED'
+    end,
+  FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
+  #supervisedentity{seid=SEid,
+                    localstatus=LocalStatus,
+                    localalivestatus='WDGM_CORRECT',
+                    localdeadlinestatus='WDGM_CORRECT',
+                    locallogicalstatus='WDGM_CORRECT',
+                    failed_alive_supervision_cycle_tol=FailedAliveTol,
+                    failed_reference_supervision_cycles=0,
+                    supervision_cycles=0}.
+
 
 %% -Frequency-------------------------------------------------------------------
 
