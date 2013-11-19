@@ -33,7 +33,7 @@ The last decade of the 20th century resulted in a dramatic growth of technology
 \cite{AUTOSAR:gilberg}. The rate is still increasing with up to 90\% of all
 innovations being realized through electronics in the beginning of the 21st
 century \cite{Frost_Sullivan:flyer}, and over 80 \% of all innovations in the
-automotive industry is in the electronics and software area
+automotive industry are in the electronics and software area
 \cite{SAFE:interoperability}.
 %% eventuellt dela upp paragrafen här då det är två olika ideer; en om att
 %% teknologin utvecklas snabbt och mycket, och en som handlar om att just bilar
@@ -54,12 +54,12 @@ complexity to the code. It is very important to test and verify all steps of the
 development.
 
 The complexity issue is that in systems such as microprocessors the number of
-possible failure modes is so large it is considered
+possible failure states is so large that it is considered
 infinite \cite{COURSEBOOK:safety-critical}. This makes it impossible exhaustively
 test the system, and therefore, also make the detection of failures unreliable.
 
 Quviq QuickCheck has the ability to automate this process, and allow the
-developer to write properties instead of tests. These properties make it
+developer to write properties instead of tests. These properties makes it
 possible for QuickCheck to create arbitrary input vectors that can be feed to
 the code. Figure~\ref{IMG:phase_model} shows the different steps of the software
 development process and the test and verification phases it has.
@@ -94,7 +94,7 @@ Open System ARchitecture) and makes it possible to select different suppliers
 for different modules of the system.
 
 AUTOSAR is very complex and since it is quite new, it still suffers from child
-deceases, with requirements that is confusing and contradictorily. The first
+deceases, with requirements that are confusing and contradictorily. The first
 versions of AUTOSAR is made without functional safety in mind.
 
 %Aim for the work. What should be accomplished?
@@ -128,7 +128,7 @@ safety critical point of view? Is the implemented model good enough? Is it possi
 collapse states that do not affect the safety of the system?
 
 An evaluation of the solution is needed, does it ensure functional safety? How
-can one measure the size of the state space that are actually verified?
+can one measure the size of the state space that is actually verified?
 
 One must propose and motivate what should be done to be able to
 achieve a semi formal verification. This can include a confidence interval
@@ -179,14 +179,14 @@ PC-machine.
 \section{Choose of tool for verification}
 Software unit testing can be achieved by almost any tool.
 %% motivera.
-Consequently this phase is not the most interesting when it comes to the choose
+Consequently this phase is not the most interesting when it comes to the choice
 of a tool verification. Of course one can take the simplicity to achieve good
 %% "simplicity" - av vad?
 unit testing into account, but still it is not what makes a verification tool
 especially unique for the project goals.
 
 Since the purpose is about benchmarking software the phase ''verification of
-software safety requirements'' will not influence the choose. To be able to test
+software safety requirements'' will not influence the choice. To be able to test
 this phase, a greater amount of components of the whole system must be
 available. Such components may include hardware etcetera. Implementation wise
 %% "etcetera" borde arbetas bort.
@@ -238,9 +238,9 @@ possible to get some kind of confidence interval on the correctness of the code?
 \chapter{Time-plan}
 \section{Provisional plan}
 Exactly how things should be done isn't clear. Therefor we are proposing a more
-orderly plan to be able learn what can be done and where problems may lie a
-head. At first just try to implement one or two simple rules from an AUTOSAR
-specification, in Erlang, and try to run it on AUTOSAR module. It's important to
+orderly plan to be able learn what can be done and where problems may lie ahead.
+At first just try to implement one or two simple rules from an AUTOSAR
+specification, in Erlang, and try to run it on an AUTOSAR module. It's important to
 notice that this may have nothing to do with our final solution and is mostly
 for evaluating what can be done in QuickCheck. Since our work is not just about
 implementing tests, but rather show that we can make semi formal verification on
