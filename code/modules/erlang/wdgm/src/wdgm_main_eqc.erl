@@ -52,6 +52,7 @@ local_SE_status(S, SE) ->
   {LocalStatus, FailCycles} = check_local_status({SE#supervisedentity.localstatus, AliveRes, DeadlineRes, LogicalRes}, FAIL_TOL, FAIL_CYCLES),
   SE#supervisedentity{localstatus=LocalStatus,
                       localalivestatus=AliveRes,
+                      supervision_cycles=SE#supervisedentity.supervision_cycles+1,
                       failed_reference_supervision_cycles=FailCycles}.
 
 check_local_status({'WDGM_LOCAL_STATUS_OK',
@@ -136,7 +137,7 @@ check_local_status({'WDGM_LOCAL_STATUS_EXPIRED',
   {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}; %% [WDGM]
 check_local_status({_, _, _, _},
                    _, FAIL_CYCLES) ->
-  {'WDGM_LOCAL_STATUS_EXPIRED', 0}. %% should never get here
+  {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}. %% should never get here
 
 %%-ALIVE SUPERVISION------------------------------------------------------------
 %% @doc should not do anything with the state, just need it for the checking.
@@ -164,7 +165,7 @@ check_CP_within_SE(S, CPref) ->
   SEid = wdgm_config_params:get_SE_id(CPref),
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
   {SRC, EAI, MinMargin, MaxMargin} = hd(wdgm_config_params:get_AS_for_CP(S#state.currentMode, CPid)),
-  SC = SE#supervisedentity.supervision_cycles,
+  SC = SE#supervisedentity.supervision_cycles+1, %% because dont update in when SC==0
   case SC rem SRC == 0 of
     true ->
       I = algorithm_for_alive_supervision(CPstate#alive.alive_counter,
@@ -181,11 +182,8 @@ check_CP_within_SE(S, CPref) ->
     false -> dontcheckme
   end.
 
-algorithm_for_alive_supervision(AliveCounter, SupervisionCycles, SRC, EAI) ->
-  case SupervisionCycles rem SRC == 0 of
-    true -> AliveCounter-EAI;
-    false -> 0
-  end.
+algorithm_for_alive_supervision(AliveCounter, _SupervisionCycles, _SRC, EAI) ->
+  AliveCounter-EAI.
 %%  AliveCounter-SupervisionCycles+(SRC-EAI). %% [WDGM074] Stämmer detta?
 
 
