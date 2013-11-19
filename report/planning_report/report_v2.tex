@@ -86,6 +86,17 @@ designed according to the specification. %It is important that the test phases
 %test the specifications and not the
 %implementation.
 
+Because all manufacturers strive for the lowest production cost, car
+manufacturers together with suppliers and other related companies, from the
+automotive industry, have come to agree over a standard for the software
+architecture in automotive vehicles. This standard is named AUTOSAR (AUTomotive
+Open System ARchitecture) and makes it possible to select different suppliers
+for different modules of the system.
+
+AUTOSAR is very complex and since it is quite new, it still suffers from child
+deceases, with requirements that is confusing and contradictorily. The first
+versions of AUTOSAR is made without functional safety in mind.
+
 %Aim for the work. What should be accomplished?
 \section{Purpose}
 The purpose is to automate the testing process in an effective and good way.
@@ -111,8 +122,7 @@ means.
 The second problem is to evaluate if QuickCheck can be used to achieve this
 verification.
 
-The third problem, which is a technical problem, is to implement a model for
-AUTOSAR in Erlang.
+The third problem, is to implement a model for AUTOSAR in Erlang.
 
 Then we come to the more academic problems, which is to tweak the generators of
 our test model. Which test cases is interesting in a safety critical point of
