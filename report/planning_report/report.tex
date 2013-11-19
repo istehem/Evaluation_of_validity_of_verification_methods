@@ -134,6 +134,26 @@ The CryptoServiceManager should also have functionality which gives the same
 results no matter which state it is in, such as hash
 functions\cite{SPEC:AUTOSAR:CSM}.
 
+\subsection{Work flow}
+
+\begin{enumerate}
+
+\item Construct a model for AUTOSAR in Erlang
+\item Run Quickcheck for this model and compare the results with the output from
+the c code.
+\item Tweak the generators \label{generators}
+  \begin{itemize}
+    \item Which test cases are relevant
+    \item Evaluate the results
+    \begin{enumerate}
+      \item What is the state space?
+      \item Collapse irrelevant states
+    \end{enumerate}
+  \end{itemize}
+\item Are the results good enough?
+\item If not go the step \ref{generators}
+\end{enumerate}
+
 %Method of accomplishment. How should the work be carried out?
 \chapter{Method}
 \section{Specification}
