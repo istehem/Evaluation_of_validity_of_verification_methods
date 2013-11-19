@@ -20,7 +20,7 @@ SHELL = C:/cygwin/bin/sh.exe
 ERLFLAGS= -pa $(CURDIR)/.eunit -pa $(CURDIR)/ebin -pa $(CURDIR)/deps/*/ebin
 
 DEPS_PLT=$(CURDIR)/.deps_plt
-DEPS=erts kernel stdlib
+DEPS=erts kernel stdlib eqc
 
 # =============================================================================
 # Verify that the programs we need to run are installed on this system
@@ -41,7 +41,7 @@ endif
 .PHONY: all compile doc clean test dialyzer typer shell distclean pdf \
   update-deps clean-common-test-data rebuild
 
-all: deps compile dialyzer test
+all: deps compile test
 
 # =============================================================================
 # Rules to build the system

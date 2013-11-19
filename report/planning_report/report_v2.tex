@@ -239,6 +239,27 @@ continue. Possible Erlang and QuickCheck is not suited for our goals.
 More information about this can be found on the Gantt scheme
 represented below.
 
+\subsection{Work flow}
+A proposed work flow is given below.
+
+\begin{enumerate}
+\item Construct a model for AUTOSAR in Erlang
+\item Run Quickcheck for this model and compare the results with the output from
+the c code.
+\item Tweak the generators for the test cases \label{generators}
+    \item Evaluate the results
+    \begin{enumerate}
+      \item What is the state space?
+      \item Which test cases are relevant?
+      \item Collapse irrelevant states
+      \item What can be said about the results?
+    \end{enumerate}
+\item Are the results good enough, does it satisfy the requirements for the ASIL
+levels?
+\item If not go the step \ref{generators}
+\end{enumerate}
+
+
 \begin{ganttchart}[vgrid={dotted}, today=9, today label={Current week}, today offset=.5]{1}{20}
   \setganttlinklabel{s-s}{}
   \setganttlinklabel{f-s}{}
