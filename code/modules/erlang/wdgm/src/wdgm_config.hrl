@@ -19,7 +19,7 @@
 -record(state,
         {initialized=false,
          currentMode=-1,
-         globalstatus='WDGM_GLOBAL_STATUS_DEACTIVATED',
+         globalstatus,
          originalCfg=#wdgm{},
          expiredSEid,
          expiredsupervisioncycles=0,

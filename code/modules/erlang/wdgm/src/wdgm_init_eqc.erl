@@ -146,6 +146,7 @@ deinit() ->
 deinit_post(S, _Args, _Ret) ->
   case S#state.globalstatus of
     'WDGM_GLOBAL_STATUS_OK' -> eq(eqc_c:value_of('WdgM_GlobalStatus'), 'WDGM_GLOBAL_STATUS_DEACTIVATED');
+    undefined               -> true;
     Status -> eq(eqc_c:value_of('WdgM_GlobalStatus'), Status)
   end.
 
@@ -299,7 +300,7 @@ getglobalstatus_post(S, _Args, Ret) ->
     {0, R} -> eq(R, S#state.globalstatus);
     {1, _} -> S#state.initialized == false andalso
                (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_DEACTIVATED' orelse
-                S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK')
+                S#state.globalstatus == undefined)
               %% [WDGM344] should check if status pointer (Args) is null
               %% [WDGM258] should optionally check if status pointer is null
   end.
