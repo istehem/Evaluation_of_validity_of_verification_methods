@@ -133,7 +133,7 @@ setmode_next(S, Ret, [ModeId, _Cid]) ->
 deinit_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
     orelse
-      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
+      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso % <- unnecessary
        S#state.initialized == true).
 
 deinit_command(_S) ->
