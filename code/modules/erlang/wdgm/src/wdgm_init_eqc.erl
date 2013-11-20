@@ -359,21 +359,22 @@ mainfunction_post(_S, _Args, _Ret) ->
       case eqc_c:deref(CfgPtr) of
         {_,_,_,ModePtr} ->
           case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, 4)) of
-            {_,_,_,_,_DeadlineSupCount,_,_,_,_DeadlineSupPtr,_,_,_} -> true;
-            %% case findKeyIndex(CPId, 6, eqc_c:read_array(DeadlineSupPtr, DeadlineSupCount)) of
-            %%  not_found -> %% checkpoint does not exist in alive supervision
-            %%    true;
-            %%  Idx -> %% checkpoint exists but need to check it
-            %%    element(3, lists:nth(Idx,
-            %%           eqc_c:read_array(element(4, eqc_c:value_of('WdgM_MonitorTableRef')),
-            %%       DeadlineSupCount)))
-            %%      == element(2, lists:nth(Idx, S#state.deadlineTable))+1
-            %% end;
-            _ -> true
+            {_ExpiredSupCycleTol,
+             _TriggerCount,
+             _AliveSupCount,
+             _DeadlineSupCount,
+             _LogicalSupCount,
+             _LocalStatusParmCount,
+             _AliveSupTablePtr,
+             _DeadlineSupTablePtr,
+             _LogicalSupTablePtr,
+             _LocalStatusParmTablePtr,
+             _TriggerTablePtr} -> true;
+            _ -> true %% some problem rose from the modeinfo
           end;
-        _ -> true
+        _ -> true %% some error rose from dereferencing, probably nullpointer
       end;
-    _ -> true
+    _ -> true %% ouch, currentconfigptr is not a ptr could be 'NULL'
   end.
 
 mainfunction_next(S, _Ret, _Args) ->
