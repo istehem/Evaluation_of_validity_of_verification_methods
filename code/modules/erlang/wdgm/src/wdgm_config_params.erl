@@ -59,8 +59,8 @@ get_CPs_of_SE(SeID) ->
   [car_xml:get_value("WdgMCheckpointId", X) || X <- car_xml:get_containers_by_def("WdgMCheckpoint", wdgm_config_params:get_supervised_entity(SeID))].
 
 get_deadline_params(DS) ->
-  {car_xml:get_value("WdgMDeadlineStartRef", DS),
-   car_xml:get_value("WdgMDeadlineStopRef", DS),
+  {get_checkpoint_id(car_xml:get_value("WdgMDeadlineStartRef", DS)),
+   get_checkpoint_id(car_xml:get_value("WdgMDeadlineStopRef", DS)),
    car_xml:get_value("WdgMDeadlineMin", DS),
    car_xml:get_value("WdgMDeadlineMax", DS)}.
 
