@@ -33,12 +33,17 @@
 -record(deadline,
         {startCP,
          stopCP,
-         timer_status,
-         timestamp=0}).
+         minmargin,
+         maxmargin,
+         timestamp=0,
+         timer}).
 -record(logical,
         {initCP,
-         finalCP,
-         activity}).
+         finalCPs,
+         cps_in_graph,
+         graph,
+         activity,
+         storedCP}).
 -record(supervisedentity,
         {seid,
          localstatus='WDGM_LOCAL_STATUS_OK',

@@ -11,8 +11,7 @@ CHECKPOINTREACHED
 [WDGM299] for cps that is not a deadline start or stop cp, ignore
 
 [WDGM295] identify which logical graph a given cp belongs to
-[WDGM246] for each external and internal graph, store the cp that is most resently reported
-          if the activity flag=true, for each new cp check that the transition between stored and new cp is allowed
+[WDGM246] for each external and internal graph, store the cp that is most recently reported
 [WDGM274] verify that cp belonging to internal graph is correct by,
           activity flag=false, cp=initial cp -> 'WDGM_CORRECT'
           activity flag=false, cp /= initial -> 'WDGM_INCORRECT'
