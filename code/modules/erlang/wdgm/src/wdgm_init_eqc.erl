@@ -43,23 +43,36 @@ init_next(S, _Ret, _Args) ->
          originalCfg=R,
          globalstatus='WDGM_GLOBAL_STATUS_OK',
          supervisedentities=reset_supervised_entities(S, ModeId),
-         deadlineTable=lists:map(fun ({X, Y}) ->
-                                         #deadline{startCP=wdgm_config_params:get_checkpoint_id(X),
-                                                   stopCP=wdgm_config_params:get_checkpoint_id(Y),
-                                                   timestamp=0}
-                                 end,
-                                 wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'DS')),
-         logicalTable=lists:map(fun ({X, Y}) ->
-                                        #logical{initCP=wdgm_config_params:get_checkpoint_id(X),
-                                                 finalCP=wdgm_config_params:get_checkpoint_id(Y),
-                                                 activity=false}
-                                end,
-                                wdgm_config_params:get_double_checkpoints_for_mode(ModeId, 'ELS')),
-         aliveTable=lists:map(fun (X) ->
-                                  #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
-                                         alive_counter=0}
-                              end,
-                              wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))}.
+         deadlineTable=
+           lists:map(fun (DS) ->
+                         {Start, Stop, Min, Max} = wdgm_config_params:get_deadline_params(DS),
+                         #deadline{startCP=Start,
+                                   stopCP=Stop,
+                                   minmargin=Min,
+                                   maxmargin=Max,
+                                   timestamp=0} %% [WDGM298]
+                     end,
+                     wdgm_config_params:get_deadline_supervision(ModeId)),
+         logicalTable=
+           lists:map(fun ({Init, Finals, Transitions}) ->
+                         #logical{initCP=Init,
+                                  finalCPs=Finals,
+                                  cps_in_graph=
+                                    lists:usort(lists:flatmap(fun ({A,B}) ->
+                                                                  [A, B]
+                                                              end,
+                                                              Transitions)),
+                                  graph=Transitions,
+                                  activity=false}
+                     end,
+                     wdgm_config_params:get_internal_graphs() ++
+                       wdgm_config_params:get_external_graphs(ModeId)),
+         aliveTable=
+           lists:map(fun (X) ->
+                         #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
+                                alive_counter=0}
+                     end,
+                     wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))}.
 
 %% -WdgM_GetMode----------------------------------------------------------------
 
@@ -209,40 +222,112 @@ checkpoint_postcondition(S, [SeID, CPId]) ->
     not lists:member(CPId, wdgm_config_params:get_CPs_of_SE(SeID)) orelse
     not wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SeID).
 
-checkpointreached_next(S, _Ret, Args = [_SeID, CPId]) ->
+checkpointreached_next(S, _Ret, Args = [SEid, CPid]) ->
   case not checkpoint_postcondition(S, Args) of
     true ->
-      NewS = case lists:keyfind(CPId, 2, S#state.aliveTable) of
+      AS = case lists:keyfind(CPid, 2, S#state.aliveTable) of
                false -> S;
                _ -> AliveTable = [case X#alive.cpid of
-                                    CPId -> X#alive{alive_counter=X#alive.alive_counter+1};
+                                    CPid -> X#alive{alive_counter=X#alive.alive_counter+1};
                                     _ -> X
                                   end
                                   || X <- S#state.aliveTable],
                     S#state{aliveTable=AliveTable}
              end,
-      DeadlineStart = lists:keyfind(CPId, 2, NewS#state.deadlineTable),
-      New2S = case DeadlineStart of
-                false -> NewS;
-                _     ->
-                  NewS#state{deadlineTable=lists:keyreplace(CPId,
-                                                            3,
-                                                            NewS#state.deadlineTable,
-                                                            DeadlineStart#deadline{timer_status = 'WDGM_START'})}
-              end,
-      DeadlineStop = lists:keyfind(CPId, 3, NewS#state.deadlineTable),
-      case DeadlineStop of
-        false -> New2S;
-        _ ->
-          New2S#state{deadlineTable=lists:keyreplace(CPId,
-                                                     3,
-                                                     New2S#state.deadlineTable,
-                                                     DeadlineStop#deadline{timer_status = 'WDGM_STOP'})}
-      end;
+      DS = deadlinereached(AS, SEid, CPid),
+      logicalreached(DS, SEid, CPid);
     false -> S
   end.
 
+deadlinereached(S, SEid, CPid) ->
+  DeadlineStart = lists:keyfind(CPid, 2, S#state.deadlineTable),
+  DeadlineStop  = lists:keyfind(CPid, 3, S#state.deadlineTable),
+  {NewDeadline, Difference} =
+    case {DeadlineStart, DeadlineStop} of
+      {false, false} -> %% [WDGM299] ignore
+        {false, 0};
+      {_, false}     -> %% [WDGM228] start ids
+        {DeadlineStart#deadline{timestamp=DeadlineStart#deadline.timer}, 0};
+      {false, _}     -> %% [WDGM229] stop ids
+        {DeadlineStop#deadline{timestamp=0},
+         DeadlineStop#deadline.timer-DeadlineStop#deadline.timestamp}
+    end,
+  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+  case NewDeadline == false of
+    true -> S;
+    _    ->
+      DeadlineMin = NewDeadline#deadline.minmargin,
+      DeadlineMax = NewDeadline#deadline.maxmargin,
+      Behaviour =
+        case
+          Difference =< DeadlineMax andalso
+          Difference >= DeadlineMin andalso
+          SE#supervisedentity.localdeadlinestatus == 'WDGM_CORRECT' %% dont destroy previous CP behaviour
+        of
+          true  -> 'WDGM_CORRECT'; %% [WDGM294]
+          false -> 'WDGM_INCORRECT'
+        end,
+      %% one of these will not update the state
+      NewDeadlineTable     = lists:keyreplace(CPid, 2, S#state.deadlineTable, NewDeadline),
+      UpdatedDeadlineTable = lists:keyreplace(CPid, 3, NewDeadlineTable, NewDeadline),
+      NewSEs = lists:keyreplace(SEid, 2, S#state.supervisedentities, SE#supervisedentity{localdeadlinestatus=Behaviour}),
+      S#state{deadlineTable=UpdatedDeadlineTable,
+              supervisedentities=NewSEs}
+  end.
 
+logicalreached(S, SEid, CPid) ->
+  FindCPid = fun (Elem) -> CPid == Elem end,
+  IsGraphCP = [LR || LR <- S#state.logicalTable, lists:member(FindCPid, LR#logical.cps_in_graph)],
+  case IsGraphCP of
+    []  -> S; %% [WDGM297]
+    LRs -> %% [WDGM295]
+      LR = hd(LRs),
+      case verify_CP(LRs, CPid) of
+        'WDGM_CORRECT' -> %% [WDGM274], [WDGM252]
+          ActivityFlag =
+            case lists:member(CPid, LR#logical.finalCPs) of
+              true  -> false; %% [WDGM331]
+              false -> true %% [WDGM332]
+            end,
+          S#state{logicalTable=
+                    S#state.logicalTable--
+                    [LR]++
+                    [LR#logical{storedCP=CPid, %% [WDGM246]
+                                activity=ActivityFlag}]};
+        'WDGM_INCORRECT' ->
+          SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+          S#state{supervisedentities=
+                    lists:keyreplace(SEid,
+                                     2,
+                                     S#state.supervisedentities,
+                                     SE#supervisedentity{locallogicalstatus='WDGM_INCORRECT'})}
+      end
+  end.
+
+verify_CP(LogicalRec, CP) ->
+  case LogicalRec#logical.activity of
+    true  -> is_successor(LogicalRec, CP);
+    false -> is_initial_CP(LogicalRec, CP)
+  end.
+
+is_successor(LogicalRec, CP) ->
+  IsDestCPofStoredSource =
+    lists:keyfind(CP,
+                  2,
+                  lists:filter(fun ({Source, _Dest}) ->
+                                   Source == LogicalRec#logical.storedCP
+                               end,
+                               LogicalRec#logical.graph)),
+  case IsDestCPofStoredSource of
+    true  -> 'WDGM_CORRECT';
+    false -> 'WDGM_INCORRECT'
+  end.
+
+is_initial_CP(LogicalRec, CP) ->
+  case CP == LogicalRec#logical.initCP of
+    true  -> 'WDGM_CORRECT';
+    false -> 'WDGM_INCORRECT'
+  end.
 
 %% -WdgM_UpdateAliveCounter-----------------------------------------------------
 %% Deprecated

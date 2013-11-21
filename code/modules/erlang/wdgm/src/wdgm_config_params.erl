@@ -58,16 +58,12 @@ get_checkpoint_id(CheckpointRef) ->
 get_CPs_of_SE(SeID) ->
   [car_xml:get_value("WdgMCheckpointId", X) || X <- car_xml:get_containers_by_def("WdgMCheckpoint", wdgm_config_params:get_supervised_entity(SeID))].
 
+get_deadline_params(DS) ->
+  {car_xml:get_value("WdgMDeadlineStartRef", DS),
+   car_xml:get_value("WdgMDeadlineStopRef", DS),
+   car_xml:get_value("WdgMDeadlineMin", DS),
+   car_xml:get_value("WdgMDeadlineMax", DS)}.
 
-get_double_checkpoints_for_mode(ModeId, Which) ->
-  case Which of
-    'DS' ->
-      [{car_xml:get_value("WdgMDeadlineStartRef", X),
-	car_xml:get_value("WdgMDeadlineStopRef", X)} || X <- get_deadline_supervision(ModeId)];
-    'ELS' ->
-      [{car_xml:get_value("WdgMExternalCheckpointInitialRef", X),
-	car_xml:get_value("WdgMExternalCheckpointFinalRef", X)} || X <- get_externallogical_supervision(ModeId)]
-  end.
 get_checkpoints_for_mode(ModeId, Which) ->
   case Which of
     'AS' ->
@@ -118,6 +114,25 @@ get_AS_for_CP(ModeId, CPid) ->
      || AS <- get_alive_supervision(ModeId),
         CPid == get_checkpoint_id(car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS))].
 
-%% get_SEid_from_CP(ModeId, CPid) ->
-%%     [get_SE_id(car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS)) || AS <- get_alive_supervision(ModeId),
-%%                          CPid == get_checkpoint_id(car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS))].
+%%%% used by wdgm_Init
+
+get_internal_graph(SEid) ->
+  SE = get_supervised_entity(SEid),
+  {get_checkpoint_id(car_xml:get_value("WdgMInternalCheckpointInitialRef", SE)),
+   [get_checkpoint_id(V) || V <- car_xml:get_values("WdgMInternallCheckpointFinalRef", SE)],
+   [{get_checkpoint_id(car_xml:get_value("WdgMInternalTransitionSourceRef", Transition)),
+     get_checkpoint_id(car_xml:get_value("WdgMInternalTransitionDestRef", Transition))}
+    || Transition <- car_xml:get_containers_by_def("WdgMInternalTransition", SE)]}.
+
+get_internal_graphs() ->
+  [get_internal_graph(SEid) || {SEid, _} <- get_supervised_entities()].
+
+get_external_graph(ES) ->
+  {get_checkpoint_id(car_xml:get_value("WdgMExternalCheckpointInitialRef", ES)),
+   [get_checkpoint_id(V) || V <- car_xml:get_values("WdgMExternalCheckpointFinalRef", ES)],
+   [{get_checkpoint_id(car_xml:get_value("WdgMExternalTransitionSourceRef", Transition)),
+     get_checkpoint_id(car_xml:get_value("WdgMExternalTransitionDestRef", Transition))}
+    || Transition <- car_xml:get_containers_by_def("WdgMExternalTransition", ES)]}.
+
+get_external_graphs(ModeId) ->
+  [get_external_graph(ES) || ES <- get_externallogical_supervision(ModeId)].
