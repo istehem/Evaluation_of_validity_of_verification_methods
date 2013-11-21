@@ -163,14 +163,13 @@ deinit_post(S, _Args, _Ret) ->
   end.
 
 deinit_next(S, _Ret, _Args) ->
-  GlobalStatus =
     case S#state.globalstatus of
-      'WDGM_GLOBAL_STATUS_OK' -> 'WDGM_GLOBAL_STATUS_DEACTIVATED'; %% [WDGM286]
-      Status -> Status
-    end,
-  S#state{initialized = false,
-          globalstatus=GlobalStatus,
-          currentMode=-1}.
+      'WDGM_GLOBAL_STATUS_OK' ->
+        S#state{initialized = false,
+                globalstatus='WDGM_GLOBAL_STATUS_DEACTIVATED', %% [WDGM286]
+                currentMode=-1};
+      _ -> S
+    end.
 
 %% -WdgM_CheckpointReached------------------------------------------------------
 

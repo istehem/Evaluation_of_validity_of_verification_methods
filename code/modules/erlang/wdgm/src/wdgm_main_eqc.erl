@@ -14,7 +14,14 @@ global_status(S) ->
   EXPIRED_TOL = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.expired_supervision_cycles_tol,
   EXPIRED_CYCLES = S#state.expiredsupervisioncycles,
   {Status, NewExpiredCycles} = check_global_status({S#state.globalstatus, Failed, Expired}, EXPIRED_TOL, EXPIRED_CYCLES),
-  S#state{globalstatus=Status, expiredsupervisioncycles=NewExpiredCycles, supervisedentities=NewSEs}.
+  EXPIRED_SE = (lists:keyfind('WDGM_LOCAL_STATUS_EXPIRED', 3, NewSEs)),
+  S#state{globalstatus=Status,
+          expiredSEid=case EXPIRED_SE of
+                        false -> undefined;
+                        SE -> SE#supervisedentity.seid
+                      end,
+          expiredsupervisioncycles=NewExpiredCycles,
+          supervisedentities=NewSEs}.
 
 check_global_status({'WDGM_GLOBAL_STATUS_OK', false, false}, _, EXPIRED_CYCLES) ->
   {'WDGM_GLOBAL_STATUS_OK', EXPIRED_CYCLES}; %% [WDGM078]
