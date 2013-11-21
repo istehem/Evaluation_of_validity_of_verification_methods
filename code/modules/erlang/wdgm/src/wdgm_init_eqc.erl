@@ -146,7 +146,7 @@ deinit_post(S, _Args, _Ret) ->
   case S#state.globalstatus of
     'WDGM_GLOBAL_STATUS_OK' -> eq(eqc_c:value_of('WdgM_GlobalStatus'), 'WDGM_GLOBAL_STATUS_DEACTIVATED');
     undefined               -> true;
-    Status -> eq(eqc_c:value_of('WdgM_GlobalStatus'), Status)
+    Status                  -> eq(eqc_c:value_of('WdgM_GlobalStatus'), Status)
   end.
 
 deinit_next(S, _Ret, _Args) ->
@@ -421,7 +421,8 @@ reset_supervised_entities(S, ModeId) ->
          {true, true} -> %% [WDGM182]
            FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
            (lists:keyfind(SEid, 2, SEs))#supervisedentity{
-             failed_alive_supervision_cycle_tol=FailedAliveTol};
+             failed_alive_supervision_cycle_tol=FailedAliveTol,
+             supervision_cycles=0};
          {true, false} -> new_SE_record(ModeId, SEid, true); %% [WDGM209];
          {false, _} -> new_SE_record(ModeId, SEid, false) %% [WDGM207], [WDGM291]
        end
