@@ -1,4 +1,4 @@
--module(wdgm_main_eqc).
+-module(wdgm_main).
 
 -compile(export_all).
 -include("wdgm_config.hrl").
