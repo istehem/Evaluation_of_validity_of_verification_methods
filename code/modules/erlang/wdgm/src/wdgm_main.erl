@@ -173,12 +173,14 @@ check_CP_within_SE(S, CPref) ->
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
   {SRC, EAI, MinMargin, MaxMargin} = hd(wdgm_config_params:get_AS_for_CP(S#state.currentMode, CPid)),
   SC = SE#supervisedentity.supervision_cycles+1, %% because dont update in when SC==0
+  check_aliveness(CPstate#alive.alive_counter, SC, SRC, EAI, MinMargin, MaxMargin).
+
+check_aliveness(_, 0, _, _, _, _) ->
+  'WDGM_CORRECT';
+check_aliveness(AC, SC, SRC, EAI, MinMargin, MaxMargin) ->
   case SC rem SRC == 0 of
     true ->
-      I = algorithm_for_alive_supervision(CPstate#alive.alive_counter,
-                                          SC,
-                                          SRC,
-                                          EAI),
+      I = algorithm_for_alive_supervision(AC, EAI),
       case
         I =< MaxMargin andalso
         I >= -MinMargin
@@ -186,10 +188,10 @@ check_CP_within_SE(S, CPref) ->
         true -> 'WDGM_CORRECT';
         _ -> 'WDGM_INCORRECT'
       end;
-    false -> dontcheckme
+    false -> check_aliveness(AC, SC-1, SRC, EAI, MinMargin, MaxMargin)
   end.
 
-algorithm_for_alive_supervision(AliveCounter, _SupervisionCycles, _SRC, EAI) ->
+algorithm_for_alive_supervision(AliveCounter, EAI) ->
   AliveCounter-EAI.
 %%  AliveCounter-SupervisionCycles+(SRC-EAI). %% [WDGM074] Stämmer detta?
 
