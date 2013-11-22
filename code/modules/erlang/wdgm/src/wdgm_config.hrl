@@ -29,7 +29,8 @@
          supervisedentities}).
 -record(alive,
         {cpid,
-         alive_counter=0}).
+         alive_counter=0,
+         status='WDGM_CORRECT'}).
 -record(deadline,
         {startCP,
          stopCP,

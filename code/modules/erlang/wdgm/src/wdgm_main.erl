@@ -6,7 +6,9 @@
 %%-GLOBAL STATUS----------------------------------------------------------------
 
 global_status(S) ->
-  NewSEs = [local_SE_status(S, SE) || SE <- S#state.supervisedentities],
+  NewSEsAndAliveCPs = [local_SE_status(S, SE) || SE <- S#state.supervisedentities],
+  NewSEs = lists:map(fun (Elem) -> element(1, Elem) end, NewSEsAndAliveCPs),
+  NewAliveTable = lists:map(fun (Elem) -> element(2, Elem) end, NewSEsAndAliveCPs),
   {Failed, Expired} = lists:foldl(fun (SE, {Failed, Expired}) ->
                                       {(Failed  orelse 'WDGM_LOCAL_STATUS_FAILED'  == SE#supervisedentity.localstatus),
                                        (Expired orelse 'WDGM_LOCAL_STATUS_EXPIRED' == SE#supervisedentity.localstatus)}
@@ -15,13 +17,15 @@ global_status(S) ->
   EXPIRED_CYCLES = S#state.expiredsupervisioncycles,
   {Status, NewExpiredCycles} = check_global_status({S#state.globalstatus, Failed, Expired}, EXPIRED_TOL, EXPIRED_CYCLES),
   EXPIRED_SE = (lists:keyfind('WDGM_LOCAL_STATUS_EXPIRED', 3, NewSEs)),
-  S#state{globalstatus=Status,
-          expiredSEid=case EXPIRED_SE of
-                        false -> undefined;
-                        SE -> SE#supervisedentity.seid
-                      end,
-          expiredsupervisioncycles=NewExpiredCycles,
-          supervisedentities=NewSEs}.
+  S#state{
+    globalstatus=Status,
+    expiredSEid=case EXPIRED_SE of
+                  false -> undefined;
+                  SE -> SE#supervisedentity.seid
+                end,
+    expiredsupervisioncycles=NewExpiredCycles,
+    aliveTable=NewAliveTable,
+    supervisedentities=NewSEs}.
 
 check_global_status({'WDGM_GLOBAL_STATUS_OK', false, false}, _, EXPIRED_CYCLES) ->
   {'WDGM_GLOBAL_STATUS_OK', EXPIRED_CYCLES}; %% [WDGM078]
@@ -51,16 +55,17 @@ check_global_status({_, _, _}, _, EXPIRED_CYCLES) ->
 %%-LOCAL SE STATUS--------------------------------------------------------------
 
 local_SE_status(S, SE) ->
-  AliveRes = alive_supervision(S, SE),
+  {AliveRes, NewCPsofSE} = alive_supervision(S, SE),
   DeadlineRes = deadline_supervision(SE),
   LogicalRes = logical_supervision(SE),
   FAIL_TOL = SE#supervisedentity.failed_alive_supervision_cycle_tol,
   FAIL_CYCLES = SE#supervisedentity.failed_reference_supervision_cycles,
   {LocalStatus, FailCycles} = check_local_status({SE#supervisedentity.localstatus, AliveRes, DeadlineRes, LogicalRes}, FAIL_TOL, FAIL_CYCLES),
-  SE#supervisedentity{localstatus=LocalStatus,
-                      localalivestatus=AliveRes,
-                      supervision_cycles=SE#supervisedentity.supervision_cycles+1,
-                      failed_reference_supervision_cycles=FailCycles}.
+  {SE#supervisedentity{localstatus=LocalStatus,
+                       localalivestatus=AliveRes,
+                       supervision_cycles=SE#supervisedentity.supervision_cycles+1,
+                       failed_reference_supervision_cycles=FailCycles},
+  NewCPsofSE}.
 
 check_local_status({'WDGM_LOCAL_STATUS_OK',
                     'WDGM_CORRECT',
@@ -151,20 +156,21 @@ check_local_status({_, _, _, _},
 %% checks all CPs have the correct behaviour of a SE.
 alive_supervision(S, SE) ->
   CPs_for_SE = wdgm_config_params:get_CPs_of_SE(SE#supervisedentity.seid),
-  Correct = lists:foldl(fun (X, Correct) -> (Correct andalso (X == 'WDGM_CORRECT' orelse
-                                                              X == dontcheckme)) end,
+  NewAliveCPsofSE = [check_CP_within_SE(S, CPref)
+                     || CPref <- wdgm_config_params:get_checkpoints_for_mode(S#state.currentMode, 'AS'),
+                        lists:member(wdgm_config_params:get_checkpoint_id(CPref), CPs_for_SE)],
+  Correct = lists:foldl(fun (AliveCP, Correct) -> (Correct andalso AliveCP#alive.status == 'WDGM_CORRECT') end,
                         true,
-                        [check_CP_within_SE(S, CPref)
-                         || CPref <- wdgm_config_params:get_checkpoints_for_mode(S#state.currentMode, 'AS'),
-                            lists:member(wdgm_config_params:get_checkpoint_id(CPref), CPs_for_SE)]),
-  case Correct of
-    true ->
-      'WDGM_CORRECT';
-    false ->
-      'WDGM_INCORRECT'
-  end.
+                        NewAliveCPsofSE),
+  LocalSEalivestatus=
+    case Correct of
+      true ->
+        'WDGM_CORRECT';
+      false ->
+        'WDGM_INCORRECT'
+    end,
+  {LocalSEalivestatus, NewAliveCPsofSE}.
 
-%% @doc should not do anything with the state, just need it for the checking.
 %% checks if a CP have the correct behaviour.
 check_CP_within_SE(S, CPref) ->
   CPid = wdgm_config_params:get_checkpoint_id(CPref),
@@ -173,23 +179,20 @@ check_CP_within_SE(S, CPref) ->
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
   {SRC, EAI, MinMargin, MaxMargin} = hd(wdgm_config_params:get_AS_for_CP(S#state.currentMode, CPid)),
   SC = SE#supervisedentity.supervision_cycles+1, %% because dont update in when SC==0
-  check_aliveness(CPstate#alive.alive_counter, SC, SRC, EAI, MinMargin, MaxMargin).
-
-check_aliveness(_, 0, _, _, _, _) ->
-  'WDGM_CORRECT';
-check_aliveness(AC, SC, SRC, EAI, MinMargin, MaxMargin) ->
-  case SC rem SRC == 0 of
-    true ->
-      I = algorithm_for_alive_supervision(AC, EAI),
-      case
-        I =< MaxMargin andalso
-        I >= -MinMargin
-      of
-        true -> 'WDGM_CORRECT';
-        _ -> 'WDGM_INCORRECT'
-      end;
-    false -> check_aliveness(AC, SC-1, SRC, EAI, MinMargin, MaxMargin)
-  end.
+  NewCPalivestatus=
+    case SC rem SRC == 0 of
+      true ->
+        I = algorithm_for_alive_supervision(CPstate#alive.alive_counter, EAI),
+        case
+          I =< MaxMargin andalso
+          I >= -MinMargin
+        of
+          true -> 'WDGM_CORRECT';
+          _ -> 'WDGM_INCORRECT'
+        end;
+      false -> CPstate#alive.status
+    end,
+  CPstate#alive{status=NewCPalivestatus}.
 
 algorithm_for_alive_supervision(AliveCounter, EAI) ->
   AliveCounter-EAI.
