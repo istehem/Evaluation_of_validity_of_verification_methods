@@ -1,0 +1,41 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\begin{document}
+
+\section{Requirements that is broken within the C code}
+\begin{description}
+  \item[WDGM286] \parbox[t]{0.8\linewidth}{WdgM\_DeInit should set the global
+      status to WDGM\_GLOBAL\_STATUS\_DEACTIVATED if the global status was
+    WDGM\_GLOBAL\_STATUS\_OK}
+  \item[WDGM215] \parbox[t]{0.8\linewidth}{if global status was
+      WDGM\_GLOBAL\_STATUS\_OK and becomes WDGM\_GLOBAL\_STATUS\_EXPIRED, don't
+      increment WdgM\_ExpiredSupervisionCycles}
+  \item[WDGM252] \parbox[t]{0.8\linewidth}{if CP belongs to a graph, that
+      graph's activity flag is set to false, and the CP is not the initial CP of
+      that graph, then logical supervision status for that SE shall be set to
+      WDGM\_INCORRECT}
+  \item[WDGM274] \parbox[t]{0.8\linewidth}{Same as [WDGM252] but for internal
+      supervision}
+  \item[WDGM219] \parbox[t]{0.8\linewidth}{if global status was
+      WDGM\_GLOBAL\_STATUS\_EXPIRED, it exists a SE that has the local status
+      WDGM\_LOCAL\_STATUS\_EXPIRED, ExpiredSupervisionCycles is less than or
+      equal to the expired supervision cycle tolerance, then keep the global
+      status EXPIRED and increment ExpiredSupervisionCycles}
+\end{description}
+
+
+\section{Bugfixes and changes to the C code}
+\begin{description}
+  \item[WdgM\_Lcfg.c:232] commented a function call to other module
+  \item[WdgM\_Lcfg.c:170] commented a function call to other module
+  \item[WdgM.c:2056] bugfix because [WDGM286]
+  \item[WdgM.c:976] bugfix because [WDGM215]
+  \item[WdgM.c:1836] bugfix because [WDGM252]
+  \item[WdgM.c:989] bugfix because [WDGM219]
+  \item[WdgM.c:1779] bugfix because [WDGM274]
+\end{description}
+
+\end{document}
