@@ -36,7 +36,7 @@
          minmargin,
          maxmargin,
          timestamp=0,
-         timer}).
+         timer=0}).
 -record(logical,
         {initCP,
          finalCPs,

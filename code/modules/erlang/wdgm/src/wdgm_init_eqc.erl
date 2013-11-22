@@ -38,41 +38,43 @@ init_next(S, _Ret, _Args) ->
   Rs = wdgm_xml:start(),
   {_, R} = (hd(Rs)), %% why do we get a list of records?
   ModeId = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
-  #state{initialized=true,
-         currentMode=ModeId,
-         originalCfg=R,
-         globalstatus='WDGM_GLOBAL_STATUS_OK',
-         supervisedentities=reset_supervised_entities(S, ModeId),
-         deadlineTable=
-           lists:map(fun (DS) ->
-                         {Start, Stop, Min, Max} = wdgm_config_params:get_deadline_params(DS),
-                         #deadline{startCP=Start,
-                                   stopCP=Stop,
-                                   minmargin=Min,
-                                   maxmargin=Max,
-                                   timestamp=0} %% [WDGM298]
-                     end,
-                     wdgm_config_params:get_deadline_supervision(ModeId)),
-         logicalTable=
-           lists:map(fun ({Init, Finals, Transitions}) ->
-                         #logical{initCP=Init,
-                                  finalCPs=Finals,
-                                  cps_in_graph=
-                                    lists:usort(lists:flatmap(fun ({A,B}) ->
-                                                                  [A, B]
-                                                              end,
-                                                              Transitions)),
-                                  graph=Transitions,
-                                  activity=false}
-                     end,
-                     wdgm_config_params:get_internal_graphs() ++
-                       wdgm_config_params:get_external_graphs(ModeId)),
-         aliveTable=
-           lists:map(fun (X) ->
-                         #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
-                                alive_counter=0}
-                     end,
-                     wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))}.
+  NewS =
+    #state{initialized=true,
+           currentMode=ModeId,
+           originalCfg=R,
+           globalstatus='WDGM_GLOBAL_STATUS_OK',
+           deadlineTable=
+             lists:map(fun (DS) ->
+                           {Start, Stop, Min, Max} = wdgm_config_params:get_deadline_params(DS),
+                           #deadline{startCP=Start,
+                                     stopCP=Stop,
+                                     minmargin=Min,
+                                     maxmargin=Max,
+                                     timestamp=0,
+                                     timer=0} %% [WDGM298]
+                       end,
+                       wdgm_config_params:get_deadline_supervision(ModeId)),
+           logicalTable=
+             lists:map(fun ({Init, Finals, Transitions}) ->
+                           #logical{initCP=Init,
+                                    finalCPs=Finals,
+                                    cps_in_graph=
+                                      lists:usort(lists:flatmap(fun ({A,B}) ->
+                                                                    [A, B]
+                                                                end,
+                                                                Transitions)),
+                                    graph=Transitions,
+                                    activity=false}
+                       end,
+                       wdgm_config_params:get_internal_graphs() ++
+                         wdgm_config_params:get_external_graphs(ModeId)),
+           aliveTable=
+             lists:map(fun (X) ->
+                           #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
+                                  alive_counter=0}
+                       end,
+                       wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))},
+  NewS#state{supervisedentities=reset_supervised_entities(NewS, ModeId)}.
 
 %% -WdgM_GetMode----------------------------------------------------------------
 
@@ -372,7 +374,7 @@ mainfunction_post(_S, _Args, _Ret) ->
   end.
 
 mainfunction_next(S, _Ret, _Args) ->
-  wdgm_main_eqc:global_status(S).
+  wdgm_main:global_status(S).
 
 %% -----------------------------------------------------------------------------
 %% -----------------------------------------------------------------------------
