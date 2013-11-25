@@ -24,8 +24,18 @@
       WDGM\_LOCAL\_STATUS\_EXPIRED, ExpiredSupervisionCycles is less than or
       equal to the expired supervision cycle tolerance, then keep the global
       status EXPIRED and increment ExpiredSupervisionCycles}
+  \item[WDGM182] \parbox[t]{0.8\linewidth}{if global status was WDGM\_GLOBAL\_STATUS\_OK or
+    WDGM\_GLOBAL\_STATUS\_FAILED, for each SE that is activated in the new mode,
+    retain the state of each local SE.}
 \end{description}
 
+\section{Requirements that is broken within AUTOSAR}
+\begin{description}
+  \item[ambiguous meaning] the definition of what (deadline) timestamp is and were it shall
+    be set is ambiguous. Is it cycles, ticks, seconds or microseconds? and where
+    should it increment/set the timestamp?
+  \item[conflicting requirements] [WDGM317], [WDGM139] because [WDGM186]
+\end{description}
 
 \section{Bugfixes and changes to the C code}
 \begin{description}
@@ -36,6 +46,7 @@
   \item[WdgM.c:1836] bugfix because [WDGM252]
   \item[WdgM.c:989] bugfix because [WDGM219]
   \item[WdgM.c:1779] bugfix because [WDGM274]
+  \item[WdgM.c:1386] bugfix because [WDGM182]
 \end{description}
 
 \end{document}
