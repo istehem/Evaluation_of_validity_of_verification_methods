@@ -60,11 +60,15 @@ logicalreached(S, SEid, CPid) ->
                                 activity=ActivityFlag}]};
         'WDGM_INCORRECT' ->
           SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-          S#state{supervisedentities=
-                    lists:keyreplace(SEid,
-                                     2,
-                                     S#state.supervisedentities,
-                                     SE#supervisedentity{locallogicalstatus='WDGM_INCORRECT'})}
+          case SE of
+            false -> S;
+            _ ->
+              S#state{supervisedentities=
+                        lists:keyreplace(SEid,
+                                         2,
+                                         S#state.supervisedentities,
+                                         SE#supervisedentity{locallogicalstatus='WDGM_INCORRECT'})}
+          end
       end
   end.
 
