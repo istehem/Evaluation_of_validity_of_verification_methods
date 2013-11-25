@@ -11,8 +11,8 @@ deadlinereached(S, SEid, CPid) ->
       {false, false} -> %% [WDGM299] ignore
         S;
       {_, false}     -> %% [WDGM228] start ids
-      lists:keyreplace(DeadlineStart#deadline.startCP,2,S#state.deadlineTable,
-                       DeadlineStart#deadline{timestamp=DeadlineStart#deadline.timer + 1});
+      S#state{deadlineTable=lists:keyreplace(DeadlineStart#deadline.startCP,2,S#state.deadlineTable,
+                       DeadlineStart#deadline{timestamp=DeadlineStart#deadline.timer + 1})};
       {false, _}     -> %% [WDGM229] stop ids
         Difference = DeadlineStop#deadline.timer-DeadlineStop#deadline.timestamp,
         SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
@@ -34,7 +34,7 @@ deadlinereached(S, SEid, CPid) ->
   end.
 
 logicalreached(S, SEid, CPid) ->
-  IsGraphCP = [LR || LR <- S#state.logicalTable, lists:member(CPid, LR#logical.cps_in_graph)],
+  IsGraphCP = [LR || LR <- S#state.logicalTable, LR /= [] andalso lists:member(CPid, LR#logical.cps_in_graph)],
   case IsGraphCP of
     []  -> S; %% [WDGM297]
     LRs -> %% [WDGM295]
@@ -80,8 +80,8 @@ is_successor(LogicalRec, CP) ->
                                end,
                                LogicalRec#logical.graph)),
   case IsDestCPofStoredSource of
-    true  -> 'WDGM_CORRECT';
-    false -> 'WDGM_INCORRECT'
+    false -> 'WDGM_INCORRECT';
+    _     -> 'WDGM_CORRECT'
   end.
 
 is_initial_CP(LogicalRec, CP) ->
