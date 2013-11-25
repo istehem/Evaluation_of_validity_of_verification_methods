@@ -7,23 +7,18 @@
 deadlinereached(S, SEid, CPid) ->
   DeadlineStart = lists:keyfind(CPid, 2, S#state.deadlineTable),
   DeadlineStop  = lists:keyfind(CPid, 3, S#state.deadlineTable),
-  {NewDeadline, Difference} =
-    case {DeadlineStart, DeadlineStop} of
+  case {DeadlineStart, DeadlineStop} of
       {false, false} -> %% [WDGM299] ignore
-        {false, 0};
+        S;
       {_, false}     -> %% [WDGM228] start ids
-        {DeadlineStart#deadline{timestamp=DeadlineStart#deadline.timer}, 0};
+      lists:keyreplace(DeadlineStart#deadline.startCP,2,S#state.deadlineTable,
+                       DeadlineStart#deadline{timestamp=DeadlineStart#deadline.timer + 1});
       {false, _}     -> %% [WDGM229] stop ids
-        {DeadlineStop#deadline{timestamp=0},
-         DeadlineStop#deadline.timer-DeadlineStop#deadline.timestamp}
-    end,
-  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  case NewDeadline == false of
-    true -> S;
-    _    ->
-      DeadlineMin = NewDeadline#deadline.minmargin,
-      DeadlineMax = NewDeadline#deadline.maxmargin,
-      Behaviour =
+        Difference = DeadlineStop#deadline.timer-DeadlineStop#deadline.timestamp,
+        SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+        DeadlineMin = DeadlineStop#deadline.minmargin,
+        DeadlineMax = DeadlineStop#deadline.maxmargin,
+        Behaviour =
         case
           Difference =< DeadlineMax andalso
           Difference >= DeadlineMin andalso
@@ -32,11 +27,9 @@ deadlinereached(S, SEid, CPid) ->
           true  -> 'WDGM_CORRECT'; %% [WDGM294]
           false -> 'WDGM_INCORRECT'
         end,
-      %% one of these will not update the state
-      NewDeadlineTable     = lists:keyreplace(CPid, 2, S#state.deadlineTable, NewDeadline),
-      UpdatedDeadlineTable = lists:keyreplace(CPid, 3, NewDeadlineTable, NewDeadline),
-      NewSEs = lists:keyreplace(SEid, 2, S#state.supervisedentities, SE#supervisedentity{localdeadlinestatus=Behaviour}),
-      S#state{deadlineTable=UpdatedDeadlineTable,
+        UpdatedDeadlineTable = lists:keyreplace(CPid, 3, S#state.deadlineTable, DeadlineStop#deadline{timestamp=0}),
+        NewSEs = lists:keyreplace(SEid, 2, S#state.supervisedentities, SE#supervisedentity{localdeadlinestatus=Behaviour}),
+        S#state{deadlineTable=UpdatedDeadlineTable,
               supervisedentities=NewSEs}
   end.
 
