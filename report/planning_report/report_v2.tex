@@ -117,18 +117,26 @@ The functional safety concept will be most important in this phase.
 %The problem at hand, the assignment
 \section{Objective}
 The first problem at hand is to evaluate what ``semi formal verification'',
-according to the ISO-standard, means.
+according to the ISO-standard, means. In formal methods of mathematics, formal
+verification means to prove the correctness of algorithms. This can be done by
+arguing that the state space that is not checked will not affect the model. It
+is not possible to do in a complex computer system due to the state space
+problem. The ISO-standard mentions both ``formal verification'' and ``semi
+formal verification'' for software development, but does not describe how to
+achieve any of these.
 
 The second problem is to evaluate if QuickCheck can be used to achieve this.
 
-A model for an AUTOSAR module needs to be implemented.
+A model for an AUTOSAR module needs to be implemented. For this to be a good
+model some questions first need to be answered.
 How can one achieve good test cases for this model? How can one tweak the test
-generation? More specific; which test cases are interesting in a
-safety critical point of view? Is the implemented model good enough? Is it possible to
-collapse states that do not affect the safety of the system?
+generation? More specific; which test cases are interesting in a safety critical
+point of view? Is the implemented model good enough? Is it possible to collapse
+states that do not affect the safety of the system?
 
-An evaluation of the solution is needed, does it ensure functional safety? How
-can one measure the size of the state space that is actually verified?
+After the model has been implemented, there must be an evaluation of the
+solution. Does it ensure functional safety? How can one measure the
+size of the state space that is actually verified?
 
 One must propose and motivate what should be done to be able to
 achieve a semi formal verification. This can include a confidence interval
