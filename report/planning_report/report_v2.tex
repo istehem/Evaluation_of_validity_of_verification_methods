@@ -124,23 +124,35 @@ is not possible to do in a complex computer system due to the state space
 problem. The ISO-standard mentions both ``formal verification'' and ``semi
 formal verification'' for software development, but does not describe how to
 achieve any of these.
+This evaluation must be done to get knowledge of how to properly implement
+functional safety according to the ISO-standard and achieve some form of ASIL
+classification.
 
 The second problem is to evaluate if QuickCheck can be used to achieve this.
+QuickCheck grants the ability to automate the testing, and knowledge of this
+tool exist in the corporation where this thesis is done. %% Företaget hm....
 
 A model for an AUTOSAR module needs to be implemented. For this to be a good
 model some questions first need to be answered.
 How can one achieve good test cases for this model? How can one tweak the test
-generation? More specific; which test cases are interesting in a safety critical
-point of view? Is the implemented model good enough? Is it possible to collapse
+generation to find test cases are interesting in a safety critical point of
+view? Is the implemented model good enough? Is it possible to collapse
 states that do not affect the safety of the system?
+The test generation is a big problem in verifying a model. With unit tests, one
+can argue that each line of code has been executed (100\% code coverage),
+but that is just a statement of the execution. Have it been executed correctly?
 
 After the model has been implemented, there must be an evaluation of the
 solution. Does it ensure functional safety? How can one measure the
 size of the state space that is actually verified?
+Even if test generation has been done properly, the solution might not be within
+the ISO-standards means of functional safety.
 
 One must propose and motivate what should be done to be able to
 achieve a semi formal verification. This can include a confidence interval
-for how certain the verification is.
+for how certain the verification is. The confidence interval would help describe
+the visited state space because it is probably not feasible to exhaustively search
+all states.
 
 The main objective is to prove that it is possible to do semi formal
 verification for an AUTOSAR module and its specification.
@@ -245,7 +257,7 @@ possible to get some kind of confidence interval on the correctness of the code?
 %Gantt-schema.
 \chapter{Time-plan}
 \section{Provisional plan}
-Exactly how things should be done isn't clear. Therefor we are proposing a more
+Exactly how things should be done isn't clear. Therefore we are proposing a more
 orderly plan to be able learn what can be done and where problems may lie ahead.
 At first just try to implement one or two simple rules from an AUTOSAR
 specification, in Erlang, and try to run it on an AUTOSAR module. It's important to
