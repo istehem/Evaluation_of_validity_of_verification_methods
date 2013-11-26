@@ -176,10 +176,10 @@ checkpointreached_post(S, Args=[_SeID, CPId], Ret) ->
                        not_found -> %% checkpoint does not exist in alive supervision
                          true;
                        Idx -> %% checkpoint exists but need to check it
-                         element(3, lists:nth(Idx,
+                         eq(element(3, lists:nth(Idx,
                                               eqc_c:read_array(element(4, eqc_c:value_of('WdgM_MonitorTableRef')),
-                                                               AliveSupCount)))
-                           == (lists:nth(Idx, S#state.aliveTable))#alive.alive_counter+1
+                                                               AliveSupCount))),
+                           ((lists:keyfind(CPId, 2, S#state.aliveTable))#alive.alive_counter+1))
                      end;
                    _ -> true
                  end;
@@ -320,7 +320,7 @@ mainfunction_command(_S) ->
 mainfunction() ->
   ?C_CODE:'WdgM_MainFunction'().
 
-mainfunction_post(_S, _Args, _Ret) ->
+mainfunction_post(S, _Args, _Ret) ->
   case eqc_c:value_of('WdgM_CurrentConfigPtr') of
     CfgPtr = {ptr, _, _} ->
       case eqc_c:deref(CfgPtr) of
@@ -336,7 +336,7 @@ mainfunction_post(_S, _Args, _Ret) ->
              _DeadlineSupTablePtr,
              _LogicalSupTablePtr,
              _LocalStatusParmTablePtr,
-             _TriggerTablePtr} -> true;
+             _TriggerTablePtr} -> eqc_c:value_of('WdgM_GlobalStatus') == S#state.globalstatus;
             _ -> true %% some problem rose from the modeinfo
           end;
         _ -> true %% some error rose from dereferencing, probably nullpointer

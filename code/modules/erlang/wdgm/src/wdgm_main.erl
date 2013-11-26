@@ -186,7 +186,7 @@ check_CP_within_SE(S, CPref) ->
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
   {SRC, EAI, MinMargin, MaxMargin} = hd(wdgm_config_params:get_AS_for_CP(S#state.currentMode, CPid)),
   SC = SE#supervisedentity.supervision_cycles+1, %% because dont update when SC==0
-  NewCPalivestatus=
+  {NewCPalivestatus, NewCPalivecounter} =
     case SC rem SRC == 0 of
       true ->
         I = algorithm_for_alive_supervision(CPstate#alive.alive_counter, EAI),
@@ -194,12 +194,15 @@ check_CP_within_SE(S, CPref) ->
           I =< MaxMargin andalso
           I >= -MinMargin
         of
-          true -> 'WDGM_CORRECT';
-          _ -> 'WDGM_INCORRECT'
+          true -> {'WDGM_CORRECT', 0};
+          _    -> {'WDGM_INCORRECT', 0}
         end;
-      false -> CPstate#alive.status
+      false    -> {CPstate#alive.status, CPstate#alive.alive_counter}
     end,
-  S#state{aliveTable=lists:keyreplace(CPid, 2, S#state.aliveTable, CPstate#alive{status=NewCPalivestatus})}.
+  S#state{aliveTable=lists:keyreplace(CPid, 2,
+                                      S#state.aliveTable,
+                                      CPstate#alive{status=NewCPalivestatus,
+                                                   alive_counter=NewCPalivecounter})}.
 
 algorithm_for_alive_supervision(AliveCounter, EAI) ->
   AliveCounter-EAI.
