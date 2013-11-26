@@ -311,7 +311,7 @@ getfirstexpiredseid_next(S, _Ret, _Args) ->
 %% -WdgM_MainFunction-----------------------------------------------------------
 
 mainfunction_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior andalso
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior orelse
     S#state.initialized == true.
 
 mainfunction_command(_S) ->
@@ -345,7 +345,10 @@ mainfunction_post(_S, _Args, _Ret) ->
   end.
 
 mainfunction_next(S, _Ret, _Args) ->
-  wdgm_main:global_status(S).
+  case S#state.initialized of
+    true -> wdgm_main:global_status(S);
+    false -> S
+  end.
 
 %% -----------------------------------------------------------------------------
 %% -----------------------------------------------------------------------------
