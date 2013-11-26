@@ -131,6 +131,31 @@ setmode_next(S, Ret, [ModeId, _Cid]) ->
            true ->
              S#state{currentMode = ModeId,
                      supervisedentities=reset_supervised_entities(S, ModeId),
+                     deadlineTable=
+                       lists:map(fun (DS) ->
+                                     {Start, Stop, Min, Max} = wdgm_config_params:get_deadline_params(DS),
+                                     #deadline{startCP=Start,
+                                               stopCP=Stop,
+                                               minmargin=Min,
+                                               maxmargin=Max,
+                                               timestamp=0,
+                                               timer=0}
+                                 end,
+                                 wdgm_config_params:get_deadline_supervision(ModeId)),
+                     logicalTable=
+                       lists:map(fun ({Init, Finals, Transitions}) ->
+                                     #logical{initCP=Init,
+                                              finalCPs=Finals,
+                                              cps_in_graph=
+                                                lists:usort(lists:flatmap(fun ({A,B}) ->
+                                                                              [A, B]
+                                                                          end,
+                                                                          Transitions)),
+                                              graph=Transitions,
+                                              activity=false}
+                                 end,
+                                 wdgm_config_params:get_internal_graphs() ++
+                                   wdgm_config_params:get_external_graphs(ModeId)),
                      aliveTable=lists:map(fun (X) ->
                                               #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
                                                      alive_counter=0}

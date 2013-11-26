@@ -25,8 +25,10 @@
       equal to the expired supervision cycle tolerance, then keep the global
       status EXPIRED and increment ExpiredSupervisionCycles}
   \item[WDGM182] \parbox[t]{0.8\linewidth}{if global status was WDGM\_GLOBAL\_STATUS\_OK or
-    WDGM\_GLOBAL\_STATUS\_FAILED, for each SE that is activated in the new mode,
-    retain the state of each local SE.}
+      WDGM\_GLOBAL\_STATUS\_FAILED, for each SE that is activated in the new mode,
+      retain the state of each local SE.}
+  \item[p. 27] \parbox[t]{0.8\linewidth}{At Watchdog Manager initialization, all
+      the Results of alive/deadline/logical supervision are set to correct.}
 \end{description}
 
 \section{Requirements that is broken within AUTOSAR}
@@ -39,14 +41,18 @@
 
 \section{Bugfixes and changes to the C code}
 \begin{description}
-  \item[WdgM\_Lcfg.c:232] commented a function call to other module
-  \item[WdgM\_Lcfg.c:170] commented a function call to other module
+  \item[WdgM\_Lcfg.c:232] \parbox[t]{0.8\linewidth}{commented a function call to other module (//.Switch\_currentMode((Rte\_ModeType\_WdgMMode)status);)}
+  \item[WdgM\_Lcfg.c:170] \parbox[t]{0.8\linewidth}{commented a function call to other module
+(//.Switch\_currentMode((Rte\_ModeType\_WdgMMode)status);)}
   \item[WdgM.c:2056] bugfix because [WDGM286]
   \item[WdgM.c:976] bugfix because [WDGM215]
   \item[WdgM.c:1836] bugfix because [WDGM252]
   \item[WdgM.c:989] bugfix because [WDGM219]
   \item[WdgM.c:1779] bugfix because [WDGM274]
   \item[WdgM.c:1386] bugfix because [WDGM182]
+  \item[WdgM\_Lcfg.c:223] \parbox[t]{0.8\linewidth}{bugfix, added initialization
+      to alive/deadline/logical supervision results to WDGM\_CORRECT (copied the
+      if statement from row 199), because [p. 27]}
 \end{description}
 
 \end{document}
