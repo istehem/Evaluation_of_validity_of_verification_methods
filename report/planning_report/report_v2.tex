@@ -119,9 +119,11 @@ The functional safety concept will be most important in this phase.
 The first problem at hand is to evaluate what ``semi formal verification'',
 according to the ISO-standard, means. In formal methods of mathematics, formal
 verification means to prove the correctness of algorithms. This can be done by
-arguing that the state space that is not checked will not affect the model. It
-is not possible to do in a complex computer system due to the state space
-problem. The ISO-standard mentions both ``formal verification'' and ``semi
+arguing that the state space that is not checked will not affect the model.
+In general, complex computer systems suffers from the state space explosion problem and
+therefore exhaustively visiting all states are not practically possible.
+
+The ISO-standard mentions both ``formal verification'' and ``semi
 formal verification'' for software development, but does not describe how to
 achieve any of these.
 
