@@ -312,7 +312,7 @@ getfirstexpiredseid_next(S, _Ret, _Args) ->
 
 mainfunction_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior orelse
-    S#state.initialized == true.
+    S#state.initialized == true. %% [WDGM039]
 
 mainfunction_command(_S) ->
   {call, ?MODULE, mainfunction, []}.
