@@ -39,42 +39,14 @@ init_next(S, _Ret, _Args) ->
   {_, R} = (hd(Rs)), %% why do we get a list of records?
   ModeId = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
   NewS =
-    #state{initialized=true,
-           currentMode=ModeId,
-           originalCfg=R,
-           globalstatus='WDGM_GLOBAL_STATUS_OK',
-           deadlineTable=
-             lists:map(fun (DS) ->
-                           {Start, Stop, Min, Max} = wdgm_config_params:get_deadline_params(DS),
-                           #deadline{startCP=Start,
-                                     stopCP=Stop,
-                                     minmargin=Min,
-                                     maxmargin=Max,
-                                     timestamp=0,
-                                     timer=0} %% [WDGM298]
-                       end,
-                       wdgm_config_params:get_deadline_supervision(ModeId)),
-           logicalTable=
-             lists:map(fun ({Init, Finals, Transitions}) ->
-                           #logical{initCP=Init,
-                                    finalCPs=Finals,
-                                    cps_in_graph=
-                                      lists:usort(lists:flatmap(fun ({A,B}) ->
-                                                                    [A, B]
-                                                                end,
-                                                                Transitions)),
-                                    graph=Transitions,
-                                    activity=false}
-                       end,
-                       wdgm_config_params:get_internal_graphs() ++
-                         wdgm_config_params:get_external_graphs(ModeId)),
-           aliveTable=
-             lists:map(fun (X) ->
-                           #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
-                                  alive_counter=0}
-                       end,
-                       wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))},
-  NewS#state{supervisedentities=reset_supervised_entities(NewS, ModeId)}.
+    #state{initialized   = true,
+           currentMode   = ModeId,
+           originalCfg   = R,
+           globalstatus  = 'WDGM_GLOBAL_STATUS_OK',
+           deadlineTable = reset_deadline_table(ModeId), %% [WDGM298]
+           logicalTable  = reset_logical_table(ModeId),
+           aliveTable    = reset_alive_table(ModeId)},
+  NewS#state{supervisedentities = reset_supervised_entities(NewS, ModeId)}.
 
 %% -WdgM_GetMode----------------------------------------------------------------
 
@@ -125,42 +97,16 @@ setmode_post(S, [ModeId, Cid], Ret) ->
 setmode_next(S, Ret, [ModeId, _Cid]) ->
   case Ret of
     0 -> case
-           S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
-           S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED'
+           S#state.currentMode /= ModeId andalso %% is this correct
+           (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
+            S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED')
          of
            true ->
              S#state{currentMode = ModeId,
-                     supervisedentities=reset_supervised_entities(S, ModeId),
-                     deadlineTable=
-                       lists:map(fun (DS) ->
-                                     {Start, Stop, Min, Max} = wdgm_config_params:get_deadline_params(DS),
-                                     #deadline{startCP=Start,
-                                               stopCP=Stop,
-                                               minmargin=Min,
-                                               maxmargin=Max,
-                                               timestamp=0,
-                                               timer=0}
-                                 end,
-                                 wdgm_config_params:get_deadline_supervision(ModeId)),
-                     logicalTable=
-                       lists:map(fun ({Init, Finals, Transitions}) ->
-                                     #logical{initCP=Init,
-                                              finalCPs=Finals,
-                                              cps_in_graph=
-                                                lists:usort(lists:flatmap(fun ({A,B}) ->
-                                                                              [A, B]
-                                                                          end,
-                                                                          Transitions)),
-                                              graph=Transitions,
-                                              activity=false}
-                                 end,
-                                 wdgm_config_params:get_internal_graphs() ++
-                                   wdgm_config_params:get_external_graphs(ModeId)),
-                     aliveTable=lists:map(fun (X) ->
-                                              #alive{cpid=wdgm_config_params:get_checkpoint_id(X),
-                                                     alive_counter=0}
-                                          end,
-                                          wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'))};
+                     supervisedentities = reset_supervised_entities(S, ModeId),
+                     deadlineTable      = reset_deadline_table(ModeId),
+                     logicalTable       = reset_logical_table(ModeId),
+                     aliveTable         = reset_alive_table(ModeId)};
            false -> %% [WDGM316], [WDGM145]
              S
          end;
@@ -427,6 +373,40 @@ findKeyIndex(Elem, P, [Tuple|Ls],N) -> case element(P, Tuple) of
                                          _ -> findKeyIndex(Elem, P, Ls, N+1)
                                        end.
 
+reset_alive_table(ModeId) ->
+  lists:map(fun (X) ->
+                #alive{cpid          = wdgm_config_params:get_checkpoint_id(X),
+                       alive_counter = 0}
+            end,
+            wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS')).
+
+reset_deadline_table(ModeId) ->
+  lists:map(fun (DS) ->
+                {Start, Stop, Min, Max} = wdgm_config_params:get_deadline_params(DS),
+                #deadline{startCP    = Start,
+                          stopCP     = Stop,
+                          minmargin  = Min,
+                          maxmargin  = Max,
+                          timestamp  = 0,
+                          timer      = 0}
+            end,
+            wdgm_config_params:get_deadline_supervision(ModeId)).
+
+reset_logical_table(ModeId) ->
+  lists:map(fun ({Init, Finals, Transitions}) ->
+                #logical{initCP       = Init,
+                         finalCPs     = Finals,
+                         cps_in_graph =
+                           lists:usort(lists:flatmap(fun ({A,B}) ->
+                                                         [A, B]
+                                                     end,
+                                                     Transitions)),
+                         graph        = Transitions,
+                         activity     = false}
+            end,
+            wdgm_config_params:get_internal_graphs() ++
+              wdgm_config_params:get_external_graphs(ModeId)).
+
 reset_supervised_entities(S, ModeId) ->
   case S#state.supervisedentities of
     undefined -> %% not initialized...
@@ -441,9 +421,13 @@ reset_supervised_entities(S, ModeId) ->
        of
          {true, true} -> %% [WDGM182]
            FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
-           (lists:keyfind(SEid, 2, SEs))#supervisedentity{
+           SE = lists:keyfind(SEid, 2, SEs),
+           SE#supervisedentity{
              failed_alive_supervision_cycle_tol=FailedAliveTol,
-             supervision_cycles=0};
+             supervision_cycles=case S#state.currentMode == ModeId of
+                                  true  -> SE#supervisedentity.supervision_cycles;
+                                  false -> 0
+                                end};
          {true, false} -> new_SE_record(ModeId, SEid, true); %% [WDGM209];
          {false, _} -> new_SE_record(ModeId, SEid, false) %% [WDGM207], [WDGM291]
        end
