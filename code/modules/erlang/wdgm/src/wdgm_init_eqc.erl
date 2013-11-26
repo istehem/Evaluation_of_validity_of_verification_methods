@@ -322,29 +322,33 @@ mainfunction() ->
   ?C_CODE:'WdgM_MainFunction'().
 
 mainfunction_post(S, _Args, _Ret) ->
-  NextS = wdgm_main:global_status(S),
-  eqc_c:value_of('WdgM_GlobalStatus') == NextS#state.globalstatus andalso
-  case eqc_c:value_of('WdgM_CurrentConfigPtr') of
-    CfgPtr = {ptr, _, _} ->
-      case eqc_c:deref(CfgPtr) of
-        {_,_,_,ModePtr} ->
-          case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, 4)) of
-            {_ExpiredSupCycleTol,
-             _TriggerCount,
-             _AliveSupCount,
-             _DeadlineSupCount,
-             _LogicalSupCount,
-             _LocalStatusParmCount,
-             _AliveSupTablePtr,
-             _DeadlineSupTablePtr,
-             _LogicalSupTablePtr,
-             _LocalStatusParmTablePtr,
-             _TriggerTablePtr} -> true;
-            _ -> true %% some problem rose from the modeinfo
-          end;
-        _ -> true %% some error rose from dereferencing, probably nullpointer
-      end;
-    _ -> true %% ouch, currentconfigptr is not a ptr could be 'NULL'
+  case S#state.initialized of
+    true ->
+      NextS = wdgm_main:global_status(S),
+      eqc_c:value_of('WdgM_GlobalStatus') == NextS#state.globalstatus andalso
+        case eqc_c:value_of('WdgM_CurrentConfigPtr') of
+          CfgPtr = {ptr, _, _} ->
+            case eqc_c:deref(CfgPtr) of
+              {_,_,_,ModePtr} ->
+                case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, 4)) of
+                  {_ExpiredSupCycleTol,
+                   _TriggerCount,
+                   _AliveSupCount,
+                   _DeadlineSupCount,
+                   _LogicalSupCount,
+                   _LocalStatusParmCount,
+                   _AliveSupTablePtr,
+                   _DeadlineSupTablePtr,
+                   _LogicalSupTablePtr,
+                   _LocalStatusParmTablePtr,
+                   _TriggerTablePtr} -> true;
+                  _ -> true %% some problem rose from the modeinfo
+                end;
+              _ -> true %% some error rose from dereferencing, probably nullpointer
+            end;
+          _ -> true %% ouch, currentconfigptr is not a ptr could be 'NULL'
+        end;
+    false -> true
   end.
 
 mainfunction_next(S, _Ret, _Args) ->
