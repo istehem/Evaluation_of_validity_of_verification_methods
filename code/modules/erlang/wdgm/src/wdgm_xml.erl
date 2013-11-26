@@ -36,8 +36,7 @@ config(Cfg) ->
 			  caller_ids         = get_values("_/WdgMGeneral/WdgMCallerIds/WdgMCallerId", WdgM) },
   Mode = get_value("_/Tst_Cfg1/WdgMInitialMode", WdgM),
   Test = #tst_cfg1{
-    initial_mode_id = get_value(Mode ++ "/WdgMModeId", Cfg),
-    expired_supervision_cycles_tol = get_value(Mode ++ "/WdgMExpiredSupervisionCycleTol", Cfg)
+    initial_mode_id = get_value(Mode ++ "/WdgMModeId", Cfg)
    },
 %  Names = [N || {container, N, _XmlRef, _Hash, _Type, _Params, _Children, _Na, _Cont} <- car_xml:remove_children(car_xml:get_containers_by_def("WdgMMode", Cfg))],
   #wdgm{wdgmgeneral=General, tst_cfg1=Test}.

@@ -24,6 +24,11 @@
       WDGM\_LOCAL\_STATUS\_EXPIRED, ExpiredSupervisionCycles is less than or
       equal to the expired supervision cycle tolerance, then keep the global
       status EXPIRED and increment ExpiredSupervisionCycles}
+  \item[WDGM216] \parbox[t]{0.8\linewidth}{if global status was
+      WDGM\_GLOBAL\_STATUS\_OK, it exists a SE that has the local status
+      WDGM\_LOCAL\_STATUS\_EXPIRED, ExpiredSupervisionCyclesTol is equal to
+      zero, then the global status should be set to
+      WDGM\_GLOBAL\_STATUS\_STOPPED}
   \item[WDGM182] \parbox[t]{0.8\linewidth}{if global status was WDGM\_GLOBAL\_STATUS\_OK or
       WDGM\_GLOBAL\_STATUS\_FAILED, for each SE that is activated in the new mode,
       retain the state of each local SE.}
@@ -37,6 +42,8 @@
     be set is ambiguous. Is it cycles, ticks, seconds or microseconds? and where
     should it increment/set the timestamp?
   \item[conflicting requirements] [WDGM317], [WDGM139] because [WDGM186]
+  \item[no requirement, p. 125] reset of alive counter in mainfunction
+  \item[ambiguous meaning] return value not specified but E\_NOT\_OK seems logical
 \end{description}
 
 \section{Bugfixes and changes to the C code}
@@ -48,6 +55,7 @@
   \item[WdgM.c:976] bugfix because [WDGM215]
   \item[WdgM.c:1836] bugfix because [WDGM252]
   \item[WdgM.c:989] bugfix because [WDGM219]
+  \item[WdgM.c:989] bugfix because [WDGM216]
   \item[WdgM.c:1779] bugfix because [WDGM274]
   \item[WdgM.c:1386] bugfix because [WDGM182]
   \item[WdgM\_Lcfg.c:223] \parbox[t]{0.8\linewidth}{bugfix, added initialization

@@ -14,7 +14,7 @@ global_status(S) ->
                                       {(Failed  orelse 'WDGM_LOCAL_STATUS_FAILED'  == SE#supervisedentity.localstatus),
                                        (Expired orelse 'WDGM_LOCAL_STATUS_EXPIRED' == SE#supervisedentity.localstatus)}
                                   end, {false, false}, NewS#state.supervisedentities),
-  EXPIRED_TOL = NewS#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.expired_supervision_cycles_tol,
+  EXPIRED_TOL = NewS#state.expired_supervision_cycles_tol,
   EXPIRED_CYCLES = NewS#state.expiredsupervisioncycles,
   {Status, NewExpiredCycles} = check_global_status({NewS#state.globalstatus, Failed, Expired}, EXPIRED_TOL, EXPIRED_CYCLES),
   EXPIRED_SE = (lists:keyfind('WDGM_LOCAL_STATUS_EXPIRED', 3, NewS#state.supervisedentities)),
@@ -202,7 +202,7 @@ check_CP_within_SE(S, CPref) ->
   S#state{aliveTable=lists:keyreplace(CPid, 2,
                                       S#state.aliveTable,
                                       CPstate#alive{status=NewCPalivestatus,
-                                                   alive_counter=NewCPalivecounter})}.
+                                                    alive_counter=NewCPalivecounter})}.
 
 algorithm_for_alive_supervision(AliveCounter, EAI) ->
   AliveCounter-EAI.

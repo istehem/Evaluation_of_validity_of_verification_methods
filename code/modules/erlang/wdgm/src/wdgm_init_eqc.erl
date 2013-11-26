@@ -42,6 +42,7 @@ init_next(S, _Ret, _Args) ->
     #state{initialized   = true,
            currentMode   = ModeId,
            originalCfg   = R,
+           expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
            globalstatus  = 'WDGM_GLOBAL_STATUS_OK',
            deadlineTable = reset_deadline_table(ModeId), %% [WDGM298]
            logicalTable  = reset_logical_table(ModeId),
@@ -103,6 +104,7 @@ setmode_next(S, Ret, [ModeId, _Cid]) ->
          of
            true ->
              S#state{currentMode = ModeId,
+                     expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
                      supervisedentities = reset_supervised_entities(S, ModeId),
                      deadlineTable      = reset_deadline_table(ModeId),
                      logicalTable       = reset_logical_table(ModeId),
@@ -321,6 +323,8 @@ mainfunction() ->
   ?C_CODE:'WdgM_MainFunction'().
 
 mainfunction_post(S, _Args, _Ret) ->
+  NextS = wdgm_main:global_status(S),
+  eqc_c:value_of('WdgM_GlobalStatus') == NextS#state.globalstatus andalso
   case eqc_c:value_of('WdgM_CurrentConfigPtr') of
     CfgPtr = {ptr, _, _} ->
       case eqc_c:deref(CfgPtr) of
@@ -336,7 +340,7 @@ mainfunction_post(S, _Args, _Ret) ->
              _DeadlineSupTablePtr,
              _LogicalSupTablePtr,
              _LocalStatusParmTablePtr,
-             _TriggerTablePtr} -> eqc_c:value_of('WdgM_GlobalStatus') == S#state.globalstatus;
+             _TriggerTablePtr} -> true;
             _ -> true %% some problem rose from the modeinfo
           end;
         _ -> true %% some error rose from dereferencing, probably nullpointer

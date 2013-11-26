@@ -10,8 +10,7 @@
          caller_ids}).
 
 -record(tst_cfg1,
-        {initial_mode_id,
-         expired_supervision_cycles_tol=0}).
+        {initial_mode_id}).
 
 -record(wdgm,
         {wdgmgeneral, tst_cfg1}).
@@ -23,6 +22,7 @@
          originalCfg=#wdgm{},
          expiredSEid,
          expiredsupervisioncycles=0,
+         expired_supervision_cycles_tol=0,
          aliveTable,
          deadlineTable,
          logicalTable,

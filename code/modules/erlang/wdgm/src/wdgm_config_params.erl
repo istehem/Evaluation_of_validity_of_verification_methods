@@ -136,3 +136,9 @@ get_external_graph(ES) ->
 
 get_external_graphs(ModeId) ->
   [get_external_graph(ES) || ES <- get_externallogical_supervision(ModeId)].
+
+
+%%%% used by wdgm_SetMode
+
+get_expired_supervision_cycles(ModeId) ->
+  car_xml:get_value("WdgMExpiredSupervisionCycleTol", get_mode(ModeId)).
