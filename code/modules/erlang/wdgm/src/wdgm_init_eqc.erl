@@ -98,7 +98,6 @@ setmode_post(S, [ModeId, Cid], Ret) ->
 setmode_next(S, Ret, [ModeId, _Cid]) ->
   case Ret of
     0 -> case
-           S#state.currentMode /= ModeId andalso %% is this correct
            (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
             S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED')
          of
@@ -431,10 +430,7 @@ reset_supervised_entities(S, ModeId) ->
            SE = lists:keyfind(SEid, 2, SEs),
            SE#supervisedentity{
              failed_alive_supervision_cycle_tol=FailedAliveTol,
-             supervision_cycles=case S#state.currentMode == ModeId of
-                                  true  -> SE#supervisedentity.supervision_cycles;
-                                  false -> 0
-                                end};
+             supervision_cycles=0};
          {true, false} -> new_SE_record(ModeId, SEid, true); %% [WDGM209];
          {false, _} -> new_SE_record(ModeId, SEid, false) %% [WDGM207], [WDGM291]
        end
