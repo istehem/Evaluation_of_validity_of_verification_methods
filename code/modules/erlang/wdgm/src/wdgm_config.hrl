@@ -29,6 +29,10 @@
          supervisedentities}).
 -record(alive,
         {cpid,
+         supervision_reference_cycles,
+         expected_alive_indications,
+         minmargin,
+         maxmargin,
          alive_counter=0,
          status='WDGM_CORRECT'}).
 -record(deadline,

@@ -34,6 +34,12 @@
       retain the state of each local SE.}
   \item[p. 27] \parbox[t]{0.8\linewidth}{At Watchdog Manager initialization, all
       the Results of alive/deadline/logical supervision are set to correct.}
+  \item[7.2.3.2] \parbox[t]{0.8\linewidth}{Each SE may have M+N results from
+      logical supervision, where N is the number of internal graphs for that SE,
+      and M is the number of external graphs that cross that SE.\\
+
+      together with [WDGM252] and [WDGM274], this means that the results shall not
+      be overwritten}
 \end{description}
 
 \section{Requirements that is broken within AUTOSAR}
@@ -51,13 +57,13 @@
   \item[WdgM\_Lcfg.c:232] \parbox[t]{0.8\linewidth}{commented a function call to other module (//.Switch\_currentMode((Rte\_ModeType\_WdgMMode)status);)}
   \item[WdgM\_Lcfg.c:170] \parbox[t]{0.8\linewidth}{commented a function call to other module
 (//.Switch\_currentMode((Rte\_ModeType\_WdgMMode)status);)}
-  \item[WdgM.c:2056] bugfix because [WDGM286]
-  \item[WdgM.c:976] bugfix because [WDGM215]
-  \item[WdgM.c:1836] bugfix because [WDGM252]
-  \item[WdgM.c:989] bugfix because [WDGM219]
-  \item[WdgM.c:989] bugfix because [WDGM216]
-  \item[WdgM.c:1779] bugfix because [WDGM274]
+  \item[WdgM.c:975-1016] bugfix because [WDGM077], [WDGM117], [WDGM215], [WDGM216], [WDGM219], [WDGM220]
   \item[WdgM.c:1386] bugfix because [WDGM182]
+  \item[WdgM.c:1802] bugfix because [7.2.3.2]
+  \item[WdgM.c:1805] bugfix because [WDGM274]
+  \item[WdgM.c:1864] bugfix because [7.2.3.2]
+  \item[WdgM.c:1867] bugfix because [WDGM252]
+  \item[WdgM.c:2056] bugfix because [WDGM286]
   \item[WdgM\_Lcfg.c:223] \parbox[t]{0.8\linewidth}{bugfix, added initialization
       to alive/deadline/logical supervision results to WDGM\_CORRECT (copied the
       if statement from row 199), because [p. 27]}

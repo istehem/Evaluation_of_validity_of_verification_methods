@@ -103,7 +103,7 @@ is_activated_SE_in_ELS(ModeId, SeID) ->
 			                      ++get_checkpoints_for_mode(ModeId, 'ELSfinal'))).
 
 
-%%%% used by wdgm_Main
+%%%% used by wdgm_Main and helper
 
 get_AS_for_CP(ModeId, CPid) ->
     [{car_xml:get_value("WdgMSupervisionReferenceCycle", AS),

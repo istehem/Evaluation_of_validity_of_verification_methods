@@ -384,8 +384,14 @@ findKeyIndex(Elem, P, [Tuple|Ls],N) -> case element(P, Tuple) of
                                        end.
 
 reset_alive_table(ModeId) ->
-  lists:map(fun (X) ->
-                #alive{cpid          = wdgm_config_params:get_checkpoint_id(X),
+  lists:map(fun (CPref) ->
+                CPid = wdgm_config_params:get_checkpoint_id(CPref),
+                {SRC, EAI, Min, Max} = hd(wdgm_config_params:get_AS_for_CP(ModeId, CPid)),
+                #alive{cpid          = CPid,
+                       supervision_reference_cycles = SRC,
+                       expected_alive_indications   = EAI,
+                       minmargin     = Min,
+                       maxmargin     = Max,
                        alive_counter = 0}
             end,
             wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS')).

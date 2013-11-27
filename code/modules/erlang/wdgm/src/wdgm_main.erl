@@ -162,15 +162,17 @@ alive_supervision(S, SE) ->
                     [CPref
                      || CPref <- wdgm_config_params:get_checkpoints_for_mode(S#state.currentMode, 'AS'),
                         lists:member(wdgm_config_params:get_checkpoint_id(CPref), CPs_for_SE)]),
-  Correct = lists:all(fun (Elem) -> Elem == 'WDGM_CORRECT' end,
-                      [AliveCP#alive.status
-                       || AliveCP <- NewS#state.aliveTable,
-                          lists:member(AliveCP#alive.cpid, CPs_for_SE)]),
+  AliveTableForSE = [AliveCP#alive.status
+                     || AliveCP <- NewS#state.aliveTable,
+                        lists:member(AliveCP#alive.cpid, CPs_for_SE),
+                        (SE#supervisedentity.supervision_cycles+1) rem AliveCP#alive.supervision_reference_cycles == 0],
+  Correct = lists:all(fun (Elem) -> Elem == 'WDGM_CORRECT' end, AliveTableForSE),
   LocalSEalivestatus=
-    case Correct of
-      true ->
+    case {Correct, AliveTableForSE} of
+      {_, []}    -> SE#supervisedentity.localalivestatus;
+      {true, _}  ->
         'WDGM_CORRECT';
-      false ->
+      {false, _} ->
         'WDGM_INCORRECT'
     end,
   NewS#state{supervisedentities=lists:keyreplace(SE#supervisedentity.seid,
@@ -184,7 +186,10 @@ check_CP_within_SE(S, CPref) ->
   CPstate = lists:keyfind(CPid, 2, S#state.aliveTable),
   SEid = wdgm_config_params:get_SE_id(CPref),
   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  {SRC, EAI, MinMargin, MaxMargin} = hd(wdgm_config_params:get_AS_for_CP(S#state.currentMode, CPid)),
+  SRC = CPstate#alive.supervision_reference_cycles,
+  EAI = CPstate#alive.expected_alive_indications,
+  MinMargin = CPstate#alive.minmargin,
+  MaxMargin = CPstate#alive.maxmargin,
   SC = SE#supervisedentity.supervision_cycles+1, %% because dont update when SC==0
   {NewCPalivestatus, NewCPalivecounter} =
     case SC rem SRC == 0 of
