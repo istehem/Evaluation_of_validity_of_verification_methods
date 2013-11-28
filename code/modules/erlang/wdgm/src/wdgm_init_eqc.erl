@@ -177,10 +177,16 @@ checkpointreached_post(S, Args=[_SeID, CPId], Ret) ->
                        not_found -> %% checkpoint does not exist in alive supervision
                          true;
                        Idx -> %% checkpoint exists but need to check it
-                         eq(element(3, lists:nth(Idx,
-                                              eqc_c:read_array(element(4, eqc_c:value_of('WdgM_MonitorTableRef')),
-                                                               AliveSupCount))),
-                           ((lists:keyfind(CPId, 2, S#state.aliveTable))#alive.alive_counter+1))
+                         CAliveCounter =
+                         (lists:nth(Idx,
+                                       eqc_c:read_array((eqc_c:value_of('WdgM_MonitorTableRef'))
+                                                        #'WdgM_MonitorTableRefType_Tag'
+                                                        .'AliveSupervisionMonitorTablePtr',
+                                                        AliveSupCount)))
+                            #'WdgM_AliveSupervisionMonitor_Tag'.alive_count,
+                         EAliveCounter =
+                            ((lists:keyfind(CPId, 2, S#state.aliveTable))#alive.alive_counter+1),
+                         eq(CAliveCounter, EAliveCounter)
                      end;
                    _ -> true
                  end;
@@ -199,13 +205,11 @@ checkpointreached_next(S, _Ret, Args = [SEid, CPid]) ->
   case not checkpoint_postcondition(S, Args) of
     true ->
       AS = case lists:keyfind(CPid, 2, S#state.aliveTable) of
-               false -> S;
-               _ -> AliveTable = [case X#alive.cpid of
-                                    CPid -> X#alive{alive_counter=X#alive.alive_counter+1};
-                                    _ -> X
-                                  end
-                                  || X <- S#state.aliveTable],
-                    S#state{aliveTable=AliveTable}
+               false   -> S;
+               AliveCP -> AliveTable = lists:keyreplace(CPid, 2,
+                                                        S#state.aliveTable,
+                                                        AliveCP#alive{alive_counter=AliveCP#alive.alive_counter+1}),
+                          S#state{aliveTable=AliveTable}
              end,
       DS = wdgm_checkpointreached:deadlinereached(AS, SEid, CPid),
       wdgm_checkpointreached:logicalreached(DS, SEid, CPid);
@@ -329,9 +333,10 @@ mainfunction_post(S, _Args, _Ret) ->
         case eqc_c:value_of('WdgM_CurrentConfigPtr') of
           CfgPtr = {ptr, _, _} ->
             case eqc_c:deref(CfgPtr) of
-              {_,_,_,ModePtr} ->
-                case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, 4)) of
-                  {_ExpiredSupCycleTol,
+              {_,_,ModeCount,ModePtr} ->
+                case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, ModeCount)) of
+                  {_,
+                   _ExpiredSupCycleTol,
                    _TriggerCount,
                    _AliveSupCount,
                    _DeadlineSupCount,
