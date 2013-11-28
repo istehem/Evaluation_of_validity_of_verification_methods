@@ -119,21 +119,11 @@ The functional safety concept will be most important in this phase.
 The first problem at hand is to evaluate what ``semi formal verification'',
 according to the ISO-standard, means. In formal methods of mathematics, formal
 verification means to prove the correctness of algorithms.
-
-%%This can be done by looking at the algorithms state space and argue for that
-%%a formal verification tool checks that the states and
-%every transitions between states are correct.
-
-%This can be done by
-%arguing that the state space that is not checked will not affect the model.
-%In general, complex computer systems suffers from the state space explosion problem and
-%therefore exhaustively visiting all states are not practically possible.
-
 The ISO-standard mentions both ``formal verification'' and ``semi
 formal verification'' for software development, but does not describe how to
 achieve any of these.
 This evaluation must be done to get knowledge of how to properly implement
-functional safety and reach an ASIL classification.
+functional safety and reach an ASIL classification, using automated testing.
 
 %The second problem is to evaluate if QuickCheck can be used to achieve this.
 %QuickCheck grants the ability to automate the testing, and knowledge of this
@@ -151,7 +141,7 @@ can argue for that each line of code has been executed (100\% code coverage),
 but that is just a statement for that everything has been executed. Have it been executed correctly?
 One can also ask oneself, are every combination of computations in the system
 necessary to ensure correctness? In other words is it possible to
-collapse some states in the systems state space without endangering the safety
+collapse some states in the system's state space without endangering the safety
 of the hole system?
 
 After the model has been implemented, there must be an evaluation of the
