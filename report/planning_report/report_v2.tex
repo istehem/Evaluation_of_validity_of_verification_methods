@@ -279,9 +279,9 @@ A proposed work flow is given below. \\\\
 \fbox{
 \parbox{\linewidth}{
 \begin{enumerate}
-\item Construct a model for AUTOSAR in Erlang
+\item Construct a model for an AUTOSAR module in Erlang
 \item Run Quickcheck for this model and compare the results with the output from
-the c code.
+the c code. \label{compare}
 \item Tweak the generators for the test cases \label{generators}
     \item Evaluate the results
     \begin{enumerate}
@@ -292,7 +292,7 @@ the c code.
     \end{enumerate}
 \item Are the results good enough, does it satisfy the requirements for the ASIL
 levels?
-\item If not go the step \ref{generators}
+\item If not go the step \ref{compare}
 \end{enumerate}
 }}
 
