@@ -54,21 +54,22 @@ init_next(S, _Ret, _Args) ->
 getmode_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
     orelse
-      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-       S#state.initialized == true).
+    S#state.initialized == true. %% [WDGM253]
 
 getmode_command(_S) ->
-  {call, ?MODULE, getmode, []}.
+  {call, ?MODULE, getmode, [frequency([{20, {eqc_c:alloc("uint8"),false}}, {0, {{ptr, "uint8", 0}, true}}])]}.
 
-getmode() ->
-  Mp = eqc_c:alloc("uint8"),
+getmode({Mp,_}) ->
   R = ?C_CODE:'WdgM_GetMode'(Mp),
-  {R,eqc_c:deref(Mp)}.
+  {R, eqc_c:deref(Mp)}.
 
-getmode_post(S, _Args, {R, Mode}) ->
-  (R == 0 andalso Mode == S#state.currentMode)
-    orelse R == 1.
-%%    additional checks if wdgmdeverrordetect is enabled
+getmode_post(S, {_, Is_Null}, {R, Mode}) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  case R of
+    0 -> eq(Mode, S#state.currentMode); %% [WDGM170]
+    1 -> DevErrorDetect andalso (Is_Null orelse %% [WDGM254]
+                                 not S#state.initialized) %% [WDGM253]
+  end.
 
 %% -WdgM_SetMode----------------------------------------------------------------
 
@@ -224,19 +225,26 @@ checkpointreached_next(S, _Ret, Args = [SEid, CPid]) ->
 getlocalstatus_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
     orelse
-      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-       S#state.initialized == true).
+    S#state.initialized == true.
 
 getlocalstatus_command(_S) ->
-  {call, ?MODULE, getlocalstatus, [oneof([0,2])]}.
+  {call, ?MODULE, getlocalstatus, [choose(0,5),
+                                    frequency([{20, {eqc_c:alloc("WdgM_LocalStatusType"), false}},
+                                               {0, {{ptr, "WdgM_LocalStatusType", 0}, true}}])]}.
 
-getlocalstatus(UI16_SEID) ->
-  Sp = eqc_c:alloc("WdgM_LocalStatusType"),
-  R  = ?C_CODE:'WdgM_GetLocalStatus'(UI16_SEID, Sp),
+getlocalstatus(SEid, {Sp, _}) ->
+  R  = ?C_CODE:'WdgM_GetLocalStatus'(SEid, Sp),
   {R,eqc_c:deref(Sp)}.
 
-getlocalstatus_post(_S, _Args, _Ret) ->
-  true.
+getlocalstatus_post(S, [SEid, {_, Is_Null}], {Ret, Status}) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+  case Ret of
+    0 -> eq(Status, SE#supervisedentity.localstatus); %% [WDGM171].
+    1 -> DevErrorDetect andalso (SE == false %% [WDGM172]
+                                 orelse Is_Null %% [WDGM257]
+                                 orelse not S#state.initialized) %% [WDGM173]
+  end.
 
 getlocalstatus_next(S, _Ret, _Args) ->
   S.
@@ -244,27 +252,24 @@ getlocalstatus_next(S, _Ret, _Args) ->
 %% -WdgM_GetGlobalStatus--------------------------------------------------------
 
 getglobalstatus_pre(S) ->
-  (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect)
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
     orelse
-      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-       S#state.initialized == true).
+    S#state.initialized == true.
 
 getglobalstatus_command(_S) ->
-  {call, ?MODULE, getglobalstatus, []}.
+  {call, ?MODULE, getglobalstatus, [frequency([{20, {eqc_c:alloc("WdgM_GlobalStatusType"), false}},
+                                               {0, {{ptr, "WdgM_GlobalStatusType", 0}, true}}])]}.
 
-getglobalstatus() ->
-  Sp = eqc_c:alloc("WdgM_GlobalStatusType"),
+getglobalstatus({Sp, _}) ->
   R = ?C_CODE:'WdgM_GetGlobalStatus'(Sp),
   {R, eqc_c:deref(Sp)}.
 
-getglobalstatus_post(S, _Args, Ret) ->
+getglobalstatus_post(S, {_, Is_Null}, Ret) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
   case Ret of
     {0, R} -> eq(R, S#state.globalstatus);
-    {1, _} -> S#state.initialized == false andalso
-               (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_DEACTIVATED' orelse
-                S#state.globalstatus == undefined)
-              %% [WDGM344] should check if status pointer (Args) is null
-              %% [WDGM258] should optionally check if status pointer is null
+    {1, _} -> DevErrorDetect andalso (Is_Null orelse %% [WDGM344], [WDGM258]
+                                      not S#state.initialized) %% [WDGM176]
   end.
 
 getglobalstatus_next(S, _Ret, _Args) ->
@@ -294,20 +299,24 @@ performreset_next(S, _Ret, _Args) ->
 %% -WdgM_GetFirstExpiredSEID----------------------------------------------------
 
 getfirstexpiredseid_pre(_S) ->
-  true.
+  true. %% [WDGM348]
 
 getfirstexpiredseid_command(_S) ->
-  {call, ?MODULE, getfirstexpiredseid, []}.
+  {call, ?MODULE, getfirstexpiredseid, [frequency([{20, {eqc_c:alloc("WdgM_SupervisedEntityIdType"), false}},
+                                                   {0, {{ptr, "WdgM_SupervisedEntityIdType", 0}, true}}])]}.
 
-getfirstexpiredseid() ->
-  Sp = eqc_c:alloc("WdgM_SupervisedEntityIdType"),
+getfirstexpiredseid({Sp, _}) ->
   R = ?C_CODE:'WdgM_GetFirstExpiredSEID'(Sp),
   {R, eqc_c:deref(Sp)}.
 
-getfirstexpiredseid_post(_S, _Args, Ret) ->
+getfirstexpiredseid_post(S, {_, Is_Null}, Ret) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior,
   case Ret of
-    {0, _} -> true;
-    {1, _} -> true
+    {0, SEid} -> eq(SEid, S#state.expiredSEid); %% [WDGM349]
+    {1, SEid} -> (S#state.expiredSEid == undefined andalso
+                  SEid == 0) %% [WDGM349]
+                   orelse
+                     (DevErrorDetect andalso Is_Null) %% [WDGM347]
   end.
 
 getfirstexpiredseid_next(S, _Ret, _Args) ->
