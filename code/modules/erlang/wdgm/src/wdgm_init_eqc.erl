@@ -21,18 +21,33 @@ init_pre(S) ->
   S#state.initialized /= true.
 
 init_command(_S) ->
-  {call, ?MODULE, init, []}.
+  {call, ?MODULE, init, [frequency([{20, {eqc_c:address_of('Tst_Cfg1'), false}},
+                                   {0, {{ptr, int, 0}, true}}])]}.
 
-init() ->
-  Ptr = eqc_c:address_of('Tst_Cfg1'),
+init({Ptr, _}) ->
   ?C_CODE:'WdgM_Init'(Ptr).
 
-init_post(S, _Args, _Ret) ->
-  check_supervisionstatus(eqc_c:value_of('WdgM_SupervisedEntityMonitorTable')) andalso
-    eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' andalso
-    eqc_c:value_of('WdgM_CurrentMode') == S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id.
-%% andalso
-%%    additional checks if wdgmdeverrordetect is enabled
+init_post(S, {_, Is_Null}, _Ret) ->
+  InitialMode = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  _OffModeEnabled = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.off_mode_enabled,
+  check_supervisionstatus(eqc_c:value_of('WdgM_SupervisedEntityMonitorTable')) andalso %% [WDGM268], [WDGM269]
+    eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' andalso %% [WDGM285]
+%    check_deadlinetimestamps() andalso %% [WDGM298]
+%    check_logicalactivityflag() andalso %% [WDGM296]
+%    check_all_global_and_statics() andalso %% [WDGM018]
+%    eqc_c:value_of('SeIdLocalStatusExpiredFirst') == 0 %% [WDGM350]
+%    andalso
+      (eqc_c:value_of('WdgM_CurrentMode') == InitialMode orelse %% [WDGM135]
+      (DevErrorDetect
+       andalso
+         (Is_Null %% [WDGM255]
+%          orelse
+%          not is_allowed_config() orelse %% [WDGM010]
+%          (not OffModeEnabled andalso is_disabled_watchdogs()) %% [WDGM030]
+         ))).
+
+
 
 init_next(S, _Ret, _Args) ->
   Rs = wdgm_xml:start(),
@@ -131,18 +146,20 @@ deinit() ->
 
 %% [WDGM154] should check something with WdgM_SetMode
 deinit_post(S, _Args, _Ret) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
   case S#state.globalstatus of
-    'WDGM_GLOBAL_STATUS_OK' -> eq(eqc_c:value_of('WdgM_GlobalStatus'), 'WDGM_GLOBAL_STATUS_DEACTIVATED');
-    undefined               -> true;
-    Status                  -> eq(eqc_c:value_of('WdgM_GlobalStatus'), Status)
+    'WDGM_GLOBAL_STATUS_OK' -> eq(eqc_c:value_of('WdgM_GlobalStatus'),
+                                  'WDGM_GLOBAL_STATUS_DEACTIVATED'); %% [WDGM286]
+    undefined               -> (DevErrorDetect andalso not S#state.initialized); %% [WDGM288]
+    Status                  -> eq(eqc_c:value_of('WdgM_GlobalStatus'), Status) %% lack of wdgm286?
   end.
 
 deinit_next(S, _Ret, _Args) ->
     case S#state.globalstatus of
       'WDGM_GLOBAL_STATUS_OK' ->
-        S#state{initialized = false,
-                globalstatus='WDGM_GLOBAL_STATUS_DEACTIVATED', %% [WDGM286]
-                currentMode=-1};
+        S#state{initialized  = false,
+                globalstatus = 'WDGM_GLOBAL_STATUS_DEACTIVATED', %% [WDGM286]
+                currentMode  = -1};
       _ -> S
     end.
 
@@ -280,8 +297,7 @@ getglobalstatus_next(S, _Ret, _Args) ->
 performreset_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
     orelse
-      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-       S#state.initialized == true).
+    S#state.initialized == true.
 
 performreset_command (_S) ->
   {call, ?MODULE, performreset, []}.
@@ -289,9 +305,11 @@ performreset_command (_S) ->
 performreset() ->
   ?C_CODE:'WdgM_PerformReset'().
 
-
-performreset_post(_S, _Args, _Ret) ->
-  true.
+performreset_post(S, _Args, _Ret) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  DevErrorDetect orelse S#state.initialized. %% [WDGM270]
+%% [WDGM232] går inte att göra i dagsläget pga avsaknad av WDGIF
+%% [WDGM233] ??? global status not to be considered anymore
 
 performreset_next(S, _Ret, _Args) ->
   S.
