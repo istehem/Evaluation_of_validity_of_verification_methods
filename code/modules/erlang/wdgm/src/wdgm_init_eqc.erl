@@ -21,8 +21,8 @@ init_pre(S) ->
   S#state.initialized /= true.
 
 init_command(_S) ->
-  {call, ?MODULE, init, [frequency([{20, {eqc_c:address_of('Tst_Cfg1'), false}},
-                                   {0, {{ptr, int, 0}, true}}])]}.
+  {call, ?MODULE, init, [frequency([{20, return({eqc_c:address_of('Tst_Cfg1'), false})},
+                                   {0, return({{ptr, int, 0}, true})}])]}.
 
 init({Ptr, _}) ->
   ?C_CODE:'WdgM_Init'(Ptr).
@@ -77,7 +77,8 @@ getmode_pre(S) ->
     S#state.initialized. %% [WDGM253]
 
 getmode_command(_S) ->
-  {call, ?MODULE, getmode, [frequency([{20, {eqc_c:alloc("uint8"),false}}, {0, {{ptr, "uint8", 0}, true}}])]}.
+  {call, ?MODULE, getmode, [frequency([{20, return({eqc_c:alloc("uint8"),false})},
+                                       {0, return({{ptr, "uint8", 0}, true})}])]}.
 
 getmode({Mp,_}) ->
   R = ?C_CODE:'WdgM_GetMode'(Mp),
@@ -261,10 +262,8 @@ getlocalstatus_pre(S) ->
 getlocalstatus_command(_S) ->
   Sp =eqc_c:alloc("WdgM_LocalStatusType"),
   {call, ?MODULE, getlocalstatus, [choose(1,5),
-                                    frequency([{20, return({eqc_c:alloc("WdgM_LocalStatusType"),false})}, {0, return({{ptr, "uint8", 0}, true})}])
-                                             % [{20, Sp},
-                                             %  {0, {{ptr, "WdgM_LocalStatusType", 0}, true}}])
-                                  ]}.
+                                    frequency([{20, return({eqc_c:alloc("WdgM_LocalStatusType"),false})},
+                                               {0, return({{ptr, "WdgM_LocalStatusType", 0}, true})}])]}.
 
 getlocalstatus(SEid, {Sp,_}) ->
   %Sp = eqc_c:alloc("WdgM_LocalStatusType"),
@@ -294,8 +293,8 @@ getglobalstatus_pre(S) ->
     S#state.initialized.
 
 getglobalstatus_command(_S) ->
-  {call, ?MODULE, getglobalstatus, [frequency([{20, {eqc_c:alloc("WdgM_GlobalStatusType"), false}},
-                                               {0, {{ptr, "WdgM_GlobalStatusType", 0}, true}}])]}.
+  {call, ?MODULE, getglobalstatus, [frequency([{20, return({eqc_c:alloc("WdgM_GlobalStatusType"), false})},
+                                               {0, return({{ptr, "WdgM_GlobalStatusType", 0}, true})}])]}.
 
 getglobalstatus({Sp, _}) ->
   R = ?C_CODE:'WdgM_GetGlobalStatus'(Sp),
@@ -340,8 +339,8 @@ getfirstexpiredseid_pre(_S) ->
   true. %% [WDGM348]
 
 getfirstexpiredseid_command(_S) ->
-  {call, ?MODULE, getfirstexpiredseid, [frequency([{20, {eqc_c:alloc("WdgM_SupervisedEntityIdType"), false}},
-                                                   {0, {{ptr, "WdgM_SupervisedEntityIdType", 0}, true}}])]}.
+  {call, ?MODULE, getfirstexpiredseid, [frequency([{20, return({eqc_c:alloc("WdgM_SupervisedEntityIdType"), false})},
+                                                   {0, return({{ptr, "WdgM_SupervisedEntityIdType", 0}, true})}])]}.
 
 getfirstexpiredseid({Sp, _}) ->
   R = ?C_CODE:'WdgM_GetFirstExpiredSEID'(Sp),
