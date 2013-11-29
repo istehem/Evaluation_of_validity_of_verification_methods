@@ -69,7 +69,7 @@ init_next(S, _Ret, _Args) ->
 getmode_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
     orelse
-    S#state.initialized == true. %% [WDGM253]
+    S#state.initialized. %% [WDGM253]
 
 getmode_command(_S) ->
   {call, ?MODULE, getmode, [frequency([{20, {eqc_c:alloc("uint8"),false}}, {0, {{ptr, "uint8", 0}, true}}])]}.
@@ -89,27 +89,38 @@ getmode_post(S, {_, Is_Null}, {R, Mode}) ->
 %% -WdgM_SetMode----------------------------------------------------------------
 
 setmode_pre(S) ->
-  (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
    orelse
-     (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-      S#state.initialized == true)).
+    S#state.initialized.
 
 setmode_command(_S) ->
   {call, ?MODULE, setmode, [choose(0,3), choose(1,2)]}.
 
-setmode(UI8_mode,UI16_callerId) ->
-  ?C_CODE:'WdgM_SetMode'(UI8_mode,UI16_callerId).
+setmode(Mode, CallerId) ->
+  ?C_CODE:'WdgM_SetMode'(Mode, CallerId).
 
 setmode_post(S, [ModeId, Cid], Ret) ->
-  lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids) andalso
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+
+  (S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_OK' andalso
+   S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_FAILED' andalso
+   S#state.currentMode == eqc_c:value_of('WdgM_CurrentMode')) orelse %% [WDGM316], [WDGM145]
+
+
+  S#state.globalstatus == eqc_c:value_of('WdgM_GlobalStatus') andalso %% [WDGM317]
+%%    S#state.expiredsupervisioncycles == eqc_c:value_of(expiredsupervisioncycles) andalso %% [WDGM317]
+
     case Ret of
-      0 -> ModeId == eqc_c:value_of('WdgM_CurrentMode') orelse
-             (S#state.globalstatus == eqc_c:value_of('WdgM_GlobalStatus') andalso
-              S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_OK' andalso
-              S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_FAILED' andalso
-              S#state.currentMode == eqc_c:value_of('WdgM_CurrentMode'));
-      1 -> S#state.currentMode == ModeId orelse S#state.currentMode == -1
+      0 ->
+        check_next_supervisionstatus(S, eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'), 0); %% [WDGM207], [WDGM291], [WDGM209], [WDGM182], [WDGM316]
+      1 ->
+        (DevErrorDetect andalso (ModeId within allowed range orelse %% [WDGM020]
+                                 not S#state.initialized) %% [WDGM021]
+%%%          orelse (not OffModeEnabled andalso is_disabled_watchdogs()) orelse %% [WDGM031]
+%%%          lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)) %% [WDGM245]
+         S#state.currentMode == ModeId orelse S#state.currentMode == -1
     end.
+%% [WDGM186], [WDGM142]
 
 setmode_next(S, Ret, [ModeId, _Cid]) ->
   case Ret of
@@ -135,8 +146,7 @@ setmode_next(S, Ret, [ModeId, _Cid]) ->
 deinit_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
     orelse
-      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso % <- unnecessary
-       S#state.initialized == true).
+    S#state.initialized.
 
 deinit_command(_S) ->
   {call, ?MODULE, deinit, []}.
@@ -168,8 +178,7 @@ deinit_next(S, _Ret, _Args) ->
 checkpointreached_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
     orelse
-      (not S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect andalso
-       S#state.initialized == true).
+    S#state.initialized.
 
 checkpointreached_command(_S) ->
   {call, ?MODULE, checkpointreached,
@@ -242,7 +251,7 @@ checkpointreached_next(S, _Ret, Args = [SEid, CPid]) ->
 getlocalstatus_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
     orelse
-    S#state.initialized == true.
+    S#state.initialized.
 
 getlocalstatus_command(_S) ->
   {call, ?MODULE, getlocalstatus, [choose(0,5),
@@ -271,7 +280,7 @@ getlocalstatus_next(S, _Ret, _Args) ->
 getglobalstatus_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
     orelse
-    S#state.initialized == true.
+    S#state.initialized.
 
 getglobalstatus_command(_S) ->
   {call, ?MODULE, getglobalstatus, [frequency([{20, {eqc_c:alloc("WdgM_GlobalStatusType"), false}},
@@ -297,7 +306,7 @@ getglobalstatus_next(S, _Ret, _Args) ->
 performreset_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
     orelse
-    S#state.initialized == true.
+    S#state.initialized.
 
 performreset_command (_S) ->
   {call, ?MODULE, performreset, []}.
@@ -344,7 +353,7 @@ getfirstexpiredseid_next(S, _Ret, _Args) ->
 
 mainfunction_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior orelse
-    S#state.initialized == true. %% [WDGM039]
+    S#state.initialized. %% [WDGM039]
 
 mainfunction_command(_S) ->
   {call, ?MODULE, mainfunction, []}.
@@ -393,6 +402,34 @@ mainfunction_next(S, _Ret, _Args) ->
 %% -----------------------------------------------------------------------------
 %% -----------------------------------------------------------------------------
 %% -Helper-functions------------------------------------------------------------
+
+check_next_supervisionstatus(_, [], _) -> true;
+check_next_supervisionstatus(S, [L|Ls], C) ->
+  SE = lists:keyfind(C, 2, S#state.supervisedentities),
+  (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
+   S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED') andalso
+  case L#'WdgM_SupervisedEntityMonitor_Tag'.supervision_status of
+    'WDGM_LOCAL_STATUS_OK' ->
+       SE#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_OK' orelse %% [WDGM182]
+        SE#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_DEACTIVATED' %% [WDGM209]
+        andalso check_next_supervisionstatus(S, Ls, C+1);
+    'WDGM_LOCAL_STATUS_DEACTIVATED' ->
+      ((SE#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_OK' orelse %% [WDGM207]
+        SE#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_FAILED' %% [WDGM291]
+        andalso
+          (L#'WdgM_SupervisedEntityMonitor_Tag'.alivesupervision_result == 'WDGM_CORRECT' andalso
+           L#'WdgM_SupervisedEntityMonitor_Tag'.deadlinesupervision_result == 'WDGM_CORRECT' andalso
+           L#'WdgM_SupervisedEntityMonitor_Tag'.logicalsupervision_result == 'WDGM_CORRECT' andalso
+           L#'WdgM_SupervisedEntityMonitor_Tag'.failed_reference_supervisioncycles == 0)) %% [WDGM315]
+       orelse
+       SE#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_DEACTIVATED') %% [WDGM182]
+        andalso
+        check_next_supervisionstatus(S, Ls, C+1);
+    Status ->
+      SE#supervisedentity.localstatus == Status %% [WDGM182]
+        andalso check_next_supervisionstatus(S, Ls, C+1)
+  end.
+
 
 check_supervisionstatus([]) -> true;
 check_supervisionstatus([L|Ls]) ->
