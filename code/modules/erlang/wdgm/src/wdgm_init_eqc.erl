@@ -105,27 +105,27 @@ setmode_command(_S) ->
 setmode(Mode, CallerId) ->
   ?C_CODE:'WdgM_SetMode'(Mode, CallerId).
 
-setmode_post(S, [ModeId, _Cid], Ret) ->
+setmode_post(S, [ModeId, Cid], Ret) ->
   DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
-
   (S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_OK' andalso
    S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_FAILED' andalso
    S#state.currentMode == eqc_c:value_of('WdgM_CurrentMode')) orelse %% [WDGM316], [WDGM145]
 
 
-  S#state.globalstatus == eqc_c:value_of('WdgM_GlobalStatus') andalso %% [WDGM317]
+  ((S#state.globalstatus == eqc_c:value_of('WdgM_GlobalStatus') orelse  %% [WDGM317]
+    S#state.globalstatus == undefined
+   ) andalso
 %%    S#state.expiredsupervisioncycles == eqc_c:value_of(expiredsupervisioncycles) andalso %% [WDGM317]
 
     case Ret of
       0 ->
         check_next_supervisionstatus(S, eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'), 0); %% [WDGM207], [WDGM291], [WDGM209], [WDGM182], [WDGM316]
       1 ->
-        DevErrorDetect andalso ((within_allowed_range(ModeId) orelse %% [WDGM020]
-                                 not S#state.initialized) %% [WDGM021]
+        DevErrorDetect andalso (not_within_allowed_range(ModeId) orelse %% [WDGM020]
+                                 not S#state.initialized orelse %% [WDGM021]
 %%%          orelse (not OffModeEnabled andalso is_disabled_watchdogs()) orelse %% [WDGM031]
-%%%          lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)) %% [WDGM245]
-         andalso (S#state.currentMode == ModeId orelse S#state.currentMode == -1))
-    end.
+            lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)) %% [WDGM245]
+    end).
 %% [WDGM186], [WDGM142]
 
 setmode_next(S, Ret, [ModeId, _Cid]) ->
@@ -260,7 +260,6 @@ getlocalstatus_pre(S) ->
     S#state.initialized.
 
 getlocalstatus_command(_S) ->
-  Sp =eqc_c:alloc("WdgM_LocalStatusType"),
   {call, ?MODULE, getlocalstatus, [choose(1,5),
                                     frequency([{20, return({eqc_c:alloc("WdgM_LocalStatusType"),false})},
                                                {0, return({{ptr, "WdgM_LocalStatusType", 0}, true})}])]}.
@@ -441,8 +440,8 @@ check_next_supervisionstatus(S, [L|Ls], C) ->
   end.
 
 
-within_allowed_range(_SEid) ->
-  true.
+not_within_allowed_range(_SEid) ->
+  false.
 
 check_supervisionstatus([]) -> true;
 check_supervisionstatus([L|Ls]) ->
