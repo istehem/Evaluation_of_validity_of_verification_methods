@@ -204,42 +204,21 @@ checkpoint_gen(SeID) ->
 checkpointreached(SeID, CPId) ->
   ?C_CODE:'WdgM_CheckpointReached'(SeID, CPId).
 
-checkpointreached_post(S, Args=[_SeID, CPId], Ret) ->
+checkpointreached_post(S, Args=[SEid, CPId], Ret) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  MonitorTable = eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'),
   case Ret of
-    1 -> checkpoint_postcondition(S, Args);
-    0 -> case eqc_c:value_of('WdgM_CurrentConfigPtr') of
-           CfgPtr = {ptr, _, _} ->
-             case eqc_c:deref(CfgPtr) of
-               {_,_,_,ModePtr} ->
-                 case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, 4)) of
-                   {_,_,_,AliveSupCount,_,_,_,AliveSupPtr,_,_,_,_} ->
-                     case findKeyIndex(CPId, 6, eqc_c:read_array(AliveSupPtr, AliveSupCount)) of
-                       not_found -> %% checkpoint does not exist in alive supervision
-                         true;
-                       Idx -> %% checkpoint exists but need to check it
-                         CAliveCounter =
-                         (lists:nth(Idx,
-                                       eqc_c:read_array((eqc_c:value_of('WdgM_MonitorTableRef'))
-                                                        #'WdgM_MonitorTableRefType_Tag'
-                                                        .'AliveSupervisionMonitorTablePtr',
-                                                        AliveSupCount)))
-                            #'WdgM_AliveSupervisionMonitor_Tag'.alive_count,
-                         EAliveCounter =
-                            ((lists:keyfind(CPId, 2, S#state.aliveTable))#alive.alive_counter+1),
-                         eq(CAliveCounter, EAliveCounter)
-                     end;
-                   _ -> true
-                 end;
-               _ -> true
-             end;
-           _ -> true
-         end
+    1 -> DevErrorDetect andalso
+           checkpoint_postcondition(S, Args) andalso %% [WDGM278], [WDGM279], [WDGM284], [WDGM319]
+           check_same_supervisionstatus(S, MonitorTable, 0); %% do nothing
+    0 -> NextS = checkpointreached_next(S, 0, [SEid, CPId]),
+         check_same_supervisionstatus(NextS, MonitorTable, 0) %% [WDGM322], [WDGM323]
   end.
 
 checkpoint_postcondition(S, [SeID, CPId]) ->
-  S#state.initialized /= true orelse
-    not lists:member(CPId, wdgm_config_params:get_CPs_of_SE(SeID)) orelse
-    not wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SeID).
+  not S#state.initialized orelse %% [WDGM279]
+    not lists:member(CPId, wdgm_config_params:get_CPs_of_SE(SeID)) orelse %% [WDGM284]
+    not wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SeID). %% [WDGM319] ([WDGM278])
 
 checkpointreached_next(S, _Ret, Args = [SEid, CPid]) ->
   case not checkpoint_postcondition(S, Args) of
@@ -399,39 +378,36 @@ mainfunction() ->
   ?C_CODE:'WdgM_MainFunction'().
 
 mainfunction_post(S, _Args, _Ret) ->
-  case S#state.initialized of
-    true ->
-      NextS = wdgm_main:global_status(S),
-      eqc_c:value_of('WdgM_GlobalStatus') == NextS#state.globalstatus andalso
-        case eqc_c:value_of('WdgM_CurrentConfigPtr') of
-          CfgPtr = {ptr, _, _} ->
-            case eqc_c:deref(CfgPtr) of
-              {_,_,ModeCount,ModePtr} ->
-                case lists:nth(eqc_c:value_of('WdgM_CurrentMode')+1, eqc_c:read_array(ModePtr, ModeCount)) of
-                  {_,
-                   _ExpiredSupCycleTol,
-                   _TriggerCount,
-                   _AliveSupCount,
-                   _DeadlineSupCount,
-                   _LogicalSupCount,
-                   _LocalStatusParmCount,
-                   _AliveSupTablePtr,
-                   _DeadlineSupTablePtr,
-                   _LogicalSupTablePtr,
-                   _LocalStatusParmTablePtr,
-                   _TriggerTablePtr} -> true;
-                  _ -> true %% some problem rose from the modeinfo
-                end;
-              _ -> true %% some error rose from dereferencing, probably nullpointer
-            end;
-          _ -> true %% ouch, currentconfigptr is not a ptr could be 'NULL'
-        end;
-    false -> true
-  end.
+  %% [WDGM325] set localstatus based on [WDGM201], [WDGM202], [WDGM203], [WDGM204], [WDGM300], [WDGM205], [WDGM206], [WDGM208]
+  %% [WDGM214] globalstatus == mainfunction_next.globalstatus
+  %% [WDGM326] set globalstatus based on [WDGM078], [WDGM076], [WDGM215], [WDGM216], [WDGM217], [WDGM218], [WDGM077], [WDGM117], [WDGM219], [WDGM220], [WDGM221]
+  %% [WDGM324] perform alive supervision based on [WDGM098], [WDGM074], [WDGM115], [WDGM083]
+  %% WDGIF [WDGM223], [WDGM328]
+  %% OS [WDGM275]
+  %% manage corresponding error handling [WDGM327]
+  %% S#state.globalstatus == 'WDGM_GLOBAL_STATUS_DEACTIVATED' %% [WDGM063] where???? maybe in OS?
+
+  DefensiveBehaviour = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior,
+  GlobalStatus = eqc_c:value_of('WdgM_GlobalStatus'),
+  NextS = mainfunction_next(S, 0, 0),
+  MonitorTable = eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'),
+
+  ((DefensiveBehaviour andalso not S#state.initialized) andalso
+   S#state.globalstatus == GlobalStatus andalso
+   check_same_supervisionstatus(S, MonitorTable, 0)) %% [WDGM039]
+    orelse
+
+    ((GlobalStatus == 'WDGM_GLOBAL_STATUS_EXPIRED' andalso
+     eqc_c:value_of('SeIdLocalStatusExpiredFirst') /= 0 andalso
+     NextS#state.expiredSEid /= undefined) orelse %% [WDGM351]
+
+     check_same_supervisionstatus(NextS, MonitorTable, 0) andalso %% [WDGM325]
+     NextS#state.globalstatus == GlobalStatus %% [WDGM214], [WDGM326]
+    ).
 
 mainfunction_next(S, _Ret, _Args) ->
   case S#state.initialized of
-    true -> wdgm_main:global_status(S);
+    true  -> wdgm_main:global_status(S);
     false -> S
   end.
 
@@ -440,6 +416,19 @@ mainfunction_next(S, _Ret, _Args) ->
 %% -----------------------------------------------------------------------------
 %% -Helper-functions------------------------------------------------------------
 
+%% used by mainfunction
+check_same_supervisionstatus(_, [], _) ->
+  true;
+check_same_supervisionstatus(S, [L|Ls], C) ->
+  SE = lists:keyfind(C, 2, S#state.supervisedentities),
+  L#'WdgM_SupervisedEntityMonitor_Tag'.supervision_status == SE#supervisedentity.localstatus andalso
+    L#'WdgM_SupervisedEntityMonitor_Tag'.logicalsupervision_result == SE#supervisedentity.locallogicalstatus andalso
+    L#'WdgM_SupervisedEntityMonitor_Tag'.deadlinesupervision_result == SE#supervisedentity.localdeadlinestatus andalso
+    L#'WdgM_SupervisedEntityMonitor_Tag'.alivesupervision_result == SE#supervisedentity.localalivestatus andalso
+    check_same_supervisionstatus(S, Ls, C+1).
+
+
+%% used by setmode
 check_next_supervisionstatus(_, [], _) -> true;
 check_next_supervisionstatus(S, [L|Ls], C) ->
   SE = lists:keyfind(C, 2, S#state.supervisedentities),
@@ -468,9 +457,11 @@ check_next_supervisionstatus(S, [L|Ls], C) ->
   end.
 
 
-not_within_allowed_range(_SEid) ->
-  false.
+not_within_allowed_range(ModeId) ->
+  ModeId < 0 orelse ModeId > 255.
 
+
+%% used by init
 check_supervisionstatus([]) -> true;
 check_supervisionstatus([L|Ls]) ->
   case L#'WdgM_SupervisedEntityMonitor_Tag'.supervision_status of
