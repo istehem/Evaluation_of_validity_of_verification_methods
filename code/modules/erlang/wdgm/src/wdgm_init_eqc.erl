@@ -27,25 +27,30 @@ init_command(_S) ->
 init({Ptr, _}) ->
   ?C_CODE:'WdgM_Init'(Ptr).
 
-init_post(S, {_, Is_Null}, _Ret) ->
+init_post(S, [{_, Is_Null}], _Ret) ->
   InitialMode = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
   DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
   _OffModeEnabled = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.off_mode_enabled,
-  check_supervisionstatus(eqc_c:value_of('WdgM_SupervisedEntityMonitorTable')) andalso %% [WDGM268], [WDGM269]
-    eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' andalso %% [WDGM285]
+  check_supervisionstatus(eqc_c:value_of('WdgM_SupervisedEntityMonitorTable')) andalso %% [WDGM268], [WDGM269:446
+   eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' andalso %% [WDGM285]
+
 %    check_deadlinetimestamps() andalso %% [WDGM298]
 %    check_logicalactivityflag() andalso %% [WDGM296]
 %    check_all_global_and_statics() andalso %% [WDGM018]
 %    eqc_c:value_of('SeIdLocalStatusExpiredFirst') == 0 %% [WDGM350]
 %    andalso
-      (eqc_c:value_of('WdgM_CurrentMode') == InitialMode orelse %% [WDGM135]
+
+    (eqc_c:value_of('WdgM_CurrentMode') == InitialMode orelse %% [WDGM135]
       (DevErrorDetect
        andalso
          (Is_Null %% [WDGM255]
+
+
 %          orelse
 %          not is_allowed_config() orelse %% [WDGM010]
 %          (not OffModeEnabled andalso is_disabled_watchdogs()) %% [WDGM030]
-         ))).
+
+))).
 
 
 
@@ -78,7 +83,7 @@ getmode({Mp,_}) ->
   R = ?C_CODE:'WdgM_GetMode'(Mp),
   {R, eqc_c:deref(Mp)}.
 
-getmode_post(S, {_, Is_Null}, {R, Mode}) ->
+getmode_post(S, [{_, Is_Null}], {R, Mode}) ->
   DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
   case R of
     0 -> eq(Mode, S#state.currentMode); %% [WDGM170]
@@ -99,7 +104,7 @@ setmode_command(_S) ->
 setmode(Mode, CallerId) ->
   ?C_CODE:'WdgM_SetMode'(Mode, CallerId).
 
-setmode_post(S, [ModeId, Cid], Ret) ->
+setmode_post(S, [ModeId, _Cid], Ret) ->
   DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
 
   (S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_OK' andalso
@@ -114,11 +119,11 @@ setmode_post(S, [ModeId, Cid], Ret) ->
       0 ->
         check_next_supervisionstatus(S, eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'), 0); %% [WDGM207], [WDGM291], [WDGM209], [WDGM182], [WDGM316]
       1 ->
-        (DevErrorDetect andalso (ModeId within allowed range orelse %% [WDGM020]
+        DevErrorDetect andalso ((within_allowed_range(ModeId) orelse %% [WDGM020]
                                  not S#state.initialized) %% [WDGM021]
 %%%          orelse (not OffModeEnabled andalso is_disabled_watchdogs()) orelse %% [WDGM031]
 %%%          lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)) %% [WDGM245]
-         S#state.currentMode == ModeId orelse S#state.currentMode == -1
+         andalso (S#state.currentMode == ModeId orelse S#state.currentMode == -1))
     end.
 %% [WDGM186], [WDGM142]
 
@@ -254,23 +259,29 @@ getlocalstatus_pre(S) ->
     S#state.initialized.
 
 getlocalstatus_command(_S) ->
-  {call, ?MODULE, getlocalstatus, [choose(0,5),
-                                    frequency([{20, {eqc_c:alloc("WdgM_LocalStatusType"), false}},
-                                               {0, {{ptr, "WdgM_LocalStatusType", 0}, true}}])]}.
+  Sp =eqc_c:alloc("WdgM_LocalStatusType"),
+  {call, ?MODULE, getlocalstatus, [choose(1,5),
+                                    frequency([{20, return({eqc_c:alloc("WdgM_LocalStatusType"),false})}, {0, return({{ptr, "uint8", 0}, true})}])
+                                             % [{20, Sp},
+                                             %  {0, {{ptr, "WdgM_LocalStatusType", 0}, true}}])
+                                  ]}.
 
-getlocalstatus(SEid, {Sp, _}) ->
+getlocalstatus(SEid, {Sp,_}) ->
+  %Sp = eqc_c:alloc("WdgM_LocalStatusType"),
   R  = ?C_CODE:'WdgM_GetLocalStatus'(SEid, Sp),
+  io:fwrite("###~p####\n",[Sp]),
   {R,eqc_c:deref(Sp)}.
 
-getlocalstatus_post(S, [SEid, {_, Is_Null}], {Ret, Status}) ->
-  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
-  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-  case Ret of
-    0 -> eq(Status, SE#supervisedentity.localstatus); %% [WDGM171].
-    1 -> DevErrorDetect andalso (SE == false %% [WDGM172]
-                                 orelse Is_Null %% [WDGM257]
-                                 orelse not S#state.initialized) %% [WDGM173]
-  end.
+%getlocalstatus_post(S, [SEid, {_, Is_Null}], {Ret, Sp}) ->
+%  Status = eqc_c:deref(Sp),
+%  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+%  SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+%  case Ret of
+%    0 -> eq(Status, SE#supervisedentity.localstatus); %% [WDGM171].
+%    1 -> DevErrorDetect andalso (SE == false %% [WDGM172]
+ %                                orelse Is_Null %% [WDGM257]
+%                                 orelse not S#state.initialized) %% [WDGM173]
+%  end.
 
 getlocalstatus_next(S, _Ret, _Args) ->
   S.
@@ -290,7 +301,7 @@ getglobalstatus({Sp, _}) ->
   R = ?C_CODE:'WdgM_GetGlobalStatus'(Sp),
   {R, eqc_c:deref(Sp)}.
 
-getglobalstatus_post(S, {_, Is_Null}, Ret) ->
+getglobalstatus_post(S, [{_, Is_Null}], Ret) ->
   DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
   case Ret of
     {0, R} -> eq(R, S#state.globalstatus);
@@ -336,7 +347,7 @@ getfirstexpiredseid({Sp, _}) ->
   R = ?C_CODE:'WdgM_GetFirstExpiredSEID'(Sp),
   {R, eqc_c:deref(Sp)}.
 
-getfirstexpiredseid_post(S, {_, Is_Null}, Ret) ->
+getfirstexpiredseid_post(S, [{_, Is_Null}], Ret) ->
   DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior,
   case Ret of
     {0, SEid} -> eq(SEid, S#state.expiredSEid); %% [WDGM349]
@@ -430,6 +441,9 @@ check_next_supervisionstatus(S, [L|Ls], C) ->
         andalso check_next_supervisionstatus(S, Ls, C+1)
   end.
 
+
+within_allowed_range(_SEid) ->
+  true.
 
 check_supervisionstatus([]) -> true;
 check_supervisionstatus([L|Ls]) ->
