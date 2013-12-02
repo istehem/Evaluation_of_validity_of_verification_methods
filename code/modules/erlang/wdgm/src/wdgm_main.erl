@@ -17,12 +17,14 @@ global_status(S) ->
   EXPIRED_TOL = NewS#state.expired_supervision_cycles_tol,
   EXPIRED_CYCLES = NewS#state.expiredsupervisioncycles,
   {Status, NewExpiredCycles} = check_global_status({NewS#state.globalstatus, Failed, Expired}, EXPIRED_TOL, EXPIRED_CYCLES),
-  EXPIRED_SE = (lists:keyfind('WDGM_LOCAL_STATUS_EXPIRED', 3, NewS#state.supervisedentities)),
   NewS#state{
     globalstatus=Status,
-    expiredSEid=case EXPIRED_SE of
-                  false -> undefined;
-                  SE -> SE#supervisedentity.seid
+    expiredSEid=case S#state.expiredSEid of
+                    undefined -> case lists:keyfind('WDGM_LOCAL_STATUS_EXPIRED', 3, NewS#state.supervisedentities) of
+                                  false -> undefined;
+                                  SE -> SE#supervisedentity.seid
+                                  end;
+                    SEID      -> SEID
                 end,
     expiredsupervisioncycles=NewExpiredCycles}.
 
