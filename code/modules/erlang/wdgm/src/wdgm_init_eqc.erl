@@ -212,7 +212,8 @@ checkpointreached_post(S, Args=[SEid, CPId], Ret) ->
            checkpoint_postcondition(S, Args) andalso %% [WDGM278], [WDGM279], [WDGM284], [WDGM319]
            (S#state.supervisedentities == undefined orelse check_same_supervisionstatus(S, MonitorTable, 0));
     0 -> NextS = checkpointreached_next(S, 0, [SEid, CPId]),
-         check_same_supervisionstatus(NextS, MonitorTable, 0) %% [WDGM322], [WDGM323]
+         NextS#state.globalstatus == 'WDGM_GLOBAL_STATUS_EXPIRED' orelse
+          check_same_supervisionstatus(NextS, MonitorTable, 0) %% [WDGM322], [WDGM323]
   end.
 
 checkpoint_postcondition(S, [SeID, CPId]) ->
@@ -398,7 +399,9 @@ mainfunction_post(S, _Args, _Ret) ->
       NextS#state.expiredSEid /= undefined) %% [WDGM351]
      orelse
        (S#state.initialized andalso
-        check_same_supervisionstatus(NextS, MonitorTable, 0)) andalso %% [WDGM325]
+        (NextS#state.globalstatus == 'WDGM_GLOBAL_STATUS_EXPIRED'
+         orelse check_same_supervisionstatus(NextS, MonitorTable, 0))) %% [WDGM325]
+       andalso
      NextS#state.globalstatus == GlobalStatus), %% [WDGM214], [WDGM326]
   case DefensiveBehaviour of
     true ->
@@ -435,7 +438,7 @@ check_same_supervisionstatus(S, [L|Ls], C) ->
   L#'WdgM_SupervisedEntityMonitor_Tag'.supervision_status == SE#supervisedentity.localstatus andalso
     L#'WdgM_SupervisedEntityMonitor_Tag'.logicalsupervision_result == SE#supervisedentity.locallogicalstatus andalso
       L#'WdgM_SupervisedEntityMonitor_Tag'.deadlinesupervision_result == SE#supervisedentity.localdeadlinestatus andalso
-         %% L#'WdgM_SupervisedEntityMonitor_Tag'.alivesupervision_result == SE#supervisedentity.localalivestatus andalso
+         L#'WdgM_SupervisedEntityMonitor_Tag'.alivesupervision_result == SE#supervisedentity.localalivestatus andalso
          %% Due to the c implementation the new state will not be updated when there exists a local status that has expired,
          %% Updating or not updateing the state is correct according to the specification,
          %% hence this property can not be checked here.
