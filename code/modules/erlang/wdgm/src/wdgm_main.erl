@@ -230,7 +230,7 @@ foldresult(_Fun, State, []) ->
   State;
 foldresult(Fun, State, [X|Xs]) ->
   case
-    %% så modellen passar c-koden, break out if expired
+    %% så modellen passar c-koden => break out if expired
     lists:keyfind('WDGM_LOCAL_STATUS_EXPIRED', 3, State#state.supervisedentities)
   of
     false ->

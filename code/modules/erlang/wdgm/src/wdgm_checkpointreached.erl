@@ -23,6 +23,7 @@ deadlinereached(S, SEid, CPid) ->
           Difference =< DeadlineMax andalso
           Difference >= DeadlineMin andalso
           SE#supervisedentity.localdeadlinestatus == 'WDGM_CORRECT' %% dont destroy previous CP behaviour
+          andalso DeadlineStop#deadline.timestamp /= 0 %% must be started before, [WDGM229]
         of
           true  -> 'WDGM_CORRECT'; %% [WDGM294]
           false -> 'WDGM_INCORRECT'
