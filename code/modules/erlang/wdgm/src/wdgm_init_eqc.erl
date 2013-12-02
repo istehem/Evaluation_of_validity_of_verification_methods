@@ -392,18 +392,26 @@ mainfunction_post(S, _Args, _Ret) ->
   NextS = mainfunction_next(S, 0, 0),
   MonitorTable = eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'),
 
-  ((DefensiveBehaviour andalso not S#state.initialized) andalso
-   S#state.globalstatus == GlobalStatus andalso
-   check_same_supervisionstatus(S, MonitorTable, 0)) %% [WDGM039]
-    orelse
-
+  Behaviour =
     ((GlobalStatus == 'WDGM_GLOBAL_STATUS_EXPIRED' andalso
-     eqc_c:value_of('SeIdLocalStatusExpiredFirst') /= 0 andalso
-     NextS#state.expiredSEid /= undefined) orelse %% [WDGM351]
+      eqc_c:value_of('SeIdLocalStatusExpiredFirst') /= 0 andalso
+      NextS#state.expiredSEid /= undefined) %% [WDGM351]
+     orelse
+       (S#state.initialized andalso
+        check_same_supervisionstatus(NextS, MonitorTable, 0)) andalso %% [WDGM325]
+     NextS#state.globalstatus == GlobalStatus), %% [WDGM214], [WDGM326]
 
-     check_same_supervisionstatus(NextS, MonitorTable, 0) andalso %% [WDGM325]
-     NextS#state.globalstatus == GlobalStatus %% [WDGM214], [WDGM326]
-    ).
+  case DefensiveBehaviour of
+    true ->
+      case S#state.initialized of
+        true -> Behaviour;
+        false ->
+          S#state.globalstatus == GlobalStatus andalso
+            (S#state.supervisedentities == undefined orelse
+            check_same_supervisionstatus(S, MonitorTable, 0))
+      end; %% [WDGM039]
+    false -> Behaviour
+  end.
 
 mainfunction_next(S, _Ret, _Args) ->
   case S#state.initialized of
