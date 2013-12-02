@@ -432,9 +432,12 @@ check_same_supervisionstatus(S, [L|Ls], C) ->
   SE = lists:keyfind(C, 2, S#state.supervisedentities),
   L#'WdgM_SupervisedEntityMonitor_Tag'.supervision_status == SE#supervisedentity.localstatus andalso
     L#'WdgM_SupervisedEntityMonitor_Tag'.logicalsupervision_result == SE#supervisedentity.locallogicalstatus andalso
-    L#'WdgM_SupervisedEntityMonitor_Tag'.deadlinesupervision_result == SE#supervisedentity.localdeadlinestatus andalso
-    L#'WdgM_SupervisedEntityMonitor_Tag'.alivesupervision_result == SE#supervisedentity.localalivestatus andalso
-    check_same_supervisionstatus(S, Ls, C+1).
+      L#'WdgM_SupervisedEntityMonitor_Tag'.deadlinesupervision_result == SE#supervisedentity.localdeadlinestatus andalso
+         L#'WdgM_SupervisedEntityMonitor_Tag'.alivesupervision_result == SE#supervisedentity.localalivestatus andalso
+  case SE#supervisedentity.localstatus of
+    'WDGM_LOCAL_STATUS_EXPIRED' -> true;
+     _                          -> check_same_supervisionstatus(S, Ls, C+1)
+  end.
 
 
 %% used by setmode
