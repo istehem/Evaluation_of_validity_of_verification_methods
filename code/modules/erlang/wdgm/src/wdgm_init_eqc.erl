@@ -406,7 +406,8 @@ mainfunction_post(S, _Args, _Ret) ->
       case S#state.initialized of
         true -> Behaviour;
         false ->
-          S#state.globalstatus == GlobalStatus andalso
+          (S#state.globalstatus == GlobalStatus orelse (S#state.globalstatus == undefined
+            andalso GlobalStatus == 'WDGM_GLOBAL_STATUS_OK')) andalso
             (S#state.supervisedentities == undefined orelse
             check_same_supervisionstatus(S, MonitorTable, 0))
       end; %% [WDGM039]
