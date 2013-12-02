@@ -400,7 +400,6 @@ mainfunction_post(S, _Args, _Ret) ->
        (S#state.initialized andalso
         check_same_supervisionstatus(NextS, MonitorTable, 0)) andalso %% [WDGM325]
      NextS#state.globalstatus == GlobalStatus), %% [WDGM214], [WDGM326]
-
   case DefensiveBehaviour of
     true ->
       case S#state.initialized of
@@ -415,7 +414,10 @@ mainfunction_post(S, _Args, _Ret) ->
   end.
 
 mainfunction_next(S, _Ret, _Args) ->
-  case S#state.initialized of
+  case
+    S#state.initialized andalso
+    S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_STOPPED' %%  [WDGM221]
+  of
     true  -> wdgm_main:global_status(S);
     false -> S
   end.
