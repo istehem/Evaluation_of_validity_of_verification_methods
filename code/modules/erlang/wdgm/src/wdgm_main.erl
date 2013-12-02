@@ -229,5 +229,12 @@ logical_supervision(SE) ->
 foldresult(_Fun, State, []) ->
   State;
 foldresult(Fun, State, [X|Xs]) ->
-  NewS = Fun(State, X),
-  foldresult(Fun, NewS, Xs).
+  case
+    %% så modellen passar c-koden, break out if expired
+    lists:keyfind('WDGM_LOCAL_STATUS_EXPIRED', 3, State#state.supervisedentities)
+  of
+    false ->
+      NewS = Fun(State, X),
+      foldresult(Fun, NewS, Xs);
+    _ -> State
+  end.
