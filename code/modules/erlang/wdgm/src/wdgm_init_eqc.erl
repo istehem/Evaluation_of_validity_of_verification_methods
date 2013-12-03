@@ -394,14 +394,14 @@ mainfunction_post(S, _Args, _Ret) ->
   MonitorTable = eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'),
 
   Behaviour =
-    ((GlobalStatus == 'WDGM_GLOBAL_STATUS_EXPIRED' andalso
+  NextS#state.globalstatus == GlobalStatus andalso %% [WDGM214], [WDGM326]
+  ((GlobalStatus == 'WDGM_GLOBAL_STATUS_EXPIRED' andalso
       eqc_c:value_of('SeIdLocalStatusExpiredFirst') /= 0 andalso
       NextS#state.expiredSEid /= undefined) %% [WDGM351]
      orelse
        (S#state.initialized andalso
-         check_same_supervisionstatus(NextS, MonitorTable, 0)) %% [WDGM325]
-       andalso
-     NextS#state.globalstatus == GlobalStatus), %% [WDGM214], [WDGM326]
+         check_same_supervisionstatus(NextS, MonitorTable, 0))), %% [WDGM325]
+
   case DefensiveBehaviour of
     true ->
       case S#state.initialized of
