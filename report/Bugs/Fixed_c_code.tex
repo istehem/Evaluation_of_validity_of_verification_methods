@@ -260,6 +260,68 @@ changed to:
 \end{lstlisting}
 
 \newpage
+\section{Wdgm.c:1834}
+
+\begin{lstlisting}
+if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].most_recently_reported==
+  WdgM_GetInternalGraphStopId(WdgM_CurrentMode,idx,index))
+{
+  SchM_Enter_WdgM_EaLogicalSupResultProtect();
+  WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
+  SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  SchM_Enter_WdgM_EaActivityFlagProtect();
+  WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag=FALSE;
+  SchM_Exit_WdgM_EaActivityFlagProtect();
+}
+\end{lstlisting}
+
+changedto:
+
+\begin{lstlisting}
+if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].most_recently_reported==
+  WdgM_GetInternalGraphStopId(WdgM_CurrentMode,idx,index)&&prev_log_res==WDGM_CORRECT)
+{
+  SchM_Enter_WdgM_EaLogicalSupResultProtect();
+  WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
+  SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  SchM_Enter_WdgM_EaActivityFlagProtect();
+  WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag=FALSE;
+  SchM_Exit_WdgM_EaActivityFlagProtect();
+}
+\end{lstlisting}
+
+\newpage
+\section{WdgM.c:1903}
+
+\begin{lstlisting}
+if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_recently_reported==
+  WdgM_GetExtGraphStopId(WdgM_CurrentMode,idx,index))
+{
+  SchM_Enter_WdgM_EaLogicalSupResultProtect();
+  WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
+  SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  SchM_Enter_WdgM_EaActivityFlagProtect();
+  WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag=FALSE;
+  SchM_Exit_WdgM_EaActivityFlagProtect();
+}
+\end{lstlisting}
+
+changed to:
+
+\begin{lstlisting}
+if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_recently_reported==
+  WdgM_GetExtGraphStopId(WdgM_CurrentMode,idx,index)&&prev_log_res==WDGM_CORRECT)
+{
+  SchM_Enter_WdgM_EaLogicalSupResultProtect();
+  WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
+  SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  SchM_Enter_WdgM_EaActivityFlagProtect();
+  WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag=FALSE;
+  SchM_Exit_WdgM_EaActivityFlagProtect();
+}
+\end{lstlisting}
+
+\newpage
 \section{WdgM.c:2056}
 \begin{lstlisting}
   if (TRUE == retval)
