@@ -43,13 +43,18 @@ logicalreached(S, SEid, CPid) ->
       case verify_CP(LR, CPid) of
         'WDGM_CORRECT' -> %% [WDGM274], [WDGM252]
           ActivityFlag =
-            case lists:member(CPid, LR#logical.finalCPs) of
+            case
+              LR#logical.activity andalso % annars om man har grafer med samma
+                                          % slutcheckpoint som startcheckpoint
+                                          % så kommer den att fela
+              lists:member(CPid, LR#logical.finalCPs)
+            of
               true  -> false; %% [WDGM331]
               false -> true %% [WDGM332]
             end,
           S#state{logicalTable=
                     (S#state.logicalTable--
-                    [LR])++
+                       [LR])++
                     [LR#logical{storedCP=CPid, %% [WDGM246]
                                 activity=ActivityFlag}]};
         'WDGM_INCORRECT' ->
