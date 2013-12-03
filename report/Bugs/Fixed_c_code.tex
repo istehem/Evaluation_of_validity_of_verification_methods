@@ -68,8 +68,8 @@
   \item[WdgM.c:1805] bugfix because [WDGM274]
   \item[WdgM.c:1864] bugfix because [7.2.3.2]
   \item[WdgM.c:1867] bugfix because [WDGM252]
-  \item[WdgM.c:1834] bugfix because [WDGM274]
-  \item[WdgM.c:1903] bugfix because [WDGM252]
+  \item[WdgM.c:1834] bugfix because [7.2.3.2]
+  \item[WdgM.c:1903] bugfix because [7.2.3.2]
   \item[WdgM.c:2056] bugfix because [WDGM286]
   \item[WdgM\_Lcfg.c:223] \parbox[t]{0.8\linewidth}{bugfix, added initialization
       to alive/deadline/logical supervision results to WDGM\_CORRECT (copied the
@@ -180,12 +180,14 @@ changed to:
       WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result;
     if (FALSE == (WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag))
     {
-      if (CheckpointId == WdgM_GetInternalGraphStartId(WdgM_CurrentMode,idx)
-      && prev_log_res == WDGM_CORRECT) // part of bugfix above
+      if (CheckpointId == WdgM_GetInternalGraphStartId(WdgM_CurrentMode,idx))
       {
-        SchM_Enter_WdgM_EaLogicalSupResultProtect();
-        WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result = WDGM_CORRECT;
-        SchM_Exit_WdgM_EaLogicalSupResultProtect();
+        if(prev_log_res == WDGM_CORRECT) // part of bugfix above
+        {
+          SchM_Enter_WdgM_EaLogicalSupResultProtect();
+          WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result = WDGM_CORRECT;
+          SchM_Exit_WdgM_EaLogicalSupResultProtect();
+        }
         WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].most_recently_reported = CheckpointId;
         SchM_Enter_WdgM_EaActivityFlagProtect();
         WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag = TRUE;
@@ -239,12 +241,14 @@ changed to:
     {
       for (i=0; (i<WdgM_GetInitialCheckpointIdCnt(WdgM_CurrentMode,idx)); ++i)
       {
-        if (CheckpointId==WdgM_GetExtGraphStartId(WdgM_CurrentMode,idx,i)
-        && prev_log_res == WDGM_CORRECT) // part of bugfix above
+        if (CheckpointId==WdgM_GetExtGraphStartId(WdgM_CurrentMode,idx,i))
         {
-          SchM_Enter_WdgM_EaLogicalSupResultProtect();
-          WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result = WDGM_CORRECT;
-          SchM_Exit_WdgM_EaLogicalSupResultProtect();
+          if(prev_log_res == WDGM_CORRECT) // part of bugfix above
+          {
+            SchM_Enter_WdgM_EaLogicalSupResultProtect();
+            WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result = WDGM_CORRECT;
+            SchM_Exit_WdgM_EaLogicalSupResultProtect();
+          }
           WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_recently_reported = CheckpointId;
           SchM_Enter_WdgM_EaActivityFlagProtect();
           WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag = TRUE;
@@ -281,11 +285,14 @@ changedto:
 
 \begin{lstlisting}
 if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].most_recently_reported==
-  WdgM_GetInternalGraphStopId(WdgM_CurrentMode,idx,index)&&prev_log_res==WDGM_CORRECT)
+  WdgM_GetInternalGraphStopId(WdgM_CurrentMode,idx,index))
 {
-  SchM_Enter_WdgM_EaLogicalSupResultProtect();
-  WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
-  SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  if(prev_log_res==WDGM_CORRECT)
+  {
+    SchM_Enter_WdgM_EaLogicalSupResultProtect();
+    WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
+    SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  }
   SchM_Enter_WdgM_EaActivityFlagProtect();
   WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag=FALSE;
   SchM_Exit_WdgM_EaActivityFlagProtect();
@@ -312,11 +319,14 @@ changed to:
 
 \begin{lstlisting}
 if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_recently_reported==
-  WdgM_GetExtGraphStopId(WdgM_CurrentMode,idx,index) && prev_log_res==WDGM_CORRECT)
+  WdgM_GetExtGraphStopId(WdgM_CurrentMode,idx,index))
 {
-  SchM_Enter_WdgM_EaLogicalSupResultProtect();
-  WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
-  SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  if(prev_log_res==WDGM_CORRECT)
+  {
+    SchM_Enter_WdgM_EaLogicalSupResultProtect();
+    WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
+    SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  }
   SchM_Enter_WdgM_EaActivityFlagProtect();
   WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag=FALSE;
   SchM_Exit_WdgM_EaActivityFlagProtect();
