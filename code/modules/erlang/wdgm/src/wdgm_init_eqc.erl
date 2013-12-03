@@ -433,19 +433,21 @@ check_same_supervisionstatus(_, [], _) ->
   true;
 check_same_supervisionstatus(S, [L|Ls], C) ->
   SE = lists:keyfind(C, 2, S#state.supervisedentities),
+  %% Due to different implementations the new state may not be updated when
+  %% there exists a local or global status that has expired, Updating or not
+  %% updateing the state is correct according to the specification hence
+  %% supervision status can not always be checked.
   S#state.globalstatus == 'WDGM_GLOBAL_STATUS_EXPIRED' orelse
     S#state.globalstatus == 'WDGM_GLOBAL_STATUS_STOPPED' orelse
-    L#'WdgM_SupervisedEntityMonitor_Tag'.supervision_status == SE#supervisedentity.localstatus andalso
-    L#'WdgM_SupervisedEntityMonitor_Tag'.logicalsupervision_result == SE#supervisedentity.locallogicalstatus andalso
-    L#'WdgM_SupervisedEntityMonitor_Tag'.deadlinesupervision_result == SE#supervisedentity.localdeadlinestatus andalso
-    L#'WdgM_SupervisedEntityMonitor_Tag'.alivesupervision_result == SE#supervisedentity.localalivestatus andalso
-  %% Due to the c implementation the new state will not be updated when there exists a local status that has expired,
-  %% Updating or not updateing the state is correct according to the specification,
-  %% hence this property can not be checked here.
     case SE#supervisedentity.localstatus of
       'WDGM_LOCAL_STATUS_EXPIRED' -> true;
       _                           -> check_same_supervisionstatus(S, Ls, C+1)
-    end.
+    end
+    andalso
+    L#'WdgM_SupervisedEntityMonitor_Tag'.supervision_status == SE#supervisedentity.localstatus andalso
+    L#'WdgM_SupervisedEntityMonitor_Tag'.logicalsupervision_result == SE#supervisedentity.locallogicalstatus andalso
+    L#'WdgM_SupervisedEntityMonitor_Tag'.deadlinesupervision_result == SE#supervisedentity.localdeadlinestatus andalso
+    L#'WdgM_SupervisedEntityMonitor_Tag'.alivesupervision_result == SE#supervisedentity.localalivestatus.
 
 
 %% used by setmode
