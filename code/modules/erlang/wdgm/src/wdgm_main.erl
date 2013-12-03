@@ -72,11 +72,13 @@ local_SE_status(S, SE) ->
   FAIL_TOL = NewSE#supervisedentity.failed_alive_supervision_cycle_tol,
   FAIL_CYCLES = NewSE#supervisedentity.failed_reference_supervision_cycles,
   {LocalStatus, FailCycles} = check_local_status({NewSE#supervisedentity.localstatus, AliveRes, DeadlineRes, LogicalRes}, FAIL_TOL, FAIL_CYCLES),
-  NewS#state{supervisedentities=
-               lists:keyreplace(NewSE#supervisedentity.seid, 2, NewS#state.supervisedentities,
-                                NewSE#supervisedentity{localstatus=LocalStatus,
-                                                       supervision_cycles=SE#supervisedentity.supervision_cycles+1,
-                                                       failed_reference_supervision_cycles=FailCycles})}.
+  NewS#state{
+    deadlineTable=[DS#deadline{timer=DS#deadline.timer+1} || DS <- NewS#state.deadlineTable],
+    supervisedentities=
+      lists:keyreplace(NewSE#supervisedentity.seid, 2, NewS#state.supervisedentities,
+                       NewSE#supervisedentity{localstatus=LocalStatus,
+                                              supervision_cycles=SE#supervisedentity.supervision_cycles+1,
+                                              failed_reference_supervision_cycles=FailCycles})}.
 
 check_local_status({'WDGM_LOCAL_STATUS_OK',
                     'WDGM_CORRECT',
