@@ -597,10 +597,20 @@ new_SE_record(ModeId, SEid, Activated) ->
 %% -Frequency-------------------------------------------------------------------
 
 -spec weight(S :: eqc_statem:symbolic_state(), Command :: atom()) -> integer().
-weight(_S, setmode) -> 2;
+weight(_S, setmode) -> 0;
 weight(_S, checkpointreached) -> 25;
 weight(_S, mainfunction) -> 10;
-weight(_S, init) -> 1;
+weight(S, init) -> case S#state.initialized of
+                      true -> 0;
+                      _    -> 200
+                   end;
+weight(S,deinit) -> case S#state.initialized of
+                      true -> 1;
+                      _    -> 0
+                    end;
+weight(_S,getfirstexpiredseid_pre) -> 0;
+weight(_S,getmode)                 -> 0;
+weight(_S,getglobalstatus)         -> 0;
 weight(_S, _Cmd) -> 1.
 
 %% -Properties------------------------------------------------------------------
@@ -614,9 +624,15 @@ prop_wdgm_init() ->
                     eqc_c:restart(),
                     {H,S,Res} = run_commands(?MODULE,Cmds),
                     pretty_commands(?MODULE,Cmds,{H,S,Res},
-                                    aggregate(command_names(Cmds),
+                                    aggregate(collect_res(H,S,Res,Cmds),
                                               Res == ok))
                   end)).
 
 start () ->
   wdgm_eqc:start().
+
+collect_res(_H,_S,_Res,Cmds) ->
+  case Cmds of
+    []                      -> [{none,0}];
+    [{_,_,{_,_,Name,_}}|Xs] -> [{Name,length(Xs)}]
+  end.
