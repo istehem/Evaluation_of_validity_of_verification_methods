@@ -11,20 +11,28 @@ global_status(S) ->
   %% NewAliveTable = lists:map(fun (Elem) -> element(2, Elem) end, NewSEsAndAliveCPs),
   NewS = foldresult(fun local_SE_status/2, S, S#state.supervisedentities),
   {Failed, Expired} = lists:foldl(fun (SE, {Failed, Expired}) ->
-                                      {(Failed  orelse 'WDGM_LOCAL_STATUS_FAILED'  == SE#supervisedentity.localstatus),
-                                       (Expired orelse 'WDGM_LOCAL_STATUS_EXPIRED' == SE#supervisedentity.localstatus)}
+                                      {(Failed  orelse
+                                        'WDGM_LOCAL_STATUS_FAILED'  == SE#supervisedentity.localstatus),
+                                       (Expired orelse
+                                        'WDGM_LOCAL_STATUS_EXPIRED' == SE#supervisedentity.localstatus)}
                                   end, {false, false}, NewS#state.supervisedentities),
   EXPIRED_TOL = NewS#state.expired_supervision_cycles_tol,
   EXPIRED_CYCLES = NewS#state.expiredsupervisioncycles,
-  {Status, NewExpiredCycles} = check_global_status({NewS#state.globalstatus, Failed, Expired}, EXPIRED_TOL, EXPIRED_CYCLES),
+  {Status, NewExpiredCycles} = check_global_status({NewS#state.globalstatus, Failed, Expired},
+                                                   EXPIRED_TOL,
+                                                   EXPIRED_CYCLES),
   NewS#state{
     globalstatus=Status,
     expiredSEid=case S#state.expiredSEid of
-                    undefined -> case lists:keyfind('WDGM_LOCAL_STATUS_EXPIRED', 3, NewS#state.supervisedentities) of
-                                  false -> undefined;
-                                  SE -> SE#supervisedentity.seid
-                                  end;
-                    SEID      -> SEID
+                  undefined -> case
+                                 lists:keyfind('WDGM_LOCAL_STATUS_EXPIRED',
+                                               3,
+                                               NewS#state.supervisedentities)
+                               of
+                                 false -> undefined;
+                                 SE    -> SE#supervisedentity.seid
+                               end;
+                  SEID      -> SEID
                 end,
     expiredsupervisioncycles=NewExpiredCycles}.
 
