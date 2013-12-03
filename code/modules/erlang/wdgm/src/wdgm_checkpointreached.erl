@@ -53,8 +53,8 @@ logicalreached(S, SEid, CPid) ->
               false -> true %% [WDGM332]
             end,
           S#state{logicalTable=
-                    S#state.logicalTable--
-                    [LR]++
+                    (S#state.logicalTable--
+                       [LR])++
                     [LR#logical{storedCP=CPid, %% [WDGM246]
                                 activity=ActivityFlag}]};
         'WDGM_INCORRECT' ->
