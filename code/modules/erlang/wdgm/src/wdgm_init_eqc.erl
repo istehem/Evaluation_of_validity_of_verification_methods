@@ -266,7 +266,7 @@ getlocalstatus_post(S, [SEid, Is_Null], {Ret, Status}) ->
   DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
   case Ret of
     0 ->   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
-           ((S#state.expiredSEid /= undefined andalso S#state.expiredSEid < SEid) orelse
+           (S#state.expiredSEid /= undefined orelse
            Status == SE#supervisedentity.localstatus); %% [WDGM171].
     1 -> DevErrorDetect andalso (not S#state.initialized orelse %% [WDGM173]
                                  Is_Null orelse %% [WDGM257]
