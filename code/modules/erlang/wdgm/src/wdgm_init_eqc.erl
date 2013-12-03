@@ -212,7 +212,6 @@ checkpointreached_post(S, Args=[SEid, CPId], Ret) ->
            checkpoint_postcondition(S, Args) andalso %% [WDGM278], [WDGM279], [WDGM284], [WDGM319]
            (S#state.supervisedentities == undefined orelse check_same_supervisionstatus(S, MonitorTable, 0));
     0 -> NextS = checkpointreached_next(S, 0, [SEid, CPId]),
-         NextS#state.globalstatus == 'WDGM_GLOBAL_STATUS_EXPIRED' orelse
           check_same_supervisionstatus(NextS, MonitorTable, 0) %% [WDGM322], [WDGM323]
   end.
 
@@ -400,9 +399,7 @@ mainfunction_post(S, _Args, _Ret) ->
       NextS#state.expiredSEid /= undefined) %% [WDGM351]
      orelse
        (S#state.initialized andalso
-        (NextS#state.globalstatus == 'WDGM_GLOBAL_STATUS_EXPIRED' orelse
-         NextS#state.globalstatus == 'WDGM_GLOBAL_STATUS_STOPPED' orelse
-         check_same_supervisionstatus(NextS, MonitorTable, 0))) %% [WDGM325]
+         check_same_supervisionstatus(NextS, MonitorTable, 0)) %% [WDGM325]
        andalso
      NextS#state.globalstatus == GlobalStatus), %% [WDGM214], [WDGM326]
   case DefensiveBehaviour of
@@ -420,8 +417,7 @@ mainfunction_post(S, _Args, _Ret) ->
 
 mainfunction_next(S, _Ret, _Args) ->
   case
-    S#state.initialized andalso
-    S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_STOPPED' %%  [WDGM221]
+    S#state.initialized
   of
     true  -> wdgm_main:global_status(S);
     false -> S
@@ -437,7 +433,9 @@ check_same_supervisionstatus(_, [], _) ->
   true;
 check_same_supervisionstatus(S, [L|Ls], C) ->
   SE = lists:keyfind(C, 2, S#state.supervisedentities),
-  L#'WdgM_SupervisedEntityMonitor_Tag'.supervision_status == SE#supervisedentity.localstatus andalso
+  S#state.globalstatus == 'WDGM_GLOBAL_STATUS_EXPIRED' orelse
+    S#state.globalstatus == 'WDGM_GLOBAL_STATUS_STOPPED' orelse
+    L#'WdgM_SupervisedEntityMonitor_Tag'.supervision_status == SE#supervisedentity.localstatus andalso
     L#'WdgM_SupervisedEntityMonitor_Tag'.logicalsupervision_result == SE#supervisedentity.locallogicalstatus andalso
     L#'WdgM_SupervisedEntityMonitor_Tag'.deadlinesupervision_result == SE#supervisedentity.localdeadlinestatus andalso
     L#'WdgM_SupervisedEntityMonitor_Tag'.alivesupervision_result == SE#supervisedentity.localalivestatus andalso
