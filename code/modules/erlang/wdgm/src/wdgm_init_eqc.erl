@@ -65,7 +65,10 @@ init_next(S, _Ret, _Args) ->
            expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
            globalstatus  = 'WDGM_GLOBAL_STATUS_OK',
            deadlineTable = reset_deadline_table(ModeId), %% [WDGM298]
-           logicalTable  = reset_logical_table(ModeId),
+           logicalTable  = reset_logical_table(wdgm_config_params:get_internal_graphs(),
+                                               true)
+                        ++ reset_logical_table(wdgm_config_params:get_external_graphs(ModeId),
+                                               false),
            aliveTable    = reset_alive_table(ModeId)},
   NewS#state{supervisedentities = reset_supervised_entities(NewS, ModeId)}.
 
@@ -146,7 +149,12 @@ setmode_next(S, Ret, [ModeId, _Cid]) ->
                      expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
                      supervisedentities = reset_supervised_entities(S, ModeId),
                      deadlineTable      = reset_deadline_table(ModeId),
-                     logicalTable       = reset_logical_table(ModeId),
+                     logicalTable       = lists:filter(fun (Logical) ->
+                                                           Logical#logical.is_internal
+                                                       end,
+                                                       S#state.logicalTable) %% dont reset SE internal graphs
+                                       ++ reset_logical_table(wdgm_config_params:get_external_graphs(ModeId),
+                                                              false),
                      aliveTable         = reset_alive_table(ModeId)};
            false -> %% [WDGM316], [WDGM145]
              S
@@ -212,7 +220,7 @@ checkpointreached_post(S, Args=[SEid, CPId], Ret) ->
            checkpoint_postcondition(S, Args) andalso %% [WDGM278], [WDGM279], [WDGM284], [WDGM319]
            (S#state.supervisedentities == undefined orelse check_same_supervisionstatus(S, MonitorTable, 0));
     0 -> NextS = checkpointreached_next(S, 0, [SEid, CPId]),
-          check_same_supervisionstatus(NextS, MonitorTable, 0) %% [WDGM322], [WDGM323]
+         check_same_supervisionstatus(NextS, MonitorTable, 0) %% [WDGM322], [WDGM323]
   end.
 
 checkpoint_postcondition(S, [SeID, CPId]) ->
@@ -530,7 +538,7 @@ reset_deadline_table(ModeId) ->
             end,
             wdgm_config_params:get_deadline_supervision(ModeId)).
 
-reset_logical_table(ModeId) ->
+reset_logical_table(Table, Is_Internal) ->
   lists:map(fun ({Init, Finals, Transitions}) ->
                 #logical{initCP       = Init,
                          finalCPs     = Finals,
@@ -540,10 +548,10 @@ reset_logical_table(ModeId) ->
                                                      end,
                                                      Transitions)),
                          graph        = Transitions,
-                         activity     = false}
+                         activity     = false,
+                         is_internal  = Is_Internal}
             end,
-            wdgm_config_params:get_internal_graphs() ++
-              wdgm_config_params:get_external_graphs(ModeId)).
+            Table).
 
 reset_supervised_entities(S, ModeId) ->
   case S#state.supervisedentities of
@@ -589,8 +597,9 @@ new_SE_record(ModeId, SEid, Activated) ->
 %% -Frequency-------------------------------------------------------------------
 
 -spec weight(S :: eqc_statem:symbolic_state(), Command :: atom()) -> integer().
-weight(_S, setmode) -> 1;
-weight(_S, checkpointreached) -> 1;
+weight(_S, setmode) -> 2;
+weight(_S, checkpointreached) -> 25;
+weight(_S, mainfunction) -> 10;
 weight(_S, init) -> 1;
 weight(_S, _Cmd) -> 1.
 

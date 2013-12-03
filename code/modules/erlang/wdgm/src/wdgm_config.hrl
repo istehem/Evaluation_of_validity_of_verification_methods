@@ -48,7 +48,8 @@
          cps_in_graph,
          graph,
          activity,
-         storedCP}).
+         storedCP,
+         is_internal}).
 -record(supervisedentity,
         {seid,
          localstatus='WDGM_LOCAL_STATUS_OK',

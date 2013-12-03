@@ -27,7 +27,7 @@ global_status(S) ->
                   undefined -> case
                                  lists:keyfind('WDGM_LOCAL_STATUS_EXPIRED',
                                                3,
-                                               NewS#state.supervisedentities)
+                                               lists:sort(NewS#state.supervisedentities))
                                of
                                  false -> undefined;
                                  SE    -> SE#supervisedentity.seid
