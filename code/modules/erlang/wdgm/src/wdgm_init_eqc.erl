@@ -400,8 +400,9 @@ mainfunction_post(S, _Args, _Ret) ->
       NextS#state.expiredSEid /= undefined) %% [WDGM351]
      orelse
        (S#state.initialized andalso
-        (NextS#state.globalstatus == 'WDGM_GLOBAL_STATUS_EXPIRED'
-         orelse check_same_supervisionstatus(NextS, MonitorTable, 0))) %% [WDGM325]
+        (NextS#state.globalstatus == 'WDGM_GLOBAL_STATUS_EXPIRED' orelse
+         NextS#state.globalstatus == 'WDGM_GLOBAL_STATUS_STOPPED' orelse
+         check_same_supervisionstatus(NextS, MonitorTable, 0))) %% [WDGM325]
        andalso
      NextS#state.globalstatus == GlobalStatus), %% [WDGM214], [WDGM326]
   case DefensiveBehaviour of
@@ -437,15 +438,15 @@ check_same_supervisionstatus(_, [], _) ->
 check_same_supervisionstatus(S, [L|Ls], C) ->
   SE = lists:keyfind(C, 2, S#state.supervisedentities),
   L#'WdgM_SupervisedEntityMonitor_Tag'.supervision_status == SE#supervisedentity.localstatus andalso
+    L#'WdgM_SupervisedEntityMonitor_Tag'.logicalsupervision_result == SE#supervisedentity.locallogicalstatus andalso
+    L#'WdgM_SupervisedEntityMonitor_Tag'.deadlinesupervision_result == SE#supervisedentity.localdeadlinestatus andalso
+    L#'WdgM_SupervisedEntityMonitor_Tag'.alivesupervision_result == SE#supervisedentity.localalivestatus andalso
   %% Due to the c implementation the new state will not be updated when there exists a local status that has expired,
   %% Updating or not updateing the state is correct according to the specification,
   %% hence this property can not be checked here.
     case SE#supervisedentity.localstatus of
       'WDGM_LOCAL_STATUS_EXPIRED' -> true;
-      _                           -> check_same_supervisionstatus(S, Ls, C+1) andalso
-                                       L#'WdgM_SupervisedEntityMonitor_Tag'.logicalsupervision_result == SE#supervisedentity.locallogicalstatus andalso
-                                       L#'WdgM_SupervisedEntityMonitor_Tag'.deadlinesupervision_result == SE#supervisedentity.localdeadlinestatus andalso
-                                       L#'WdgM_SupervisedEntityMonitor_Tag'.alivesupervision_result == SE#supervisedentity.localalivestatus
+      _                           -> check_same_supervisionstatus(S, Ls, C+1)
     end.
 
 
