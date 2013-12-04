@@ -210,9 +210,9 @@ checkpoint_gen(S) ->
                         {0, return(999)}]), %% or a phony
         case SEid of
           999 -> [999, 999]; %% if the phony, also choose a phony CPid
-          _   -> ?LET({NextSE, NextCP}, oneof(lists:flatten(
-                                                wdgm_checkpointreached:get_args_given_LS(S#state.logicalTable, SEid))),
-                 [NextSE, NextCP])
+          _   ->
+            LCPs = lists:flatten(wdgm_checkpointreached:get_args_given_LS(S#state.logicalTable, SEid)),
+            wdgm_checkpointreached:choose_SE_and_CP(S, LCPs)
         end).
 
 %% uint16 SupervisedEntityIdType, uint16 CheckpointIdType
