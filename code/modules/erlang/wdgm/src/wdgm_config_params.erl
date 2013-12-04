@@ -114,7 +114,7 @@ get_AS_for_CP(ModeId, CPid) ->
      || AS <- get_alive_supervision(ModeId),
         CPid == get_checkpoint_id(car_xml:get_value("WdgMAliveSupervisionCheckpointRef", AS))].
 
-%%%% used by wdgm_Init
+%%%% used by wdgm_Init and wdgm_SetMode
 
 get_internal_graph(SEid) ->
   SE = get_supervised_entity(SEid),
@@ -142,3 +142,10 @@ get_external_graphs(ModeId) ->
 
 get_expired_supervision_cycles(ModeId) ->
   car_xml:get_value("WdgMExpiredSupervisionCycleTol", get_mode(ModeId)).
+
+%%%% used by checkpointreached
+
+get_SE_of_CP(CPid) ->
+  hd([SEid || {SEid, _} <- get_supervised_entities(),
+              SECP      <- get_CPs_of_SE(SEid),
+              SECP == CPid]).

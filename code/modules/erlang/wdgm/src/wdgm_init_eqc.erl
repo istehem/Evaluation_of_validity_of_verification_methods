@@ -201,12 +201,19 @@ checkpointreached_pre(S) ->
     orelse
     S#state.initialized.
 
-checkpointreached_command(_S) ->
-  {call, ?MODULE, checkpointreached,
-   ?LET(SeID, choose(0,4), checkpoint_gen(SeID))}.
+checkpointreached_command(S) ->
+  {call, ?MODULE, checkpointreached, checkpoint_gen(S)}.
 
-checkpoint_gen(SeID) ->
-  [SeID, oneof(wdgm_config_params:get_CPs_of_SE(SeID)++[999])].
+checkpoint_gen(S) ->
+  ValidSEid = [0,1,2,3,4],
+  ?LET(SEid, frequency([{20, oneof(ValidSEid)}, %% either choose one of the valid SEid
+                        {0, return(999)}]), %% or a phony
+        case SEid of
+          999 -> [999, 999]; %% if the phony, also choose a phony CPid
+          _   -> ?LET({NextSE, NextCP}, oneof(lists:flatten(
+                                                wdgm_checkpointreached:get_args_given_LS(S#state.logicalTable, SEid))),
+                 [NextSE, NextCP])
+        end).
 
 %% uint16 SupervisedEntityIdType, uint16 CheckpointIdType
 checkpointreached(SeID, CPId) ->

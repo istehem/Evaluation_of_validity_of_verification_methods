@@ -95,3 +95,37 @@ is_initial_CP(LogicalRec, CP) ->
     true  -> 'WDGM_CORRECT';
     false -> 'WDGM_INCORRECT'
   end.
+
+
+%%-Generator--------------------------------------------------------------------
+
+%% lista med CPs tillhörande SE
+%% lista med logicalrecords
+%%-----
+%% lista med logicalrecords för SEn
+get_args_given_LS(LRs, SEid) ->
+  case LRs of
+    undefined -> [{SEid, CPid} || CPid <- wdgm_config_params:get_CPs_of_SE(SEid)];
+    _ ->
+      LogicalRecordsForSE =
+        lists:usort(
+          [ L
+            || L   <- LRs,
+               CPs <- wdgm_config_params:get_CPs_of_SE(SEid),
+               lists:member(CPs, L#logical.cps_in_graph)]),
+      [case {L#logical.is_internal, L#logical.activity} of
+         {true, true}   -> %% internal, started
+           lists:map(fun (Elem) -> {SEid, Elem} end, get_next_cps(L));
+         {true, false}  -> %% internal, not started
+           [{SEid, L#logical.initCP}];
+         {false, true}  -> %% external, started
+           [{wdgm_config_params:get_SE_of_CP(CPid), CPid} || CPid <- get_next_cps(L)];
+         {false, false} -> %% external, not started
+           [{wdgm_config_params:get_SE_of_CP(CPid), CPid} || CPid <- lists:flatten([L#logical.initCP])]
+       end
+       || L <- LogicalRecordsForSE]
+  end.
+
+get_next_cps(LogicalRec) ->
+  [element(2,G) || G <- LogicalRec#logical.graph,
+                   element(1, G) == LogicalRec#logical.storedCP].
