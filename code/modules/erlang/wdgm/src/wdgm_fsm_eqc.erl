@@ -10,7 +10,6 @@
 -define(C_CODE, wdgm_wrapper).
 -include_lib("../ebin/wdgm_wrapper.hrl").
 
-
 init(S) ->
     {ok,wdgm_global_status_ok,S}.
 %% we can asynchronously lock the wdgm_fsm,
@@ -36,8 +35,16 @@ terminate(_,_,_) ->
 
 wdgm_global_status_ok(S) ->
     [initwdgm_command(S),
-     getmode_command(S)].
-
+     getmode_command(S),
+     setmode_command(S),
+     deinit_command(S),
+     checkpointreached_command(S),
+     getglobalstatus_command(S),
+     getlocalstatus_command(S),
+     performreset_command(S),
+     getfirstexpiredseid_command(S),
+     mainfunction_command(S)
+    ].
 
 initial_state() ->
     wdgm_global_status_ok.
@@ -61,7 +68,7 @@ initwdgm_command(_S) ->
                                    {0, return({{ptr, int, 0}, true})}])]}}.
 
 initwdgm({Ptr, Is_Null}) ->
-  gen_fsm:send_event(wdgm_fsm,{write,Ptr,Is_Null}),
+  gen_fsm:send_event(wdgm_fsm,{initwdgm,Ptr,Is_Null}),
   ?C_CODE:'WdgM_Init'(Ptr).
 
 initwdgm_post(_F,_T,S, [{_, Is_Null}], _Ret) ->
@@ -140,6 +147,342 @@ getmode_post(_,_,S, [Is_Null], {R, Mode}) ->
   end.
 
 
+%% -WdgM_SetMode----------------------------------------------------------------
+
+setmode_pre(_,_,S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+   orelse
+    S#state.initialized.
+
+setmode_command(_S) ->
+  {wdgm_global_status_ok,{call, ?MODULE, setmode, [choose(0,3), choose(1,2)]}}.
+
+setmode(Mode, CallerId) ->
+  gen_fsm:send_event(wdgm_fsm,{setmode,Mode,CallerId}),
+  ?C_CODE:'WdgM_SetMode'(Mode, CallerId).
+
+setmode_post(_,_,S, [ModeId, Cid], Ret) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  (S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_OK' andalso
+   S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_FAILED' andalso
+   S#state.currentMode == eqc_c:value_of('WdgM_CurrentMode')) orelse %% [WDGM316], [WDGM145]
+
+
+  ((S#state.globalstatus == eqc_c:value_of('WdgM_GlobalStatus') orelse  %% [WDGM317]
+    S#state.globalstatus == undefined) andalso %% if not initialized everything under will failed
+%%    S#state.expiredsupervisioncycles == eqc_c:value_of(expiredsupervisioncycles) andalso %% [WDGM317]
+
+    case Ret of
+      0 ->
+        check_next_supervisionstatus(S, eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'), 0); %% [WDGM207], [WDGM291], [WDGM209], [WDGM182], [WDGM316]
+      1 ->
+        DevErrorDetect andalso (not_within_allowed_range(ModeId) orelse %% [WDGM020]
+                                 not S#state.initialized orelse %% [WDGM021]
+%%%          orelse (not OffModeEnabled andalso is_disabled_watchdogs()) orelse %% [WDGM031]
+            lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)) %% [WDGM245]
+    end).
+%% [WDGM186], [WDGM142]
+
+setmode_next(_,_,S, Ret, [ModeId, _Cid]) ->
+  case Ret of
+    0 -> case
+           (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
+            S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED')
+         of
+           true ->
+             S#state{currentMode = ModeId,
+                     expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
+                     supervisedentities = reset_supervised_entities(S, ModeId),
+                     deadlineTable      = reset_deadline_table(ModeId),
+                     logicalTable       = lists:filter(fun (Logical) ->
+                                                           Logical#logical.is_internal
+                                                       end,
+                                                       S#state.logicalTable) %% dont reset SE internal graphs
+                                       ++ reset_logical_table(wdgm_config_params:get_external_graphs(ModeId),
+                                                              false),
+                     aliveTable         = reset_alive_table(ModeId)};
+           false -> %% [WDGM316], [WDGM145]
+             S
+         end;
+    _ -> S %% if WdgIf_SetMode failed set globalstatus='WDGM_GLOBAL_STATUS_STOPPED'? %% [WDGM139]
+  end.
+
+%% -WdgM_DeInit-----------------------------------------------------------------
+
+deinit_pre(_,_,S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+    orelse
+    S#state.initialized.
+
+deinit_command(_S) ->
+  {wdgm_global_status_ok,{call, ?MODULE, deinit, []}}.
+
+deinit() ->
+  ?C_CODE:'WdgM_DeInit'().
+
+%% [WDGM154] should check something with WdgM_SetMode
+deinit_post(_,_,S, _Args, _Ret) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  case S#state.globalstatus of
+    'WDGM_GLOBAL_STATUS_OK' -> eq(eqc_c:value_of('WdgM_GlobalStatus'),
+                                  'WDGM_GLOBAL_STATUS_DEACTIVATED'); %% [WDGM286]
+    undefined               -> (DevErrorDetect andalso not S#state.initialized); %% [WDGM288]
+    Status                  -> eq(eqc_c:value_of('WdgM_GlobalStatus'), Status) %% lack of wdgm286?
+  end.
+
+deinit_next(_,_,S, _Ret, _Args) ->
+    case S#state.globalstatus of
+      'WDGM_GLOBAL_STATUS_OK' ->
+        S#state{initialized  = false,
+                globalstatus = 'WDGM_GLOBAL_STATUS_DEACTIVATED', %% [WDGM286]
+                currentMode  = -1};
+      _ -> S
+    end.
+
+%% -WdgM_CheckpointReached------------------------------------------------------
+
+checkpointreached_pre(_,_,S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+    orelse
+    S#state.initialized.
+
+checkpointreached_command(S) ->
+  {wdgm_global_status_ok,{call, ?MODULE, checkpointreached, checkpoint_gen(S)}}.
+
+checkpoint_gen(S) ->
+  ValidSEid = [0,1,2,3,4],
+  ?LET(SEid, frequency([{20, oneof(ValidSEid)}, %% either choose one of the valid SEid
+                        {0, return(999)}]), %% or a phony
+        case SEid of
+          999 -> [999, 999]; %% if the phony, also choose a phony CPid
+          _   ->
+            LCPs = lists:flatten(wdgm_checkpointreached:get_args_given_LS(S#state.logicalTable, SEid)),
+            wdgm_checkpointreached:choose_SE_and_CP(S, LCPs)
+        end).
+
+%% uint16 SupervisedEntityIdType, uint16 CheckpointIdType
+checkpointreached(SeID, CPId) ->
+  ?C_CODE:'WdgM_CheckpointReached'(SeID, CPId).
+
+checkpointreached_post(_,_,S, Args=[SEid, CPId], Ret) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  MonitorTable = eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'),
+  case Ret of
+    1 -> DevErrorDetect andalso
+           checkpoint_postcondition(S, Args) andalso %% [WDGM278], [WDGM279], [WDGM284], [WDGM319]
+           (S#state.supervisedentities == undefined orelse check_same_supervisionstatus(S, MonitorTable, 0));
+    0 -> NextS = checkpointreached_next(global_status_ok,global_status_ok,S, 0, [SEid, CPId]),
+         check_same_supervisionstatus(NextS, MonitorTable, 0) %% [WDGM322], [WDGM323]
+  end.
+
+checkpoint_postcondition(S, [SeID, CPId]) ->
+  not S#state.initialized orelse %% [WDGM279]
+    not lists:member(CPId, wdgm_config_params:get_CPs_of_SE(SeID)) orelse %% [WDGM284]
+    not wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SeID). %% [WDGM319] ([WDGM278])
+
+checkpointreached_next(_,_,S, _Ret, Args = [SEid, CPid]) ->
+  case not checkpoint_postcondition(S, Args) of
+    true ->
+      AS = case lists:keyfind(CPid, 2, S#state.aliveTable) of
+               false   -> S;
+               AliveCP -> AliveTable = lists:keyreplace(CPid, 2,
+                                                        S#state.aliveTable,
+                                                        AliveCP#alive{alive_counter=AliveCP#alive.alive_counter+1}),
+                          S#state{aliveTable=AliveTable}
+             end,
+      DS = wdgm_checkpointreached:deadlinereached(AS, SEid, CPid),
+      wdgm_checkpointreached:logicalreached(DS, SEid, CPid);
+    false -> S
+  end.
+
+%% -WdgM_UpdateAliveCounter-----------------------------------------------------
+%% Deprecated
+
+%% -WdgM_GetLocalStatus---------------------------------------------------------
+
+getlocalstatus_pre(_,_,S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+    orelse
+    S#state.initialized.
+
+getlocalstatus_command(_S) ->
+  {wdgm_global_status_ok,{call, ?MODULE, getlocalstatus, [choose(1,5),
+                                    frequency([{20, return(false)},
+                                               {0, return(true)}])]}}.
+
+getlocalstatus(SEid, Is_Null) ->
+  Sp =
+    case Is_Null of
+      true  -> {ptr, "WdgM_LocalStatusType", 0};
+      false -> eqc_c:alloc("WdgM_LocalStatusType")
+    end,
+  R  = ?C_CODE:'WdgM_GetLocalStatus'(SEid, Sp),
+  case Is_Null of
+    true  -> {R, null};
+    false -> {R, eqc_c:deref(Sp)}
+  end.
+
+getlocalstatus_post(_,_,S, [SEid, Is_Null], {Ret, Status}) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  case Ret of
+    0 ->   SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
+           (S#state.expiredSEid /= undefined orelse
+           Status == SE#supervisedentity.localstatus); %% [WDGM171].
+    1 -> DevErrorDetect andalso (not S#state.initialized orelse %% [WDGM173]
+                                 Is_Null orelse %% [WDGM257]
+                                 lists:keyfind(SEid, 2, S#state.supervisedentities) == false) %% [WDGM172]
+  end.
+
+getlocalstatus_next(_,_,S, _Ret, _Args) ->
+  S.
+
+%% -WdgM_GetGlobalStatus--------------------------------------------------------
+
+getglobalstatus_pre(_,_,S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+    orelse
+    S#state.initialized.
+
+getglobalstatus_command(_S) ->
+  {wdgm_global_status_ok,{call, ?MODULE, getglobalstatus, [frequency([{20, return(false)},
+                                               {0, return(true)}])]}}.
+
+getglobalstatus(Is_Null) ->
+  Sp =
+    case Is_Null of
+      true  -> {ptr, "WdgM_GlobalStatusType", 0};
+      false -> eqc_c:alloc("WdgM_GlobalStatusType")
+    end,
+  R = ?C_CODE:'WdgM_GetGlobalStatus'(Sp),
+  case Is_Null of
+    true  -> {R, null};
+    false -> {R, eqc_c:deref(Sp)}
+  end.
+
+getglobalstatus_post(_,_,S, [Is_Null], Ret) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  case Ret of
+    {0, R} -> eq(R, S#state.globalstatus);
+    {1, _} -> DevErrorDetect andalso (Is_Null orelse %% [WDGM344], [WDGM258]
+                                      not S#state.initialized) %% [WDGM176]
+  end.
+
+getglobalstatus_next(_,_,S, _Ret, _Args) ->
+  S.
+
+%% -WdgM_PerformReset-----------------------------------------------------------
+
+performreset_pre(_,_,S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+    orelse
+    S#state.initialized.
+
+performreset_command (_S) ->
+  {wdgm_global_status_ok,{call, ?MODULE, performreset, []}}.
+
+performreset() ->
+  ?C_CODE:'WdgM_PerformReset'().
+
+performreset_post(_,_,S, _Args, _Ret) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  DevErrorDetect orelse S#state.initialized. %% [WDGM270]
+%% [WDGM232] går inte att göra i dagsläget pga avsaknad av WDGIF
+%% [WDGM233] ??? global status not to be considered anymore
+
+performreset_next(_,_,S, _Ret, _Args) ->
+  S.
+
+%% -WdgM_GetFirstExpiredSEID----------------------------------------------------
+
+getfirstexpiredseid_pre(_,_,_S) ->
+  true. %% [WDGM348]
+
+getfirstexpiredseid_command(_S) ->
+  {wdgm_global_status_ok,{call, ?MODULE, getfirstexpiredseid, [frequency([{20, return(false)},
+                                                   {0, return(true)}])]}}.
+
+getfirstexpiredseid(Is_Null) ->
+  Sp =
+    case Is_Null of
+      true -> {ptr, "WdgM_SupervisedEntityIdType", 0};
+      false -> eqc_c:alloc("WdgM_SupervisedEntityIdType")
+    end,
+  R = ?C_CODE:'WdgM_GetFirstExpiredSEID'(Sp),
+  case Is_Null of
+    true -> {R, null};
+    false -> {R, eqc_c:deref(Sp)}
+  end.
+
+getfirstexpiredseid_post(_,_,S, [Is_Null], Ret) ->
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior,
+  case Ret of
+    {0, SEid} -> SEid == S#state.expiredSEid; %% [WDGM349]
+    {1, SEid} -> (S#state.expiredSEid == undefined andalso
+                  SEid == 0) %% [WDGM349]
+                   orelse
+                     (DevErrorDetect andalso Is_Null) %% [WDGM347]
+  end.
+
+getfirstexpiredseid_next(_,_,S, _Ret, _Args) ->
+  S.
+
+%% -WdgM_MainFunction-----------------------------------------------------------
+
+mainfunction_pre(_,_,S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior orelse
+    S#state.initialized. %% [WDGM039]
+
+mainfunction_command(_S) ->
+  {wdgm_global_status_ok,{call, ?MODULE, mainfunction, []}}.
+
+mainfunction() ->
+  ?C_CODE:'WdgM_MainFunction'().
+
+mainfunction_post(_,_,S, _Args, _Ret) ->
+  %% [WDGM325] set localstatus based on [WDGM201], [WDGM202], [WDGM203], [WDGM204], [WDGM300], [WDGM205], [WDGM206], [WDGM208]
+  %% [WDGM214] globalstatus == mainfunction_next.globalstatus
+  %% [WDGM326] set globalstatus based on [WDGM078], [WDGM076], [WDGM215], [WDGM216], [WDGM217], [WDGM218], [WDGM077], [WDGM117], [WDGM219], [WDGM220], [WDGM221]
+  %% [WDGM324] perform alive supervision based on [WDGM098], [WDGM074], [WDGM115], [WDGM083]
+  %% WDGIF [WDGM223], [WDGM328]
+  %% OS [WDGM275]
+  %% manage corresponding error handling [WDGM327]
+  %% S#state.globalstatus == 'WDGM_GLOBAL_STATUS_DEACTIVATED' %% [WDGM063] where???? maybe in OS?
+
+  DefensiveBehaviour = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior,
+  GlobalStatus = eqc_c:value_of('WdgM_GlobalStatus'),
+  NextS = mainfunction_next(wdgm_global_status_ok,wdgm_global_status_ok,S, 0, 0),
+  MonitorTable = eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'),
+
+  Behaviour =
+  NextS#state.globalstatus == GlobalStatus andalso %% [WDGM214], [WDGM326]
+  ((GlobalStatus == 'WDGM_GLOBAL_STATUS_EXPIRED' andalso
+      eqc_c:value_of('SeIdLocalStatusExpiredFirst') /= 0 andalso
+      NextS#state.expiredSEid /= undefined) %% [WDGM351]
+     orelse
+       (S#state.initialized andalso
+         check_same_supervisionstatus(NextS, MonitorTable, 0))), %% [WDGM325]
+
+  case DefensiveBehaviour of
+    true ->
+      case S#state.initialized of
+        true -> Behaviour;
+        false ->
+          (S#state.globalstatus == GlobalStatus orelse (S#state.globalstatus == undefined
+            andalso GlobalStatus == 'WDGM_GLOBAL_STATUS_OK')) andalso
+            (S#state.supervisedentities == undefined orelse
+            check_same_supervisionstatus(S, MonitorTable, 0))
+      end; %% [WDGM039]
+    false -> Behaviour
+  end.
+
+mainfunction_next(_,_,S, _Ret, _Args) ->
+  case
+    S#state.initialized
+  of
+    true  -> wdgm_main:global_status(S);
+    false -> S
+  end.
+
 %%------------------------------------------------------------------------------
 %%------------------------------------------------------------------------------
 %%------------------------------------------------------------------------------
@@ -155,8 +498,23 @@ getmode_post(_,_,S, [Is_Null], {R, Mode}) ->
 %	    end).
 
 
-weight(_,_,{_,_,getmode,_}) -> 1;
-weight(_,_,_)               -> 1.
+weight(_S, {_,_,setmode,_}) -> 0;
+weight(_S, {_,_,checkpointreached,_}) -> 25;
+weight(_S, {_,_,mainfunction,_}) -> 10;
+weight(S, {_,_,init,_}) -> case S#state.initialized of
+                      true -> 0;
+                      _    -> 200
+                   end;
+weight(S,{_,_,deinit,_}) -> case S#state.initialized of
+                      true -> 1;
+                      _    -> 0
+                    end;
+weight(_S,{_,_,getfirstexpiredseid_pre,_}) -> 0;
+weight(_S,{_,_,getmode,_})                 -> 0;
+weight(_S,{_,_,getglobalstatus})         -> 0;
+weight(_S,{_,_,performreset,_})         -> 1;
+weight(_S,{_,_,getlocalstatus})         -> 1;
+weight(_S, {_,_,_Cmd,_}) -> 1.
 
 prop_wdgm_fsm() ->
   ?SETUP( fun () -> start(),
