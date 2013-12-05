@@ -23,8 +23,31 @@ initial_state() ->
 init(S) ->
   {ok,wdgm_global_status_ok,S}.
 
-wdgm_global_status_ok(_,S) ->
+wdgm_global_status_ok(_E,S) ->
   {next_state,wdgm_global_status_ok,S}.
+
+handle_event(_E,_S,SD) ->
+  {next_state,wdgm_global_status_ok,SD}.
+
+wdgm_global_status_ok(_E,_F,S) ->
+  {next_state,wdgm_global_status_ok,S}.
+
+handle_sync_event(_E,_F,_S,_SD) ->
+  {stop,wdgm_global_status_ok,initial_state_data()}.
+
+handle_info(I,_S,SD) ->
+  io:fwrite("hopefully never called: msg = ~p\n",[I]),
+  {stop,wdgm_global_status_ok,SD}.
+
+terminate(_,_,_) ->
+  ok.
+
+code_change(_OldVsn,_S,SD,_E) ->
+  {ok,wdgm_global_status_ok,SD}.
+
+
+%Optional function
+%format_status(_Opt,[_PDict,SD]) -> Status
 
 %% -Possible transitions--------------------------------------------------------
 
