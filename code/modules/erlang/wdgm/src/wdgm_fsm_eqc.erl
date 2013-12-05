@@ -218,6 +218,7 @@ deinit_command(_S) ->
   {wdgm_global_status_ok,{call, ?MODULE, deinit, []}}.
 
 deinit() ->
+  gen_fsm:send_event(wdgm_fsm,deinit),
   ?C_CODE:'WdgM_DeInit'().
 
 %% [WDGM154] should check something with WdgM_SetMode
@@ -262,6 +263,7 @@ checkpoint_gen(S) ->
 
 %% uint16 SupervisedEntityIdType, uint16 CheckpointIdType
 checkpointreached(SeID, CPId) ->
+  gen_fsm:send_event(wdgm_fsm,{checkpointreached,SeID,CPId}),
   ?C_CODE:'WdgM_CheckpointReached'(SeID, CPId).
 
 checkpointreached_post(_,_,S, Args=[SEid, CPId], Ret) ->
@@ -311,6 +313,7 @@ getlocalstatus_command(_S) ->
                                                {0, return(true)}])]}}.
 
 getlocalstatus(SEid, Is_Null) ->
+  gen_fsm:send_event(wdgm_fsm,{getlocalstatus,SEid,Is_Null}),
   Sp =
     case Is_Null of
       true  -> {ptr, "WdgM_LocalStatusType", 0};
@@ -348,6 +351,7 @@ getglobalstatus_command(_S) ->
                                                {0, return(true)}])]}}.
 
 getglobalstatus(Is_Null) ->
+  gen_fsm:send_event(wdgm_fsm,{getglobalstatus,Is_Null}),
   Sp =
     case Is_Null of
       true  -> {ptr, "WdgM_GlobalStatusType", 0};
@@ -381,6 +385,7 @@ performreset_command (_S) ->
   {wdgm_global_status_ok,{call, ?MODULE, performreset, []}}.
 
 performreset() ->
+  gen_fsm:send_event(wdgm_fsm,performreset),
   ?C_CODE:'WdgM_PerformReset'().
 
 performreset_post(_,_,S, _Args, _Ret) ->
@@ -402,6 +407,7 @@ getfirstexpiredseid_command(_S) ->
                                                    {0, return(true)}])]}}.
 
 getfirstexpiredseid(Is_Null) ->
+  gen_fsm:send_event(wdgm_fsm,{getfirstexpiredseid,Is_Null}),
   Sp =
     case Is_Null of
       true -> {ptr, "WdgM_SupervisedEntityIdType", 0};
@@ -436,6 +442,7 @@ mainfunction_command(_S) ->
   {wdgm_global_status_ok,{call, ?MODULE, mainfunction, []}}.
 
 mainfunction() ->
+  gen_fsm:send_event(wdgm_fsm,mainfunction),
   ?C_CODE:'WdgM_MainFunction'().
 
 mainfunction_post(_,_,S, _Args, _Ret) ->
