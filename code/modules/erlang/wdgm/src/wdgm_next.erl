@@ -31,6 +31,9 @@ init_next(S, _Ret, _Args) ->
            aliveTable    = wdgm_helper:reset_alive_table(ModeId)},
   NewS#state{supervisedentities = wdgm_helper:reset_supervised_entities(NewS, ModeId)}.
 
+%%% -WdgM_GetMode---------------------------------------------------------------
+getmode_next(S, _Ret, _Args) ->
+  S.
 
 %%% -WdgM_SetMode---------------------------------------------------------------
 setmode_next(S, Ret, [ModeId, _Cid]) ->
