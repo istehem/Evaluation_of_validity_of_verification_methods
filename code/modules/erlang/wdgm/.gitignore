@@ -1,4 +1,5 @@
 doc/
 ebin/
-doc/
 .deps_plt/
+*.jpg
+*.dot

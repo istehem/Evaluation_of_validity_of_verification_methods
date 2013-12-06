@@ -10,15 +10,17 @@
 -define(C_CODE, wdgm_wrapper).
 -include_lib("../ebin/wdgm_wrapper.hrl").
 
-init(S) ->
-    {ok,wdgm_global_status_ok,S}.
+init([]) ->
+  {ok,wdgm_global_status_ok,[]}.
 %% we can asynchronously lock the wdgm_fsm,
-wdgm_global_status_ok(_E,S) ->
-    {next_state,wdgm_global_status_ok,S}.
+wdgm_global_status_ok(E,S) ->
+  {next_state,wdgm_global_status_ok,S}.
 
-wdgm_global_status_ok(E,F,S) ->
-    io:fwrite("###~p,~p###",[E,F]),
-    {next_state,wdgm_global_status_ok,S}.
+wdgm_global_status_ok(_E,_F,S) ->
+  {next_state,wdgm_global_status_ok,S}.
+
+wdgm_global_status_stopped(_E, S) ->
+  {next_state, wdgm_global_status_stopped, S}.
 
 start() ->
     wdgm_eqc:start(),
@@ -46,6 +48,18 @@ wdgm_global_status_ok(S) ->
      mainfunction_command(S)
     ].
 
+wdgm_global_status_stopped(S) ->
+    [initwdgm_command(S),
+     getmode_command(S),
+     setmode_command(S),
+     deinit_command(S),
+     checkpointreached_command(S),
+     getglobalstatus_command(S),
+     getlocalstatus_command(S),
+     performreset_command(S),
+     getfirstexpiredseid_command(S),
+     mainfunction_command(S)].
+
 initial_state() ->
     wdgm_global_status_ok.
 
@@ -64,7 +78,7 @@ initwdgm_pre(_,_,S) ->
   S#state.initialized /= true.
 
 initwdgm_command(_S) ->
-  {wdgm_global_status_ok,{call, ?MODULE, initwdgm, [frequency([{20, return({eqc_c:address_of('Tst_Cfg1'), false})},
+  {history, {call, ?MODULE, initwdgm, [frequency([{20, return({eqc_c:address_of('Tst_Cfg1'), false})},
                                    {0, return({{ptr, int, 0}, true})}])]}}.
 
 initwdgm({Ptr, Is_Null}) ->
@@ -122,7 +136,7 @@ getmode_pre(_,_,S) ->
     S#state.initialized. %% [WDGM253]
 
 getmode_command(_S) ->
-  {wdgm_global_status_ok,{call, ?MODULE, getmode, [frequency([{20, return(false)},
+  {history,{call, ?MODULE, getmode, [frequency([{20, return(false)},
                                        {0, return(true)}])]}}.
 
 getmode(Is_Null) ->
@@ -155,7 +169,7 @@ setmode_pre(_,_,S) ->
     S#state.initialized.
 
 setmode_command(_S) ->
-  {wdgm_global_status_ok,{call, ?MODULE, setmode, [choose(0,3), choose(1,2)]}}.
+  {history,{call, ?MODULE, setmode, [choose(0,3), choose(1,2)]}}.
 
 setmode(Mode, CallerId) ->
   gen_fsm:send_event(wdgm_fsm,{setmode,Mode,CallerId}),
@@ -215,7 +229,7 @@ deinit_pre(_,_,S) ->
     S#state.initialized.
 
 deinit_command(_S) ->
-  {wdgm_global_status_ok,{call, ?MODULE, deinit, []}}.
+  {history,{call, ?MODULE, deinit, []}}.
 
 deinit() ->
   gen_fsm:send_event(wdgm_fsm,deinit),
@@ -248,7 +262,7 @@ checkpointreached_pre(_,_,S) ->
     S#state.initialized.
 
 checkpointreached_command(S) ->
-  {wdgm_global_status_ok,{call, ?MODULE, checkpointreached, checkpoint_gen(S)}}.
+  {history,{call, ?MODULE, checkpointreached, checkpoint_gen(S)}}.
 
 checkpoint_gen(S) ->
   ValidSEid = [0,1,2,3,4],
@@ -308,7 +322,7 @@ getlocalstatus_pre(_,_,S) ->
     S#state.initialized.
 
 getlocalstatus_command(_S) ->
-  {wdgm_global_status_ok,{call, ?MODULE, getlocalstatus, [choose(1,5),
+  {history, {call, ?MODULE, getlocalstatus, [choose(1,5),
                                     frequency([{20, return(false)},
                                                {0, return(true)}])]}}.
 
@@ -347,7 +361,7 @@ getglobalstatus_pre(_,_,S) ->
     S#state.initialized.
 
 getglobalstatus_command(_S) ->
-  {wdgm_global_status_ok,{call, ?MODULE, getglobalstatus, [frequency([{20, return(false)},
+  {history, {call, ?MODULE, getglobalstatus, [frequency([{20, return(false)},
                                                {0, return(true)}])]}}.
 
 getglobalstatus(Is_Null) ->
@@ -382,7 +396,7 @@ performreset_pre(_,_,S) ->
     S#state.initialized.
 
 performreset_command (_S) ->
-  {wdgm_global_status_ok,{call, ?MODULE, performreset, []}}.
+  {history, {call, ?MODULE, performreset, []}}.
 
 performreset() ->
   gen_fsm:send_event(wdgm_fsm,performreset),
@@ -403,7 +417,7 @@ getfirstexpiredseid_pre(_,_,_S) ->
   true. %% [WDGM348]
 
 getfirstexpiredseid_command(_S) ->
-  {wdgm_global_status_ok,{call, ?MODULE, getfirstexpiredseid, [frequency([{20, return(false)},
+  {history, {call, ?MODULE, getfirstexpiredseid, [frequency([{20, return(false)},
                                                    {0, return(true)}])]}}.
 
 getfirstexpiredseid(Is_Null) ->
@@ -439,7 +453,7 @@ mainfunction_pre(_,_,S) ->
     S#state.initialized. %% [WDGM039]
 
 mainfunction_command(_S) ->
-  {wdgm_global_status_ok,{call, ?MODULE, mainfunction, []}}.
+  {history, {call, ?MODULE, mainfunction, []}}.
 
 mainfunction() ->
   gen_fsm:send_event(wdgm_fsm,mainfunction),
@@ -714,5 +728,3 @@ new_SE_record(ModeId, SEid, Activated) ->
                     failed_alive_supervision_cycle_tol=FailedAliveTol,
                     failed_reference_supervision_cycles=0,
                     supervision_cycles=0}.
-
-
