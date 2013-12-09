@@ -25,7 +25,7 @@ init_command(_S) ->
 
 getmode_command(_S) ->
   {call, ?WDGMSTATEM, getmode, [frequency([{20, return(false)},
-                                       {0, return(true)}])]}.
+                                           {0, return(true)}])]}.
 
 %%% -WdgM_SetMode---------------------------------------------------------------
 

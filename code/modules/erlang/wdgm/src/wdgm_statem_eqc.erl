@@ -15,7 +15,6 @@ initial_state() ->
   {_, R} = (hd(Rs)), %% why do we get a list of records?
   #state{originalCfg=R}.
 
-
 next_state(S, R, {call, _M, F, A}) ->
   apply(wdgm_next, list_to_atom(atom_to_list(F)++"_next"), [S, R, A]).
 

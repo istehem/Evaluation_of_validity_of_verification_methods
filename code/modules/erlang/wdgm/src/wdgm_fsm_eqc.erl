@@ -34,7 +34,7 @@ terminate(_,_,_) ->
     ok.
 
 wdgm_global_status_ok(S) ->
-    [initwdgm_command(S),
+    [init_command(S),
      getmode_command(S),
      setmode_command(S),
      deinit_command(S),
@@ -47,7 +47,7 @@ wdgm_global_status_ok(S) ->
     ].
 
 wdgm_global_status_stopped(S) ->
-    [initwdgm_command(S),
+    [init_command(S),
      getmode_command(S),
      setmode_command(S),
      deinit_command(S),
@@ -70,8 +70,16 @@ initial_state_data() ->
 %%------------------------------------------------------------------------------
 %%------------------------------------------------------------------------------
 
-precondition(_, _, S, {call, _M, F, _A}) ->
+precondition(wdgm_global_status_ok, wdgm_global_status_ok,
+             S, {call, _M, F, _A}) ->
+  case S#state.globalstatus of
+    'WDGM_GLOBAL_STATUS_OK' ->
+      apply(wdgm_pre, list_to_atom(atom_to_list(F)++"_pre"), [S]);
+    _ -> false
+  end;
+precondition(_F, _T, S, {call, _M, F, _A}) ->
   apply(wdgm_pre, list_to_atom(atom_to_list(F)++"_pre"), [S]).
+
 
 postcondition(_, _, S, {call, _M, F, A}, R) ->
   apply(wdgm_post, list_to_atom(atom_to_list(F)++"_post"), [S, A, R]).
@@ -81,8 +89,8 @@ next_state_data(_, _, S, R, {call, _M, F, A}) ->
 
 %% -WdgM_Init-------------------------------------------------------------------
 
-initwdgm_command(S) ->
-  {history, wdgm_command:init_command(S)}.
+init_command(S) ->
+  {history, wdgm_statem_eqc:init(S)}.
 
 %% -WdgM_GetMode----------------------------------------------------------------
 
