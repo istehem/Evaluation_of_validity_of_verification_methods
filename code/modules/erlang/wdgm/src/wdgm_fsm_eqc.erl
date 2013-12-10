@@ -8,24 +8,19 @@
 
 -include("wdgm_config.hrl").
 
+-define(COMMAND,wdgm_command).
+
 init([]) ->
-  {ok,wdgm_global_status_ok,[]}.
+  {ok,wdgm_not_init,[]}.
 
-wdgm_global_status_ok(_E,S) ->
-  {next_state,wdgm_global_status_ok,S}.
-
-wdgm_global_status_ok(_E,_F,S) ->
-  {next_state,wdgm_global_status_ok,S}.
-
-wdgm_global_status_stopped(_E, S) ->
-  {next_state, wdgm_global_status_stopped, S}.
+start_statem() ->
+    wdgm_eqc:start().
 
 start() ->
-    wdgm_eqc:start(),
-    gen_fsm:start({local,wdgm_fsm},?MODULE,[],[]).
+    gen_fsm:start({global,wdgm_fsm},?MODULE,[],[]).
 
 stop() ->
-    gen_fsm:sync_send_all_state_event(wdgm_fsm,stop).
+    gen_fsm:sync_send_all_state_event({global,wdgm_fsm},stop).
 
 handle_sync_event(stop,_,_,_) ->
     {stop,normal,ok,[]}.
@@ -33,33 +28,46 @@ handle_sync_event(stop,_,_,_) ->
 terminate(_,_,_) ->
     ok.
 
-wdgm_global_status_ok(S) ->
-    [initwdgm_command(S),
-     getmode_command(S),
-     setmode_command(S),
-     deinit_command(S),
-     checkpointreached_command(S),
-     getglobalstatus_command(S),
-     getlocalstatus_command(S),
-     performreset_command(S),
-     getfirstexpiredseid_command(S),
-     mainfunction_command(S)
+wdgm_not_init(S) ->
+  [{'WDGM_GLOBAL_STATUS_OK',?COMMAND:init_command(initial_state_data())}].
+
+wdgm_not_init(E,S) ->
+  {next_state,E,S}.
+
+'WDGM_GLOBAL_STATUS_OK'(S) ->
+  function_list('WDGM_GLOBAL_STATUS_OK',S).
+
+'WDGM_GLOBAL_STATUS_OK'(E,S) ->
+  {next_state,E,S}.
+
+'WDGM_GLOBAL_STATUS_EXPIRED'(E,S) ->
+  {next_state,E,S}.
+
+'WDGM_GLOBAL_STATUS_DEACTIVATED'(E,S) ->
+  {next_state,E,S}.
+
+'WDGM_GLOBAL_STATUS_FAILED'(E,S) ->
+  {next_state,E,S}.
+
+'WDGM_GLOBAL_STATUS_STOPPED'(E,S) ->
+  {next_state,E,S}.
+
+function_list(E,S) ->
+    [
+     {E,?COMMAND:getmode_command(S)},
+     {E,?COMMAND:setmode_command(S)},
+     {E,?COMMAND:deinit_command(S)},
+     {E,?COMMAND:checkpointreached_command(S)},
+     {E,?COMMAND:getglobalstatus_command(S)},
+     {E,?COMMAND:getlocalstatus_command(S)},
+     {E,?COMMAND:performreset_command(S)},
+     {E,?COMMAND:getfirstexpiredseid_command(S)},
+     {E,?COMMAND:mainfunction_command(S)},
+     {E,?COMMAND:init_command(S)}
     ].
 
-wdgm_global_status_stopped(S) ->
-    [initwdgm_command(S),
-     getmode_command(S),
-     setmode_command(S),
-     deinit_command(S),
-     checkpointreached_command(S),
-     getglobalstatus_command(S),
-     getlocalstatus_command(S),
-     performreset_command(S),
-     getfirstexpiredseid_command(S),
-     mainfunction_command(S)].
-
 initial_state() ->
-    wdgm_global_status_ok.
+    wdgm_not_init.
 
 initial_state_data() ->
   Rs = wdgm_xml:start(),
@@ -70,81 +78,41 @@ initial_state_data() ->
 %%------------------------------------------------------------------------------
 %%------------------------------------------------------------------------------
 
-precondition(_, _, S, {call, _M, F, _A}) ->
-  apply(wdgm_pre, list_to_atom(atom_to_list(F)++"_pre"), [S]).
+precondition(FS, _, S, {call, _M, F, A}) ->
+  case FS of
+    wdgm_not_init -> true;
+    _             -> apply(wdgm_pre, list_to_atom(atom_to_list(F)++"_pre"), [S])
+  end.
 
-postcondition(_, _, S, {call, _M, F, A}, R) ->
-  apply(wdgm_post, list_to_atom(atom_to_list(F)++"_post"), [S, A, R]).
+postcondition(FS, _, S, {call, _M, F, A}, R) ->
+  case FS of
+    wdgm_not_init -> true;
+    _             -> apply(wdgm_post, list_to_atom(atom_to_list(F)++"_post"), [S, A, R])
+  end.
 
-next_state_data(_, _, S, R, {call, _M, F, A}) ->
-  apply(wdgm_next, list_to_atom(atom_to_list(F)++"_next"), [S, R, A]).
-
-%% -WdgM_Init-------------------------------------------------------------------
-
-initwdgm_command(S) ->
-  {history, wdgm_command:init_command(S)}.
-
-%% -WdgM_GetMode----------------------------------------------------------------
-
-getmode_command(S) ->
-  {history, wdgm_command:getmode_command(S)}.
-
-%% -WdgM_SetMode----------------------------------------------------------------
-
-setmode_command(S) ->
-  {history, wdgm_command:setmode_command(S)}.
-
-%% -WdgM_DeInit-----------------------------------------------------------------
-
-deinit_command(S) ->
-  {history, wdgm_command:deinit_command(S)}.
-
-%% -WdgM_CheckpointReached------------------------------------------------------
-
-checkpointreached_command(S) ->
-  {history, wdgm_command:checkpointreached_command(S)}.
-
-%% -WdgM_UpdateAliveCounter-----------------------------------------------------
-%% Deprecated
-
-%% -WdgM_GetLocalStatus---------------------------------------------------------
-
-getlocalstatus_command(S) ->
-  {history, wdgm_command:getlocalstatus_command(S)}.
-
-%% -WdgM_GetGlobalStatus--------------------------------------------------------
-
-getglobalstatus_command(S) ->
-  {history, wdgm_command:getglobalstatus_command(S)}.
-
-%% -WdgM_PerformReset-----------------------------------------------------------
-
-performreset_command(S) ->
-  {history, wdgm_command:performreset_command(S)}.
-
-%% -WdgM_GetFirstExpiredSEID----------------------------------------------------
-
-getfirstexpiredseid_command(S) ->
-  {history, wdgm_command:getfirstexpiredseid_command(S)}.
-
-%% -WdgM_MainFunction-----------------------------------------------------------
-
-mainfunction_command(S) ->
-  {history, wdgm_command:mainfunction_command(S)}.
-
-%%------------------------------------------------------------------------------
-%%------------------------------------------------------------------------------
-%%------------------------------------------------------------------------------
-
+next_state_data(FS, _, S, R, {call, M, F, A}) ->
+  NewA =
+  case A of
+    [] -> [void];
+    _ -> [A]
+  end,
+  case FS of
+   wdgm_not_init -> gen_fsm:send_event({global,wdgm_fsm},'WDGM_GLOBAL_STATUS_OK'),
+                    apply(wdgm_next, list_to_atom(atom_to_list(F)++"_next"), [S,R] ++ NewA);
+   _             ->
+                    SNew = apply(wdgm_next, list_to_atom(atom_to_list(F)++"_next"), [S,R] ++ NewA),
+                    gen_fsm:send_event({global,wdgm_fsm},SNew#state.globalstatus),
+                    SNew
+  end.
 
 prop_wdgm_fsm() ->
-  ?SETUP( fun () -> start(),
+  ?SETUP( fun () -> start_statem(),
                     fun () -> ok end
           end,
           ?FORALL(Cmds, commands(?MODULE),
                   begin
                     eqc_c:restart(),
-                    gen_fsm:start({local,wdgm_fsm},?MODULE,[],[]),
+                    start(),
                     {H,S,Res} = run_commands(?MODULE,Cmds),
                     stop(),
                     pretty_commands(?MODULE,Cmds,{H,S,Res},
@@ -161,7 +129,13 @@ collect_res(_H,_S,_Res,Cmds) ->
 %    Ys -> [{length(Xs)/length(Ys),length(Ys)}]
 %  end.
 
-%read_probability(locked,_,_) ->
+%priority(F,F,{call,_,setmode,_}) ->
+%  100;
+%priority(_,_,{call,_,setmode,_}) ->
+%  0.
+
+%priority(_,_,_) -> io:fwrite("Trams\n").
+%read_probability(F,_,_) ->
 %    0.6;
 %read_probability(unlocked,_,_) ->
 %    0.4.
