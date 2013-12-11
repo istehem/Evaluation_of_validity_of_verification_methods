@@ -123,7 +123,7 @@ get_args_given_LS(LRs, SEid) ->
         _  ->
           [case {L#logical.is_internal, L#logical.activity} of
              {true, true}   -> %% internal, started
-               lists:map(fun (Elem) -> {found, SEid, Elem} end, get_next_cps(L));
+               lists:map(fun (CPid) -> {found, SEid, CPid} end, get_next_cps(L));
              {true, false}  -> %% internal, not started
                [{found, SEid, L#logical.initCP}];
              {false, true}  -> %% external, started
@@ -232,16 +232,16 @@ prioritize(S, ProposedSE, ProposedCP) ->
     {lists:member({mustdo             , ProposedSE, ProposedCP}, ASDSTable),
      lists:member({mainfunction_needed, ProposedSE, ProposedCP}, ASDSTable)}
   of
-    {true, _} -> {prio , ProposedSE, ProposedSE};
-    {_, true} -> {dont , ProposedSE, ProposedSE};
-    _         -> {maybe, ProposedSE, ProposedSE}
+    {true, _} -> {prio , ProposedSE, ProposedCP};
+    {_, true} -> {dont , ProposedSE, ProposedCP};
+    _         -> {maybe, ProposedSE, ProposedCP}
   end.
 
 %% could be potentially dangerous
 %% returns a SE and a CP
 choose_SE_and_CP(S, LCPs) ->
   PrioritizedCPs =
-    [prioritize(S, ProposedSE, ProposedCP) || {found, ProposedSE, ProposedCP} <- LCPs],
+    [prioritize(S, ProposedSE, ProposedCP) || {found, ProposedSE, ProposedCP} <- lists:flatten(LCPs)],
   case PrioritizedCPs of
     [] -> [0,0]; %% waaat?
     _  ->

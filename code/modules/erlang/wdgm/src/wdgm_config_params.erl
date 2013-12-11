@@ -89,9 +89,13 @@ get_checkpoints_for_mode(ModeId, Which) ->
 
 
 is_activated_SE_in_mode(ModeID, SeID) ->
-  is_activated_SE_in_AS(ModeID,SeID) orelse
-    is_activated_SE_in_DS(ModeID,SeID) orelse
-    is_activated_SE_in_ELS(ModeID,SeID).
+  case ModeID of
+    -1 -> false;
+    _ ->
+      is_activated_SE_in_AS(ModeID,SeID) orelse
+        is_activated_SE_in_DS(ModeID,SeID) orelse
+        is_activated_SE_in_ELS(ModeID,SeID)
+  end.
 
 is_activated_SE_in_AS(ModeId, SeID) ->
   lists:member(SeID, lists:map(fun get_SE_id/1, get_checkpoints_for_mode(ModeId, 'AS'))).

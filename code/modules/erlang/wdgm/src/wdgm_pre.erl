@@ -43,6 +43,9 @@ checkpointreached_pre(S) ->
     orelse
     S#state.initialized.
 
+checkpointreached_pre(_S, [false]) ->
+  false.
+
 %%% -WdgM_UpdateAliveCounter----------------------------------------------------
 %% Deprecated
 

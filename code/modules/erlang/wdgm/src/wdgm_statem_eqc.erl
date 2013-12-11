@@ -129,26 +129,39 @@ getfirstexpiredseid(Is_Null) ->
 
 mainfunction() ->
   ?C_CODE:'WdgM_MainFunction'().
+%% mainfunction(_A) ->
+%%   ?C_CODE:'WdgM_MainFunction'().
+%% mainfunction(_A,_B) ->
+%%   ?C_CODE:'WdgM_MainFunction'().
+%% mainfunction(_A,_B,_C) ->
+%%   ?C_CODE:'WdgM_MainFunction'().
 
 
 %%% -Frequency------------------------------------------------------------------
 
 -spec weight(S :: eqc_statem:symbolic_state(), Command :: atom()) -> integer().
-weight(_S, setmode) -> 0;
-weight(_S, checkpointreached) -> 25;
-weight(_S, mainfunction) -> 10;
-weight(S, init) -> case S#state.initialized of
-                      true -> 0;
-                      _    -> 200
-                   end;
-weight(S,deinit) -> case S#state.initialized of
-                      true -> 1;
-                      _    -> 0
-                    end;
-weight(_S,getfirstexpiredseid_pre) -> 0;
-weight(_S,getmode)                 -> 0;
-weight(_S,getglobalstatus)         -> 0;
-weight(_S, _Cmd) -> 1.
+weight(_S, setmode)                -> 2;
+weight(_S, checkpointreached)      -> 25;
+weight(S,  mainfunction) ->
+  case S of
+    _                              -> 10
+  end;
+weight(S,  init) ->
+  case S#state.initialized of
+    true                           -> 1;
+    _                              -> 200
+  end;
+weight(S,  deinit) ->
+  case S#state.initialized of
+    true                           -> 2;
+    _                              -> 1
+  end;
+weight(_S, getfirstexpiredseid)    -> 2;
+weight(_S, getmode)                -> 2;
+weight(_S, getlocalstatus)         -> 2;
+weight(_S, getglobalstatus)        -> 2;
+weight(_S, performreset)           -> 2;
+weight(_S, _Cmd)                   -> 1.
 
 %%% -Properties-----------------------------------------------------------------
 
@@ -161,15 +174,34 @@ prop_wdgm_init() ->
                     eqc_c:restart(),
                     {H,S,Res} = run_commands(?MODULE,Cmds),
                     pretty_commands(?MODULE,Cmds,{H,S,Res},
-                                    aggregate(collect_res(H,S,Res,Cmds),
-                                              Res == ok))
+                                    aggregate(collect_globalstatus(H,S,Res,Cmds),
+                                              aggregate(collect_init(H,S,Res,Cmds),
+                                                        aggregate(collect_length(H,S,Res,Cmds),
+                                                        Res == ok))))
                   end)).
 
 start () ->
   wdgm_eqc:start().
 
-collect_res(_H,_S,_Res,Cmds) ->
-  case Cmds of
-    []                      -> [{none,0}];
-    [{_,_,{_,_,Name,_}}|Xs] -> [{Name,length(Xs)}]
+collect_globalstatus(H, S, _Res, _Cmds) ->
+  lists:nthtail(1,
+                [GS#state.globalstatus
+                 || {GS,_} <- H++[{S, ok}]]).
+
+collect_init(_H,_S,_Res,Cmds) ->
+  case collect_init(Cmds, 0) of
+    -1 -> [{no_init}];
+    0  -> [{init_first}];
+    Nr -> [{init_at, Nr}]
   end.
+collect_init(Cmds, Nr) ->
+  case Cmds of
+    []                      -> -1;
+    [{_,_,{_,_,Name,_}}|Xs] -> case Name == init of
+                                 true  -> Nr;
+                                 false -> collect_init(Xs, Nr+1)
+                               end
+  end.
+
+collect_length(_,_,_,Cmds) ->
+  [{length_of_CmdList, length(Cmds)}].
