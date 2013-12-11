@@ -28,42 +28,97 @@ handle_sync_event(stop,_,_,_) ->
 terminate(_,_,_) ->
     ok.
 
-wdgm_not_init(S) ->
+wdgm_not_init(_S) ->
   [{'WDGM_GLOBAL_STATUS_OK',?COMMAND:init_command(initial_state_data())}].
-
 wdgm_not_init(E,S) ->
+  {next_state,E,S}.
+wdgm_not_init(E,C,S) ->
+  gen_fsm:reply(C, ok),
   {next_state,E,S}.
 
 'WDGM_GLOBAL_STATUS_OK'(S) ->
-  function_list('WDGM_GLOBAL_STATUS_OK',S).
+  function_list(S)
+    ++
+    [
+     {'WDGM_GLOBAL_STATUS_OK',?COMMAND:init_command(S)},
+     {'WDGM_GLOBAL_STATUS_DEACTIVATED',?COMMAND:deinit_command(S)},
+     {'WDGM_GLOBAL_STATUS_OK',?COMMAND:mainfunction_command(S)},
+     {'WDGM_GLOBAL_STATUS_FAILED',?COMMAND:mainfunction_command(S,S)},
+     {'WDGM_GLOBAL_STATUS_EXPIRED',?COMMAND:mainfunction_command(S,S,S)},
+     {'WDGM_GLOBAL_STATUS_STOPPED',?COMMAND:mainfunction_command(S,S,S,S)}
+    ].
+'WDGM_GLOBAL_STATUS_FAILED'(S) ->
+  function_list(S)++
+    [
+     {'WDGM_GLOBAL_STATUS_FAILED',?COMMAND:init_command(S)},
+     {'WDGM_GLOBAL_STATUS_FAILED',?COMMAND:deinit_command(S)},
+     {'WDGM_GLOBAL_STATUS_OK',?COMMAND:mainfunction_command(S)},
+     {'WDGM_GLOBAL_STATUS_FAILED',?COMMAND:mainfunction_command(S,S)},
+     {'WDGM_GLOBAL_STATUS_EXPIRED',?COMMAND:mainfunction_command(S,S,S)},
+     {'WDGM_GLOBAL_STATUS_STOPPED',?COMMAND:mainfunction_command(S,S,S,S)}
+    ].
+'WDGM_GLOBAL_STATUS_EXPIRED'(S) ->
+  function_list(S)++
+    [
+     {'WDGM_GLOBAL_STATUS_EXPIRED',?COMMAND:init_command(S)},
+     {'WDGM_GLOBAL_STATUS_EXPIRED',?COMMAND:deinit_command(S)},
+     {'WDGM_GLOBAL_STATUS_EXPIRED',?COMMAND:mainfunction_command(S)},
+     {'WDGM_GLOBAL_STATUS_STOPPED',?COMMAND:mainfunction_command(S,S)}
+    ].
+'WDGM_GLOBAL_STATUS_STOPPED'(S) ->
+  function_list(S)++
+    [
+     {'WDGM_GLOBAL_STATUS_STOPPED',?COMMAND:init_command(S)},
+     {'WDGM_GLOBAL_STATUS_STOPPED',?COMMAND:deinit_command(S)},
+     {'WDGM_GLOBAL_STATUS_STOPPED',?COMMAND:mainfunction_command(S)}
+    ].
+'WDGM_GLOBAL_STATUS_DEACTIVATED'(S) ->
+ function_list(S)++
+    [
+     {'WDGM_GLOBAL_STATUS_OK',?COMMAND:init_command(S)},
+     {'WDGM_GLOBAL_STATUS_DEACTIVATED', ?COMMAND:deinit_command(S)}
+    ].
 
 'WDGM_GLOBAL_STATUS_OK'(E,S) ->
   {next_state,E,S}.
-
+'WDGM_GLOBAL_STATUS_FAILED'(E,S) ->
+  {next_state,E,S}.
 'WDGM_GLOBAL_STATUS_EXPIRED'(E,S) ->
   {next_state,E,S}.
-
+'WDGM_GLOBAL_STATUS_STOPPED'(E,S) ->
+  {next_state,E,S}.
 'WDGM_GLOBAL_STATUS_DEACTIVATED'(E,S) ->
   {next_state,E,S}.
 
-'WDGM_GLOBAL_STATUS_FAILED'(E,S) ->
-  {next_state,E,S}.
+%% 'WDGM_GLOBAL_STATUS_OK'(E,C,S) ->
+%%   io:fwrite("##~p\n", [E]),
+%%   gen_fsm:reply(C, ok),
+%%   {next_state,E,S}.
+%% 'WDGM_GLOBAL_STATUS_FAILED'(E,C,S) ->
+%%   gen_fsm:reply(C, ok),
+%%   {next_state,E,S}.
+%% 'WDGM_GLOBAL_STATUS_EXPIRED'(E,C,S) ->
+%%   gen_fsm:reply(C, ok),
+%%   {next_state,E,S}.
+%% 'WDGM_GLOBAL_STATUS_STOPPED'(E,C,S) ->
+%%   gen_fsm:reply(C, ok),
+%%   {next_state,E,S}.
+%% 'WDGM_GLOBAL_STATUS_DEACTIVATED'(E,C,S) ->
+%%   gen_fsm:reply(C, ok),
+%%   {next_state,E,S}.
 
-'WDGM_GLOBAL_STATUS_STOPPED'(E,S) ->
-  {next_state,E,S}.
-
-function_list(E,S) ->
+function_list(S) ->
     [
-     {E,?COMMAND:getmode_command(S)},
-     {E,?COMMAND:setmode_command(S)},
-     {E,?COMMAND:deinit_command(S)},
-     {E,?COMMAND:checkpointreached_command(S)},
-     {E,?COMMAND:getglobalstatus_command(S)},
-     {E,?COMMAND:getlocalstatus_command(S)},
-     {E,?COMMAND:performreset_command(S)},
-     {E,?COMMAND:getfirstexpiredseid_command(S)},
-     {E,?COMMAND:mainfunction_command(S)},
-     {E,?COMMAND:init_command(S)}
+     {history,?COMMAND:getmode_command(S)},
+     {history,?COMMAND:setmode_command(S)},
+     {history,?COMMAND:checkpointreached_command(S)},
+     {history,?COMMAND:getglobalstatus_command(S)},
+     {history,?COMMAND:getlocalstatus_command(S)},
+     {history,?COMMAND:performreset_command(S)},
+     {history,?COMMAND:getfirstexpiredseid_command(S)}
+%%     {history,?COMMAND:deinit_command(S)},
+%%     {history,?COMMAND:mainfunction_command(S)},
+%%     {history,?COMMAND:init_command(S)}
     ].
 
 initial_state() ->
@@ -78,7 +133,7 @@ initial_state_data() ->
 %%------------------------------------------------------------------------------
 %%------------------------------------------------------------------------------
 
-precondition(FS, _, S, {call, _M, F, A}) ->
+precondition(FS, _, S, {call, _M, F, _A}) ->
   case FS of
     wdgm_not_init -> true;
     _             -> apply(wdgm_pre, list_to_atom(atom_to_list(F)++"_pre"), [S])
@@ -90,18 +145,18 @@ postcondition(FS, _, S, {call, _M, F, A}, R) ->
     _             -> apply(wdgm_post, list_to_atom(atom_to_list(F)++"_post"), [S, A, R])
   end.
 
-next_state_data(FS, _, S, R, {call, M, F, A}) ->
+next_state_data(FS, _, S, R, {call, _M, F, A}) ->
   NewA =
   case A of
     [] -> [void];
     _ -> [A]
   end,
   case FS of
-   wdgm_not_init -> gen_fsm:send_event({global,wdgm_fsm},'WDGM_GLOBAL_STATUS_OK'),
+   wdgm_not_init -> %gen_fsm:send_event({global,wdgm_fsm},'WDGM_GLOBAL_STATUS_OK'),
                     apply(wdgm_next, list_to_atom(atom_to_list(F)++"_next"), [S,R] ++ NewA);
    _             ->
                     SNew = apply(wdgm_next, list_to_atom(atom_to_list(F)++"_next"), [S,R] ++ NewA),
-                    gen_fsm:send_event({global,wdgm_fsm},SNew#state.globalstatus),
+                    %gen_fsm:send_event({global,wdgm_fsm},SNew#state.globalstatus),
                     SNew
   end.
 
@@ -120,8 +175,8 @@ prop_wdgm_fsm() ->
                                               Res == ok))
                   end)).
 
-collect_res(_H,_S,_Res,Cmds) ->
-  command_names(Cmds).
+collect_res(H,_S,_Res,Cmds) ->
+  zip(state_names(H),command_names(Cmds)).
   %Xs = lists:filter(fun({_,_,{_,_,Name,_}}) -> Name == initwdgm end,Cmds),
 
 %  case Cmds of
