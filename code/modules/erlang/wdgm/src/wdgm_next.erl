@@ -13,11 +13,13 @@
 -compile(export_all).
 
 %%% -WdgM_Init------------------------------------------------------------------
-init_next(S, _Ret, _Args) ->
-  Rs = wdgm_xml:start(),
-  {_, R} = (hd(Rs)), %% why do we get a list of records?
-  ModeId = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
-  NewS =
+init_next(S, _Ret, [{_,Is_Null}]) ->
+  case not Is_Null of
+   true ->
+    Rs = wdgm_xml:start(),
+    {_, R} = (hd(Rs)), %% why do we get a list of records?
+    ModeId = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
+    NewS =
     #state{initialized   = true,
            currentMode   = ModeId,
            originalCfg   = R,
@@ -29,7 +31,9 @@ init_next(S, _Ret, _Args) ->
                         ++ wdgm_helper:reset_logical_table(wdgm_config_params:get_external_graphs(ModeId),
                                                false),
            aliveTable    = wdgm_helper:reset_alive_table(ModeId)},
-  NewS#state{supervisedentities = wdgm_helper:reset_supervised_entities(NewS, ModeId)}.
+    NewS#state{supervisedentities = wdgm_helper:reset_supervised_entities(NewS, ModeId)};
+  _ -> S
+  end.
 
 %%% -WdgM_GetMode---------------------------------------------------------------
 getmode_next(S, _Ret, _Args) ->
