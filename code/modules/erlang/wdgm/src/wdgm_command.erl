@@ -42,7 +42,7 @@ deinit_command(_S) ->
 %%% -WdgM_CheckpointReached-----------------------------------------------------
 
 checkpointreached_command(S) ->
-  {call, ?WDGMSTATEM, checkpointreached, checkpoint_gen(S)}.
+  {call, ?WDGMSTATEM, checkpointreached, eqc_symbolic:well_defined(checkpoint_gen(S))}.
 
 checkpoint_gen(S) ->
   case wdgm_pre:checkpointreached_pre(S) of

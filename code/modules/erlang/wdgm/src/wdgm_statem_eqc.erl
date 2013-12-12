@@ -177,7 +177,8 @@ prop_wdgm_init() ->
                                     aggregate(collect_globalstatus(H,S,Res,Cmds),
                                               aggregate(collect_init(H,S,Res,Cmds),
                                                         aggregate(collect_length(H,S,Res,Cmds),
-                                                        Res == ok))))
+                                                                  aggregate(collect_given_cmd_length(H,S,Res,Cmds),
+                                                        Res == ok)))))
                   end)).
 
 start () ->
@@ -197,11 +198,22 @@ collect_init(_H,_S,_Res,Cmds) ->
 collect_init(Cmds, Nr) ->
   case Cmds of
     []                      -> -1;
-    [{_,_,{_,_,Name,_}}|Xs] -> case Name == init of
-                                 true  -> Nr;
-                                 false -> collect_init(Xs, Nr+1)
-                               end
+    [{_,_,{_,_,init,_}}|_]  -> Nr;
+    [_|Xs]                  -> collect_init(Xs, Nr+1)
   end.
 
 collect_length(_,_,_,Cmds) ->
   [{length_of_CmdList, length(Cmds)}].
+
+collect_given_cmd_length(_,_,_,Cmds) ->
+  case Cmds of
+    [] -> [{none, 0}];
+    _  -> lists:map(fun ({_,_,{_,_,Cmd,_}}) ->
+                        {list_to_atom("nr_of_"++atom_to_list(Cmd)),
+                         length(
+                           lists:filter(fun ({_,_,{_,_,Name,_}}) ->
+                                            Name == Cmd
+                                        end, Cmds))}
+                    end,
+                    Cmds)
+  end.
