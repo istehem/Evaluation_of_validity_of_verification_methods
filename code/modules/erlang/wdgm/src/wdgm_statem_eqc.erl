@@ -169,7 +169,8 @@ prop_wdgm_init() ->
   ?SETUP( fun () -> start(),
                     fun () -> ok end
           end,
-          ?FORALL(Cmds, commands(?MODULE),
+          ?FORALL(Cmds, non_empty(commands(?MODULE)), %% Use eqc_gen:vector/2 in combination ?LET
+                                                      %% for more commands
                   begin
                     eqc_c:restart(),
                     {H,S,Res} = run_commands(?MODULE,Cmds),

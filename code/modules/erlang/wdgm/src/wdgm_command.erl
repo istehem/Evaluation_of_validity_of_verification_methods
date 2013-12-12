@@ -49,21 +49,24 @@ checkpoint_gen(S) ->
     false -> [false];
     true ->
       ActivatedSEid   = [SEid
-                         || SEid <- [0,2],
+                         || SEid <- [0,2], % TODO check configuration and get all seids
                             wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SEid)],
       DeactivatedSEid = [SEid
                          || SEid <- [0,1,2,3,4],
                             not lists:member(SEid, ActivatedSEid)],
-      ?LET(SEid, frequency([{20, oneof(ActivatedSEid)}, %% either choose one of the valid SEid
+      ?LET(SEid, frequency([{20, oneof(case ActivatedSEid of
+                                          [] -> [999];
+                                          Xs -> Xs
+                                       end)},   %% either choose one of the valid SEid
                                                 % (This demands there is at least one ActivatedSEid)
                             {0, oneof(DeactivatedSEid)}, % (This demands there is at least one DeactivatedSEid)
                             {0, return(999)}]), %% or a phony
-           case SEid of
+           return(case SEid of
              999 -> [999, 999]; %% if the phony, also choose a phony CPid
              _   ->
                LCPs = lists:flatten(wdgm_checkpointreached:get_args_given_LS(S#state.logicalTable, SEid)),
                wdgm_checkpointreached:choose_SE_and_CP(S, LCPs)
-           end)
+           end))
   end.
 
 
