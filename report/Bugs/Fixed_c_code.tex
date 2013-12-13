@@ -43,6 +43,11 @@
 
       together with [WDGM252] and [WDGM274], this means that the results shall not
       be overwritten}
+  \item[WDGM255]\parbox[t]{0.8\linewidth}{Function Wdgm\_Init shall not change the
+global status if a null pointer is passed as an argument.}
+  \item[fig.4]\parbox[t]{0.8\linewidth}{The global status should be set to
+   WDGM\_GLOBAL\_STATUS\_DEACTIVATED not WDGM\_GLOBAL\_STATUS\_OK from the very
+beginning. That is before any function in WdgM.c is run.}
 \end{description}
 
 \section{Requirements that is broken within AUTOSAR}

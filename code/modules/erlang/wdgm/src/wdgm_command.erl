@@ -19,13 +19,13 @@
 
 init_command(_S) ->
   {call, ?WDGMSTATEM, init, [frequency([{20, return({eqc_c:address_of('Tst_Cfg1'), false})},
-                                   {0, return({{ptr, int, 0}, true})}])]}.
+                                   {1, return({{ptr, "WdgM_ConfigType", 0}, true})}])]}.
 
 %%% -WdgM_GetMode---------------------------------------------------------------
 
 getmode_command(_S) ->
   {call, ?WDGMSTATEM, getmode, [frequency([{20, return(false)},
-                                           {0, return(true)}])]}.
+                                           {1, return(true)}])]}.
 
 %%% -WdgM_SetMode---------------------------------------------------------------
 
@@ -79,13 +79,13 @@ getlocalstatus_command(_S) ->
   {call, ?WDGMSTATEM, getlocalstatus, [frequency([{20, choose(0,4)},
                                                   {0, return(999)}]),
                                        frequency([{20, return(false)},
-                                                  {0, return(true)}])]}.
+                                                  {1, return(true)}])]}.
 
 %%% -WdgM_GetGlobalStatus-------------------------------------------------------
 
 getglobalstatus_command(_S) ->
   {call, ?WDGMSTATEM, getglobalstatus, [frequency([{20, return(false)},
-                                                   {0, return(true)}])]}.
+                                                   {1, return(true)}])]}.
 
 %%% -WdgM_PerformReset----------------------------------------------------------
 
@@ -96,7 +96,7 @@ performreset_command (_S) ->
 
 getfirstexpiredseid_command(_S) ->
   {call, ?WDGMSTATEM, getfirstexpiredseid, [frequency([{20, return(false)},
-                                                   {0, return(true)}])]}.
+                                                   {1, return(true)}])]}.
 
 
 %%% -WdgM_MainFunction----------------------------------------------------------
