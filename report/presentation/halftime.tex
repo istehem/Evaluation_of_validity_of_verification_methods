@@ -299,16 +299,18 @@ Therefor we prioritize these functions in the generation.
 \section{Future work}
 %================================================
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{Functional Safety}
 We will look at how this testing suites ISO26262. We have good hopes of
 achieving some kind of classification.\\[0.5cm]
+
+When the configuration flag \verb!DevErrorDetect! is off, and you send a
+null pointer to \verb!WdgM_Init! you get a segmentation fault.
 \end{frame}
 
 \begin{frame}
 \frametitle{Bug report}
 As stated, we have found a lot of bugs and modified the C-code.
-
 \end{frame}
 
 \begin{frame}
@@ -322,6 +324,11 @@ It is possible to guide QuickCheck to shrink correctly, but it wont be a part of
 this thesis, because time.
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Binding modules}
+Another part of future work could be to implement a model for \verb!WdgIf! and
+get the two modules to work coherently.
+\end{frame}
 %------------------------------------------------
 
 % \begin{frame}
