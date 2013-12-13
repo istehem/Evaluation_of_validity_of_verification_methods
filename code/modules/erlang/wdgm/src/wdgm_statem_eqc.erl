@@ -206,7 +206,7 @@ collect_init(Cmds, Nr) ->
 collect_length(_,_,_,Cmds) ->
   [{length_of_CmdList, length(Cmds)}].
 
-collect_given_cmd_length(_,_,_,Cmds) ->
+collect_given_cmd_length(_H,_,_,Cmds) ->
   case Cmds of
     [] -> [{none, 0}];
     _  -> lists:map(fun ({_,_,{_,_,Cmd,_}}) ->
