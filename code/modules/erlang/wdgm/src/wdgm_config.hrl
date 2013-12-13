@@ -18,7 +18,7 @@
 -record(state,
         {initialized=false,
          currentMode=-1,
-         globalstatus,
+         globalstatus = 'WDGM_GLOBAL_STATUS_DEACTIVATED',
          originalCfg=#wdgm{},
          expiredSEid,
          expiredsupervisioncycles=0,
@@ -52,10 +52,10 @@
          is_internal}).
 -record(supervisedentity,
         {seid,
-         localstatus          = 'WDGM_LOCAL_STATUS_OK',
-         localalivestatus     = 'WDGM_CORRECT',
-         localdeadlinestatus  = 'WDGM_CORRECT',
-         locallogicalstatus   = 'WDGM_CORRECT',
+         localstatus          ,
+         localalivestatus     ,
+         localdeadlinestatus  ,
+         locallogicalstatus   ,
          failed_alive_supervision_cycle_tol,
          failed_reference_supervision_cycles = 0,
          supervision_cycles   = 0}).
