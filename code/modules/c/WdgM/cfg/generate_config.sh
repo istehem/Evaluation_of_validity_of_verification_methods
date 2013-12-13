@@ -1,1 +1,1 @@
-../generator/picea_wdgm_scg.exe -s AUTOSAR_4-0-3.xsd -x xml.xsd -a examples/WdgM_VID41_ExampleConfiguration_001_cfg1.arxml -a AUTOSAR_Types.arxml -a WDGM_VID41_MD.arxml -a WdgM_VID41_Impl.arxml -a WdgM_VID41_SWCD.arxml -o ../generated_cfg
+../generator/picea_wdgm_scg.exe -s AUTOSAR_4-0-3.xsd -x xml.xsd -a freescale/wdgm_freescale_pip.arxml -a AUTOSAR_Types.arxml -a WDGM_VID41_MD.arxml -a WdgM_VID41_Impl.arxml -a WdgM_VID41_SWCD.arxml -o ../generated_cfg
