@@ -90,7 +90,25 @@
 %------------------------------------------------
 
 \begin{frame}
+\frametitle{Implementation}
+\begin{itemize}
+  \item Watchdog Manager
+  \item Erlang implementation of AUTOSAR
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{How QuickCheck works}
+Generators, preconditions, postconditions, changes to model state.
+\begin{figure}
+  \includegraphics[keepaspectratio, width=0.7\linewidth]{api_calls}
+\end{figure}
+\end{frame}
+
+\begin{frame}
 \frametitle{Example configuration}
+Covers most of the model, still quite small.\\
+DevErrorDetect is on.\\
 \end{frame}
 
 %------------------------------------------------
@@ -99,29 +117,28 @@
 
 \begin{frame}
 \frametitle{DevErrorDetect}
+\begin{itemize}
+  \item positive testing
+  \item missing requirements
+  \item segmentation faults
+\end{itemize}
 \end{frame}
 
+% %------------------------------------------------
+% \subsection{Negative testing}
+% %------------------------------------------------
 
-\begin{frame}
-\frametitle{Initialization}
-\end{frame}
+% \begin{frame}
+% \frametitle{Red}
+% \end{frame}
 
-%------------------------------------------------
-\subsection{Negative testing}
-%------------------------------------------------
+% %------------------------------------------------
+% \subsection{Positive testing}
+% %------------------------------------------------
 
-\begin{frame}
-\frametitle{Red}
-\end{frame}
-
-
-%------------------------------------------------
-\subsection{Positive testing}
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Green}
-\end{frame}
+% \begin{frame}
+% \frametitle{Green}
+% \end{frame}
 
 %------------------------------------------------
 \subsection{Tweaking the generators}
@@ -129,21 +146,39 @@
 
 \begin{frame}
 \frametitle{What test cases are interesting?}
+\begin{itemize}
+  \item Negative testing
+    \begin{itemize}
+      \item good to cover bad arguments
+    \end{itemize}
+  \item Positive testing
+    \begin{itemize}
+      \item No absorbing state
+      \item correct arguments
+      \item correct command sequences
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{figure}
+  \includegraphics[keepaspectratio, width=0.7\linewidth]{globalstatuses}
+\end{figure}
 \end{frame}
 
 %================================================
 \section{How we handle bugs}
 %================================================
 %------------------------------------------------
-%\subsection{Lesser good methods}
+%\subsection{Less good methods}
 %------------------------------------------------
 
 \begin{frame}
-\frametitle{Lesser good methods}
+\frametitle{Less good methods}
 \begin{block}{Report bug}
   \begin{description}
     \item[+] Not our job to correct the code
-    \item[-] Takes weeks...
+    \item[-] Unknown time delay, probably weeks...
   \end{description}
 \end{block}
 
@@ -193,19 +228,21 @@
 
 \begin{frame}
 \frametitle{C-code}
-\begin{description}
-  \item[WdgM.c:1397] bugfix because [WDGM182]
-  \item[WdgM.c:1404] bugfix because [WDGM182]
-  \item[WdgM.c:1802] bugfix because [7.2.3.2]
-  \item[WdgM.c:1805] bugfix because [WDGM274]
-  \item[WdgM.c:1864] bugfix because [7.2.3.2]
-  \item[WdgM.c:1867] bugfix because [WDGM252]
-  \item[WdgM.c:1834] bugfix because [7.2.3.2]
-  \item[WdgM.c:1903] bugfix because [7.2.3.2]
-  \item[WdgM.c:2056] bugfix because [WDGM286]
-  \item[inc/?] \parbox[t]{0.8\linewidth}{Global status is initialized
-    to WDGM\_GLOBAL\_STATUS\_OK, should be DEACTIVATED because figure 4}
-\end{description}
+\begin{tabular}{l l}
+  Requirement & Our classification\\\hline
+  WDGM286 & Medium\\
+  WDGM077 & Low-Medium\footnote{\label{footnot:ett} Together their classification is Medium-High}\\
+  WDGM117 & Low-Medium$^{\ref{footnot:ett}}$ \\
+  WDGM215 & Low-Medium$^{\ref{footnot:ett}}$ \\
+  WDGM216 & Low-Medium$^{\ref{footnot:ett}}$ \\
+  WDGM219 & Low-Medium$^{\ref{footnot:ett}}$ \\
+  WDGM220 & Low-Medium$^{\ref{footnot:ett}}$ \\
+  WDGM182 & High\\
+  7.2.3.2 & Medium\footnote{\label{footnot:tva} Together with WDGM252 and WDGM274
+    this could be dangerous}\\
+  WDGM255 & Low\\
+  fig. 4  & Low
+\end{tabular}
 \end{frame}
 
 %------------------------------------------------
@@ -213,12 +250,12 @@
 %------------------------------------------------
 
 \begin{frame}
-\frametitle{Generated C-code}
-\begin{description}
-  \item[WdgM\_Lcfg.c:223] \parbox[t]{0.8\linewidth}{bugfix, added initialization
-      to alive/deadline/logical supervision results to WDGM\_CORRECT (copied the
-      if statement from row 199), because [p. 27]}
-\end{description}
+\frametitle{Generated C-code and include-files}
+\begin{tabular}{l l}
+  Requirement & Our classification\\\hline
+  p. 27   & Low\\
+  fig. 4  & Low\\
+\end{tabular}
 \end{frame}
 
 %------------------------------------------------
@@ -227,14 +264,14 @@
 
 \begin{frame}
 \frametitle{AUTOSAR}
-\begin{description}
-  \item[ambiguous meaning] the definition of what (deadline) timestamp is and were it shall be set is ambiguous. Is it cycles, ticks, seconds or microseconds? and where should it increment/set the timestamp?
-  \item[conflicting requirements] [WDGM317], [WDGM139] because [WDGM186]
-  \item[no requirement, p. 125] reset of alive counter in mainfunction
-  \item[ambiguous meaning] return value not specified but E\_NOT\_OK seems
-    logical
-  \item[DevErrorDetect] if not enabled, what is supposed to happend?
-\end{description}
+AUTOSAR complications
+\begin{itemize}
+  \item ambiguous meaning
+  \item conflicting requirements
+  \item omitted requirements/explanations
+  \item spelling of configuration parameters
+  \item references
+\end{itemize}
 \end{frame}
 
 %================================================
@@ -246,10 +283,12 @@
 
 \begin{frame}
 \frametitle{Coverage}
-if our model behave like the c model, then we can test our models function
-coverage and check that we test all functions.
+%if our model behave like the c model, then we can test our models function
+%coverage and check that we test all functions.
 \begin{itemize}
-  \item line coverage analysis
+  \item line coverage analysis (not absolute, due to bugs in C-code)
+  \item variables in the state
+  \item call coverage (not absolute)
 \end{itemize}
 \end{frame}
 
@@ -260,17 +299,17 @@ coverage and check that we test all functions.
 \begin{frame}[fragile]
 \frametitle{Statistics}
 \begin{itemize}
-  \item generated command sequences of up to \~120 commands (really no limit)
+  \item generated command sequences of up to 120 commands (really no limit)
   \item 95\% starts with the command \verb!WdgM_Init!
-
+  \item global statuses
 %% kanske hör mer till implementationen men vi borde nämna procentsatser på
 %% globalstatusar kanske?
-  \item There is five global statuses, a functional system initiates to
-    \verb!WDGM_GLOBAL_STATUS_DEACTIVATED!, and if the command
-    \verb!WdgM_Init! is successfully called, the global status should be
-    \verb!WDGM_GLOBAL_STATUS_OK!. After that, only the commands
-    \verb!WdgM_Mainfunction! and \verb!WdgM_DeInit! can change the global
-    status.
+  % \item There is five global statuses, a functional system initiates to
+  %   \verb!WDGM_GLOBAL_STATUS_DEACTIVATED!, and if the command
+  %   \verb!WdgM_Init! is successfully called, the global status should be
+  %   \verb!WDGM_GLOBAL_STATUS_OK!. After that, only the commands
+  %   \verb!WdgM_Mainfunction! and \verb!WdgM_DeInit! can change the global
+  %   status.
 \end{itemize}
 \end{frame}
 
@@ -288,7 +327,7 @@ coverage and check that we test all functions.
 \frametitle{Suitability of tests}
 We generate lists of commands, most of which starts with \verb!WdgM_Init! or it has
 \verb!WdgM_Init! in the first 2-4 commands. This is a precondition for all other
-functions except \verb!WdgM_GetFirstExpiredSEId!.
+functions except \verb!WdgM_GetFirstExpiredSEId!.\\[0.5cm]
 
 The functions that change the state considerably is
 \verb!WdgM_Checkpointreached!, \verb!WdgM_SetMode! and \verb!WdgM_Mainfunction!.
@@ -304,13 +343,15 @@ Therefor we prioritize these functions in the generation.
 We will look at how this testing suites ISO26262. We have good hopes of
 achieving some kind of classification.\\[0.5cm]
 
-When the configuration flag \verb!DevErrorDetect! is off, and you send a
-null pointer to \verb!WdgM_Init! you get a segmentation fault.
+When the configuration flag \verb!DevErrorDetect! is off, you may get
+segmentation faults.
+% When the configuration flag \verb!DevErrorDetect! is off, and you send a
+% null pointer to \verb!WdgM_Init! you get a segmentation fault.
 \end{frame}
 
 \begin{frame}
 \frametitle{Bug report}
-As stated, we have found a lot of bugs and modified the C-code.
+As stated, we have found a lot of bugs and we have modified the C-code.
 \end{frame}
 
 \begin{frame}
@@ -325,7 +366,7 @@ this thesis, because time.
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Binding modules}
+\frametitle{Combining modules}
 Another part of future work could be to implement a model for \verb!WdgIf! and
 get the two modules to work coherently.
 \end{frame}
@@ -375,7 +416,7 @@ get the two modules to work coherently.
   \begin{tabular}{l l}
     Reading (and under-\\standing)
     AUTOSAR & 4 weeks\\
-    Understanding C-code & 1 week\\
+    Understanding C-code & 2 week\\
     Implementing model & 3 weeks\\
     Testing & over time\\
     Tweaking & 2 weeks
