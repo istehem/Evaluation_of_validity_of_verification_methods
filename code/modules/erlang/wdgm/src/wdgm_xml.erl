@@ -15,8 +15,13 @@
 -compile(export_all).
 %-export([config_file/0, config/1, start/0, get_modes/0]).
 
+-define(EXAMPLECONFIG, "examples/WdgM_VID41_ExampleConfiguration_001_cfg1.arxml").
+-define(FREESCALE, "freescale/wdgm_freescale_pip.arxml").
+-define(CONFIG, ?FREESCALE).
+
+
 config_file() ->
-        wdgm_eqc:getPath(["c","WdgM","cfg","examples"]) ++ "WdgM_VID41_ExampleConfiguration_001_cfg1.arxml".
+        wdgm_eqc:getPath(["c","WdgM","cfg"]) ++ ?CONFIG.
 
 start() ->
   Cfg = config_file(),

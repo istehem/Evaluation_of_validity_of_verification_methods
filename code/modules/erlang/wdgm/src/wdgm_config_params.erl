@@ -19,9 +19,12 @@ get_supervised_entities() ->
    || Cg <- car_xml:get_containers_by_def("WdgMSupervisedEntity", ?CFG)].
 
 get_supervised_entity(Id) ->
-  {_, N} = lists:keyfind(Id, 1, get_supervised_entities()),
-  car_xml:get_container(N, car_xml:get_containers_by_def(
-			     "WdgMSupervisedEntity", ?CFG)).
+  case lists:keyfind(Id, 1, get_supervised_entities()) of
+    {_, N} ->
+      car_xml:get_container(N, car_xml:get_containers_by_def(
+                                 "WdgMSupervisedEntity", ?CFG));
+    false -> []
+  end.
 
 get_SEs_from_LS(ModeId) ->
   [car_xml:get_value("WdgMSupervisedEntityId",
@@ -56,7 +59,10 @@ get_checkpoint_id(CheckpointRef) ->
   car_xml:get_value("WdgMCheckpointId", car_xml:get_container(CheckpointRef, ?CFG)).
 
 get_CPs_of_SE(SeID) ->
-  [car_xml:get_value("WdgMCheckpointId", X) || X <- car_xml:get_containers_by_def("WdgMCheckpoint", wdgm_config_params:get_supervised_entity(SeID))].
+  SE = wdgm_config_params:get_supervised_entity(SeID),
+  [car_xml:get_value("WdgMCheckpointId", X)
+   || X <- car_xml:get_containers_by_def("WdgMCheckpoint", SE),
+      SE /= []].
 
 get_deadline_params(DS) ->
   {get_checkpoint_id(car_xml:get_value("WdgMDeadlineStartRef", DS)),
