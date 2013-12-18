@@ -141,7 +141,11 @@ mainfunction() ->
 
 -spec weight(S :: eqc_statem:symbolic_state(), Command :: atom()) -> integer().
 weight(_S, setmode)                -> 2;
-weight(_S, checkpointreached)      -> 25;
+weight(S,  checkpointreached) ->
+  case S#state.globalstatus of
+    'WDGM_GLOBAL_STATUS_FAILED'    -> 75;
+    _                              -> 25
+  end;
 weight(S,  mainfunction) ->
   case S of
     _                              -> 10
