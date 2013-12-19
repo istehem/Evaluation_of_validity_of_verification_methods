@@ -5,5 +5,6 @@ if [ $(dirname $0) != "." ]; then
 else
    echo "trams"
    rm *.h
-   for i in $(find ../../ | grep \.h$); do ln -v -s $i .; done
+   #for i in $(find ../../ | grep \.h$); do ln -v -s $i .; done
+   for i in $(find ../../ | grep \.h$); do cp -v $i .; done
 fi
