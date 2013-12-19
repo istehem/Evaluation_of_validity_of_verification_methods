@@ -5,10 +5,10 @@
 
 -compile(export_all).
 
+-include("wdgm_types.hrl").
 -include("wdgm_config.hrl").
 -define(C_CODE, wdgm_wrapper).
 -include_lib("../ebin/wdgm_wrapper.hrl").
-
 
 initial_state() ->
   Rs = wdgm_xml:start(),
@@ -139,7 +139,6 @@ mainfunction() ->
 
 %%% -Frequency------------------------------------------------------------------
 
--spec weight(S :: eqc_statem:symbolic_state(), Command :: atom()) -> integer().
 weight(_S, setmode)                -> 2;
 weight(S,  checkpointreached) ->
   case S#state.globalstatus of
