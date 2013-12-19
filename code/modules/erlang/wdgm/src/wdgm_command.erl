@@ -32,7 +32,6 @@ getmode_command(_S) ->
 setmode_command(_S) ->
   {call, ?WDGMSTATEM, setmode, [choose(0,3), choose(1,2)]}.
 
-
 %%% -WdgM_DeInit----------------------------------------------------------------
 
 deinit_command(_S) ->

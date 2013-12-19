@@ -40,28 +40,26 @@ getmode_next(S, _Ret, _Args) ->
   S.
 
 %%% -WdgM_SetMode---------------------------------------------------------------
-setmode_next(S, Ret, [ModeId, _Cid]) ->
-  case Ret of
-    0 -> case
-           (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
-            S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED')
-         of
-           true ->
-             S#state{currentMode = ModeId,
-                     expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
-                     supervisedentities = wdgm_helper:reset_supervised_entities(S, ModeId),
-                     deadlineTable      = wdgm_helper:reset_deadline_table(ModeId),
-                     logicalTable       = lists:filter(fun (Logical) ->
-                                                           Logical#logical.is_internal
-                                                       end,
-                                                       S#state.logicalTable) %% dont reset SE internal graphs
-                                       ++ wdgm_helper:reset_logical_table(wdgm_config_params:get_external_graphs(ModeId),
-                                                              false),
-                     aliveTable         = wdgm_helper:reset_alive_table(ModeId)};
-           false -> %% [WDGM316], [WDGM145]
-             S
-         end;
-    _ -> S %% if WdgIf_SetMode failed set globalstatus='WDGM_GLOBAL_STATUS_STOPPED'? %% [WDGM139]
+setmode_next(S, _Ret, [ModeId, _Cid]) ->
+  case
+    (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
+     S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED')
+    %% andalso ModeId within range, Cid is allowed
+  of
+    true ->
+      S#state{currentMode = ModeId,
+              expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
+              supervisedentities = wdgm_helper:reset_supervised_entities(S, ModeId),
+              deadlineTable      = wdgm_helper:reset_deadline_table(ModeId),
+              logicalTable       = lists:filter(fun (Logical) ->
+                                                    Logical#logical.is_internal
+                                                end,
+                                                S#state.logicalTable) %% dont reset SE internal graphs
+              ++ wdgm_helper:reset_logical_table(wdgm_config_params:get_external_graphs(ModeId),
+                                                 false),
+              aliveTable         = wdgm_helper:reset_alive_table(ModeId)};
+    false -> %% [WDGM316], [WDGM145]
+      S %% if WdgIf_SetMode failed set globalstatus='WDGM_GLOBAL_STATUS_STOPPED'? %% [WDGM139]
   end.
 
 %%% -WdgM_DeInit----------------------------------------------------------------

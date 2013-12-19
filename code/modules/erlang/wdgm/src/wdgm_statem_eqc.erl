@@ -139,7 +139,12 @@ mainfunction() ->
 
 %%% -Frequency------------------------------------------------------------------
 
-weight(_S, setmode)                -> 2;
+weight(S, setmode) ->
+  case S#state.globalstatus of
+    'WDGM_GLOBAL_STATUS_OK'        -> 7;
+    'WDGM_GLOBAL_STATUS_FAILED'    -> 10;
+    _                              -> 1
+  end;
 weight(S,  checkpointreached) ->
   case S#state.globalstatus of
     'WDGM_GLOBAL_STATUS_FAILED'    -> 75;
@@ -182,7 +187,9 @@ prop_wdgm_init() ->
                                               aggregate(collect_init(H,S,Res,Cmds),
                                                         aggregate(collect_length(H,S,Res,Cmds),
                                                                   aggregate(collect_given_cmd_length(H,S,Res,Cmds),
-                                                        Res == ok)))))
+                                                                            aggregate(collect_cmds_in_current_mode(H,S,Res,Cmds),
+                                                                                      collect(S#state.currentMode,
+                                                        Res == ok)))))))
                   end)).
 
 start () ->
@@ -220,4 +227,19 @@ collect_given_cmd_length(_H,_,_,Cmds) ->
                                         end, Cmds))}
                     end,
                     Cmds)
+  end.
+
+collect_cmds_in_current_mode(H,S,_,Cmds) ->
+  case Cmds of
+    [] -> [{none, 0}];
+    _  ->
+      ModeList = lists:nthtail(1,
+                               [GS#state.currentMode
+                                || {GS,_} <- H++[{S, ok}]]),
+      LengthOfMode = fun(Mode) ->
+                         length(lists:filter(fun (Elem) -> Elem == Mode end,
+                                             ModeList))
+                     end,
+      [ {list_to_atom("cmds_in_currentmode_" ++ integer_to_list(Mode)),
+         LengthOfMode(Mode)} || Mode <- [0,1,2,3], LengthOfMode(Mode) /= 0]
   end.
