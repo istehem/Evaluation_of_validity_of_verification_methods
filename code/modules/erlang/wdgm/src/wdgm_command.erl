@@ -48,11 +48,12 @@ checkpoint_gen(S) ->
   case wdgm_pre:checkpointreached_pre(S) of
     false -> [false];
     true ->
+      SEs = wdgm_config_params:get_supervised_entities(),
       ActivatedSEid   = [SEid
-                         || SEid <- [0,2], % TODO check configuration and get all seids
+                         || {SEid,_} <- SEs,
                             wdgm_config_params:is_activated_SE_in_mode(S#state.currentMode, SEid)],
       DeactivatedSEid = [SEid
-                         || SEid <- [0,1,2,3,4],
+                         || {SEid,_} <- SEs,
                             not lists:member(SEid, ActivatedSEid)],
       ?LET(SEid, frequency([{20, oneof(case ActivatedSEid of
                                           [] -> [999];
