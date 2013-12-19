@@ -176,6 +176,7 @@ prop_wdgm_init() ->
           ?FORALL(Cmds, non_empty(commands(?MODULE)), %% Use eqc_gen:vector/2 in combination ?LET
                                                       %% for more commands
                   begin
+                    rename_bullseye_cov_file(),
                     eqc_c:restart(),
                     {H,S,Res} = run_commands(?MODULE,Cmds),
                     pretty_commands(?MODULE,Cmds,{H,S,Res},
@@ -185,6 +186,11 @@ prop_wdgm_init() ->
                                                                   aggregate(collect_given_cmd_length(H,S,Res,Cmds),
                                                         Res == ok)))))
                   end)).
+
+rename_bullseye_cov_file() ->
+ Path = wdgm_eqc:getPath(["..","coverage"]),
+ file:rename(Path ++ "test.cov",
+             Path ++ (fun({X,Y,Z}) -> integer_to_list(X) ++ integer_to_list(Y) ++ integer_to_list(Z) ++ ".cov" end) (now())).
 
 start () ->
   wdgm_eqc:start().
