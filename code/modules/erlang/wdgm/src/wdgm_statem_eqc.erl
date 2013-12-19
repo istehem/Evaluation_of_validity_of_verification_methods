@@ -10,6 +10,12 @@
 -define(C_CODE, wdgm_wrapper).
 -include_lib("../ebin/wdgm_wrapper.hrl").
 
+-ifdef(bullseye).
+-define(COPY_FILE,copy_bullseye_cov_file()).
+-else.
+-define(COPY_FILE,ok).
+-endif.
+
 initial_state() ->
   Rs = wdgm_xml:start(),
   {_, R} = (hd(Rs)), %% why do we get a list of records?
@@ -175,7 +181,7 @@ prop_wdgm_init() ->
           ?FORALL(Cmds, non_empty(commands(?MODULE)), %% Use eqc_gen:vector/2 in combination ?LET
                                                       %% for more commands
                   begin
-                    rename_bullseye_cov_file(),
+                    ?COPY_FILE,
                     eqc_c:restart(),
                     {H,S,Res} = run_commands(?MODULE,Cmds),
                     pretty_commands(?MODULE,Cmds,{H,S,Res},
@@ -186,9 +192,9 @@ prop_wdgm_init() ->
                                                         Res == ok)))))
                   end)).
 
-rename_bullseye_cov_file() ->
+copy_bullseye_cov_file() ->
  Path = wdgm_eqc:getPath(["..","coverage"]),
- file:rename(Path ++ "test.cov",
+ file:copy(Path ++ "test.cov",
              Path ++ (fun({X,Y,Z}) -> integer_to_list(X) ++ integer_to_list(Y) ++ integer_to_list(Z) ++ ".cov" end) (now())).
 
 start () ->
