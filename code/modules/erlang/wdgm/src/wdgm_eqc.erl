@@ -6,6 +6,12 @@
 
 -define(C_CODE, wdgm_wrapper).
 
+-ifdef(bullseye).
+-define(COMPILER,"C:/Program\ Files\ \(x86\)/BullseyeCoverage/bin/gcc.exe").
+-else.
+-define(COMPILER,"gcc").
+-endif.
+
 %% -Eqc start-------------------------------------------------------------------
 
 getPath(Xs) ->
@@ -17,7 +23,7 @@ src_dir() -> getPath(["c","WdgM","eqc"]).
 
 start() ->
   wdgm_xml:start(),
-  eqc_c:start(wdgm_wrapper,[{c_src,src_dir() ++ "wdgm_wrapper.c"},
+  eqc_c:start(wdgm_wrapper,[{cc,?COMPILER},{cpp,?COMPILER},{c_src,src_dir() ++ "wdgm_wrapper.c"},
 			    {exclude_functions,[]},{additional_files,
 						    [lib_dir() ++ "WdgM_Pbcfg.o",
 						     lib_dir() ++ "WdgM_Lcfg.o",
