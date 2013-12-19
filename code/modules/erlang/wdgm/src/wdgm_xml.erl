@@ -17,7 +17,7 @@
 
 -define(EXAMPLECONFIG, "examples/WdgM_VID41_ExampleConfiguration_001_cfg1.arxml").
 -define(FREESCALE, "freescale/wdgm_freescale_pip.arxml").
--define(CONFIG, ?FREESCALE).
+-define(CONFIG, ?EXAMPLECONFIG).
 
 
 config_file() ->
