@@ -40,11 +40,12 @@ getmode_next(S, _Ret, _Args) ->
   S.
 
 %%% -WdgM_SetMode---------------------------------------------------------------
-setmode_next(S, _Ret, [ModeId, _Cid]) ->
+setmode_next(S, _Ret, [ModeId, Cid]) ->
   case
     (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
-     S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED')
-    %% andalso ModeId within range, Cid is allowed
+     S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED') andalso
+    lists:keyfind(1, ModeId, wdgm_config_params:get_modes()) /= false andalso
+    lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)
   of
     true ->
       S#state{currentMode = ModeId,
