@@ -153,6 +153,16 @@ get_external_graphs(ModeId) ->
 get_expired_supervision_cycles(ModeId) ->
   car_xml:get_value("WdgMExpiredSupervisionCycleTol", get_mode(ModeId)).
 
+will_disable_watchdog(ModeId) ->
+  lists:any(fun (Elem) ->
+                Elem == 'WDGIF_OFF_MODE'
+            end,
+            car_xml:get_values("WdgMWatchdogMode",
+                               car_xml:get_containers_by_def("WdgMTrigger",
+                                                             get_mode(ModeId)))).
+
+
+
 %%%% used by checkpointreached
 
 get_SE_of_CP(CPid) ->

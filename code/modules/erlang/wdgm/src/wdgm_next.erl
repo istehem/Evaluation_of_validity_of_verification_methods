@@ -45,7 +45,10 @@ setmode_next(S, _Ret, [ModeId, Cid]) ->
     (S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' orelse
      S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED') andalso
     lists:keyfind(ModeId, 1, wdgm_config_params:get_modes()) /= false andalso
-    lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)
+    lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids) andalso
+    S#state.initialized andalso
+    (S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.off_mode_enabled orelse
+     not wdgm_config_params:will_disable_watchdog(ModeId))
   of
     true ->
       S#state{currentMode = ModeId,
