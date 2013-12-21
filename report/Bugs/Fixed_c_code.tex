@@ -4,83 +4,85 @@
 \usepackage[english]{babel}
 \usepackage{listings}
 \usepackage{xcolor}
-
+\usepackage{verbatim}
+\usepackage{longtable}
 
 \begin{document}
 
 \section{Requirements that is broken within the C code}
-\begin{description}
-  \item[WDGM286] \parbox[t]{0.8\linewidth}{WdgM\_DeInit should set the global
-      status to WDGM\_GLOBAL\_STATUS\_DEACTIVATED if the global status was
-    WDGM\_GLOBAL\_STATUS\_OK}
-  \item[WDGM215] \parbox[t]{0.8\linewidth}{if global status was
-      WDGM\_GLOBAL\_STATUS\_OK and becomes WDGM\_GLOBAL\_STATUS\_EXPIRED, don't
-      increment WdgM\_ExpiredSupervisionCycles}
-  \item[WDGM252] \parbox[t]{0.8\linewidth}{if CP belongs to a graph, that
-      graph's activity flag is set to false, and the CP is not the initial CP of
-      that graph, then logical supervision status for that SE shall be set to
-      WDGM\_INCORRECT}
-  \item[WDGM274] \parbox[t]{0.8\linewidth}{Same as [WDGM252] but for internal
-      supervision}
-  \item[WDGM219] \parbox[t]{0.8\linewidth}{if global status was
-      WDGM\_GLOBAL\_STATUS\_EXPIRED, it exists a SE that has the local status
-      WDGM\_LOCAL\_STATUS\_EXPIRED, ExpiredSupervisionCycles is less than or
-      equal to the expired supervision cycle tolerance, then keep the global
-      status EXPIRED and increment ExpiredSupervisionCycles}
-  \item[WDGM216] \parbox[t]{0.8\linewidth}{if global status was
-      WDGM\_GLOBAL\_STATUS\_OK, it exists a SE that has the local status
-      WDGM\_LOCAL\_STATUS\_EXPIRED, ExpiredSupervisionCyclesTol is equal to
-      zero, then the global status should be set to
-      WDGM\_GLOBAL\_STATUS\_STOPPED}
-  \item[WDGM182] \parbox[t]{0.8\linewidth}{if global status was WDGM\_GLOBAL\_STATUS\_OK or
-      WDGM\_GLOBAL\_STATUS\_FAILED, for each SE that is activated in the new mode,
-      retain the state of each local SE.}
-  \item[p. 27] \parbox[t]{0.8\linewidth}{At Watchdog Manager initialization, all
-      the Results of alive/deadline/logical supervision are set to correct.}
-  \item[7.2.3.2] \parbox[t]{0.8\linewidth}{Each SE may have M+N results from
-      logical supervision, where N is the number of internal graphs for that SE,
-      and M is the number of external graphs that cross that SE.\\
+\begin{longtable}{l p{0.8\linewidth}}
+NR & Requirement\\\hline
 
-      together with [WDGM252] and [WDGM274], this means that the results shall not
-      be overwritten}
-  \item[WDGM255]\parbox[t]{0.8\linewidth}{Function Wdgm\_Init shall not change the
-global status if a null pointer is passed as an argument.}
-  \item[fig.4]\parbox[t]{0.8\linewidth}{The global status should be set to
-   WDGM\_GLOBAL\_STATUS\_DEACTIVATED not WDGM\_GLOBAL\_STATUS\_OK from the very
-beginning. That is before any function in WdgM.c is run.}
-\end{description}
+[WDGM286] & \verb!WdgM_DeInit! should set the global status to \verb!WDGM_GLOBAL_STATUS_DEACTIVATED! if the global status was \verb!WDGM_GLOBAL_STATUS_OK!\\
+
+[WDGM215] & if global status was \verb!WDGM_GLOBAL_STATUS_OK! and becomes \verb!WDGM_GLOBAL_STATUS_EXPIRED!, don't increment \verb!WdgM_ExpiredSupervisionCycles!\\
+
+[WDGM252] & if CP belongs to a graph, that graph's activity flag is set to false, and the CP is not the initial CP of that graph, then logical supervision status for that SE shall be set to \verb!WDGM_INCORRECT!\\
+
+[WDGM274] & Same as [WDGM252] but for internal supervision\\
+
+[WDGM219] & if global status was \verb!WDGM_GLOBAL_STATUS_EXPIRED!, it exists a SE that has the local status \verb!WDGM_LOCAL_STATUS_EXPIRED!, ExpiredSupervisionCycles is less than or equal to the expired supervision cycle tolerance, then keep the global status EXPIRED and increment ExpiredSupervisionCycles\\
+
+[WDGM216] & if global status was \verb!WDGM_GLOBAL_STATUS_OK!, it exists a SE that has the local status \verb!WDGM_LOCAL_STATUS_EXPIRED!, ExpiredSupervisionCyclesTol is equal to zero, then the global status should be set to \verb!WDGM_GLOBAL_STATUS_STOPPED!\\
+
+[WDGM182] & if global status was \verb!WDGM_GLOBAL_STATUS_OK! or \verb!WDGM_GLOBAL_STATUS_FAILED!, for each SE that is activated in the new mode, retain the state of each local SE.\\
+
+[p. 27] & At Watchdog Manager initialization, all the Results of alive/deadline/logical supervision are set to correct.\\
+
+[7.2.3.2] & Each SE may have M+N results from logical supervision, where N is the number of internal graphs for that SE,and M is the number of external graphs that cross that SE.
+
+together with [WDGM252] and [WDGM274], this means that the results shall not be overwritten\\
+
+[WDGM255] & Function \verb!WdgM_Init! shall not change the global status if a null pointer is passed as an argument.\\
+
+[fig.4] & The global status should be set to \verb!WDGM_GLOBAL_STATUS_DEACTIVATED! not \verb!WDGM_GLOBAL_STATUS_OK! from the very beginning. That is before any function in WdgM.c is run.\\
+
+[WDGM296] & function \verb!WdgM_Init! shall set the activity flags for each logical graph to false. (both internal and external)
+\end{longtable}
 
 \section{Requirements that is broken within AUTOSAR}
-\begin{description}
-  \item[ambiguous meaning] the definition of what (deadline) timestamp is and were it shall
-    be set is ambiguous. Is it cycles, ticks, seconds or microseconds? and where
-    should it increment/set the timestamp?
-  \item[conflicting requirements] [WDGM317], [WDGM139] because [WDGM186]
-  \item[no requirement, p. 125] reset of alive counter in mainfunction
-  \item[ambiguous meaning] return value not specified but E\_NOT\_OK seems logical
-\end{description}
+\begin{longtable}{l p{0.8\linewidth}}
+[ambiguous meaning] & the definition of what (deadline) timestamp is and were it shall be set is ambiguous. Is it cycles, ticks, seconds or microseconds? and where should it increment/set the timestamp?\\
+
+[conflicting requirements] & [WDGM317], [WDGM139] because [WDGM186]\\
+
+[no requirement, p. 125] & reset of alive counter in mainfunction\\
+
+[ambiguous meaning] & return value not specified but \verb!E_NOT_OK! seems logical\\
+\end{longtable}
 
 \section{Bugfixes and changes to the C code}
-\begin{description}
-  \item[WdgM\_Lcfg.c:232] \parbox[t]{0.8\linewidth}{commented a function call to other module (//.Switch\_currentMode((Rte\_ModeType\_WdgMMode)status);)}
-  \item[WdgM\_Lcfg.c:170] \parbox[t]{0.8\linewidth}{commented a function call to other module
-(//.Switch\_currentMode((Rte\_ModeType\_WdgMMode)status);)}
-  \item[WdgM.c:975-1016] bugfix because [WDGM077], [WDGM117], [WDGM215],
-    [WDGM216], [WDGM219], [WDGM220]
-  \item[WdgM.c:1397] bugfix because [WDGM182]
-  \item[WdgM.c:1404] bugfix because [WDGM182]
-  \item[WdgM.c:1802] bugfix because [7.2.3.2]
-  \item[WdgM.c:1805] bugfix because [WDGM274]
-  \item[WdgM.c:1864] bugfix because [7.2.3.2]
-  \item[WdgM.c:1867] bugfix because [WDGM252]
-  \item[WdgM.c:1834] bugfix because [7.2.3.2]
-  \item[WdgM.c:1903] bugfix because [7.2.3.2]
-  \item[WdgM.c:2056] bugfix because [WDGM286]
-  \item[WdgM\_Lcfg.c:223] \parbox[t]{0.8\linewidth}{bugfix, added initialization
-      to alive/deadline/logical supervision results to WDGM\_CORRECT (copied the
-      if statement from row 199), because [p. 27]}
-  \item[WdgM.h:39] WdgM\_PbCfg.h -> WdgM\_Pbcfg.h
-\end{description}
+\begin{longtable}{l p{0.8\linewidth}}
+[WdgM\_Lcfg.c:232] & commented a function call to other module (\verb!//.Switch_currentMode((Rte_ModeType_WdgMMode)status);!)\\
+
+[WdgM\_Lcfg.c:170] & commented a function call to other module (\verb!E_OK; //ph[seid-1].Switch_currentMode((Rte_ModeType_WdgMMode)status);!)\\
+
+[WdgM.c:975-1016] & bugfix because [WDGM077], [WDGM117], [WDGM215], [WDGM216], [WDGM219], [WDGM220]\\
+
+[WdgM.c:1397] & bugfix because [WDGM182]\\
+
+[WdgM.c:1404] & bugfix because [WDGM182]\\
+
+[WdgM.c:1802] & bugfix because [7.2.3.2]\\
+
+[WdgM.c:1805] & bugfix because [WDGM274]\\
+
+[WdgM.c:1864] & bugfix because [7.2.3.2]\\
+
+[WdgM.c:1867] & bugfix because [WDGM252]\\
+
+[WdgM.c:1834] & bugfix because [7.2.3.2]\\
+
+[WdgM.c:1903] & bugfix because [7.2.3.2]\\
+
+[WdgM.c:2045] & bugfix because [WDGM296]\\
+
+[WdgM.c:2056] & bugfix because [WDGM286]\\
+
+[WdgM\_Lcfg.c:223] & bugfix, added initialization to alive/deadline/logical supervision results to \verb!WDGM_CORRECT! (copied the if statement from row 199), because [p. 27]\\
+
+[WdgM.h:39] & WdgM\_PbCfg.h -> WdgM\_Pbcfg.h\\
+\end{longtable}
 
 \newpage
 \lstset{
@@ -337,6 +339,39 @@ if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_rece
   WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag=FALSE;
   SchM_Exit_WdgM_EaActivityFlagProtect();
 }
+\end{lstlisting}
+
+\newpage
+\section{WdgM.c:2056}
+\begin{lstlisting}
+      /* Check if Logical supervised entities are configured */
+      if (NULL_PTR != WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr)
+      {
+         for (idx = 0; idx < WdgM_GetExternalLogicalSupCount(WdgMInitilMode); ++idx)
+         {
+            uint16 extlogical_index=WdgM_GetExternalGraphIndex(WdgMInitilMode,idx);
+            WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[extlogical_index].activity_flag= FALSE;
+         }
+      }
+      else
+\end{lstlisting}
+changed to:
+\begin{lstlisting}
+      /* Check if Logical supervised entities are configured */
+      if (NULL_PTR != WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr)
+      {
+        // bugfix, because [WDGM296]
+        for (idx = 0; idx < WdgM_GetLocalstatusParmCount(WdgM_CurrentMode); ++idx)
+          {
+            WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag = FALSE;
+          }
+         for (idx = 0; idx < WdgM_GetExternalLogicalSupCount(WdgMInitilMode); ++idx)
+         {
+            uint16 extlogical_index=WdgM_GetExternalGraphIndex(WdgMInitilMode,idx);
+            WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[extlogical_index].activity_flag= FALSE;
+         }
+      }
+      else
 \end{lstlisting}
 
 \newpage
