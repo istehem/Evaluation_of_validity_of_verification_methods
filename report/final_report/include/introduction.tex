@@ -7,36 +7,37 @@ and some conclusions about the results.
 
 %Background to the assignment. Why is it relevant?
 \section{Background}
-The last decade of the 20th century resulted in a dramatic growth of
-technology(?). The rate is still increasing with up to 90\% of all innovations
-being realized through electronics in the beginning of the 21st century (?), and
-over 80 \% of all innovations in the automotive industry is in the electronics
-and software area\cite{SAFE:interoperability}.
+The last decade of the 20th century resulted in a dramatic growth of technology
+\cite{AUTOSAR:gilberg}. The rate is still increasing with up to 90\% of all
+innovations being realized through electronics in the beginning of the 21st
+century \cite{Frost_Sullivan:flyer}, and over 80 \% of all innovations in the
+automotive industry are in the electronics and software area
+\cite{SAFE:interoperability}.
 %% eventuellt dela upp paragrafen här då det är två olika ideer; en om att
 %% teknologin utvecklas snabbt och mycket, och en som handlar om att just bilar
 %% blir mer komplexa.
 The software-based systems in motor vehicles have become more complex, and are
-moving toward handling more critical functions (?). Vehicles have already begun
-to communicate with each other \cite{VOLVO:convoys}, and it is soon expected
-that roadside traffic management systems will also interact with the systems in
-vehicles\cite{SURVEY:car_communications}.
+moving toward handling more critical functions \cite{SAFE:interoperability}.
+Vehicles have already begun to communicate with each other \cite{VOLVO:convoys},
+and it is soon expected that roadside traffic management systems will also
+interact with the systems in vehicles \cite{SURVEY:car_communications}.
 
 While the systems become more complex the software must be fault-tolerant and
 safe. Testing, validation and verification is a need and should follow all
 product development phases, from start to finish. The problem is that testing
 is %% introducerar "product development phases" utan förklaring. behövs den?
 both time consuming and labour intensive, accounting for up to 50 \% of the
-development cost\cite{QUICKCHECK:lightweight}. Unit tests adds additional
+development cost \cite{QUICKCHECK:lightweight}. Unit tests adds additional
 complexity to the code. It is very important to test and verify all steps of the
 development.
 
 The complexity issue is that in systems such as microprocessors the number of
-possible failure modes is so large it is considered
-infinite\cite{COURSEBOOK:safety-critical}. This makes it impossible exhaustively
+possible failure states is so large that it is considered
+infinite \cite{COURSEBOOK:safety-critical}. This makes it impossible exhaustively
 test the system, and therefore, also make the detection of failures unreliable.
 
 Quviq QuickCheck has the ability to automate this process, and allow the
-developer to write properties instead of tests. These properties make it
+developer to write properties instead of tests. These properties makes it
 possible for QuickCheck to create arbitrary input vectors that can be feed to
 the code. Figure~\ref{IMG:phase_model} shows the different steps of the software
 development process and the test and verification phases it has.
@@ -63,6 +64,17 @@ designed according to the specification. %It is important that the test phases
 %test the specifications and not the
 %implementation.
 
+Because all manufacturers strive for the lowest production cost, car
+manufacturers together with suppliers and other related companies, from the
+automotive industry, have come to agree over a standard for the software
+architecture in automotive vehicles. This standard is named AUTOSAR (AUTomotive
+Open System ARchitecture) and makes it possible to select different suppliers
+for different modules of the system.
+
+AUTOSAR is very complex and since it is quite new, it still suffers from child
+deceases, with requirements that are confusing and contradictorily. The first
+versions of AUTOSAR is made without functional safety in mind.
+
 %Aim for the work. What should be accomplished?
 \section{Purpose}
 The purpose is to automate the testing process in an effective and good way.
@@ -82,33 +94,66 @@ The functional safety concept will be most important in this phase.
 %question formulation?
 %The problem at hand, the assignment
 \section{Objective}
-The objective is to propose and motivate what should be done to be able to
-achieve a semi formal verification. This should include a confidence interval
-for how certain the verification is.
+The first problem at hand is to evaluate what ``semi formal verification'',
+according to the ISO-standard, means. In formal methods of mathematics, formal
+verification means to prove the correctness of algorithms.
+The ISO-standard mentions both ``formal verification'' and ``semi
+formal verification'' for software development, but does not describe how to
+achieve any of these.
+This evaluation must be done to get knowledge of how to properly implement
+functional safety and reach an ASIL classification, using automated testing.
 
-The objective is also to prove that it is possible to do semi formal
-verification for an AUTOSAR module and its specification. This should be
-generalized so its possible to test other specifications and modules at a later
-moment. It should also not matter which configuration that is active, because
-the specification should hold for all configurations.
+%The second problem is to evaluate if QuickCheck can be used to achieve this.
+%QuickCheck grants the ability to automate the testing, and knowledge of this
+%ool exist in the corporation where this thesis is done. %% Företaget hm....
+
+A model for an AUTOSAR module needs to be implemented. For this to be a good
+model some questions first needs to be answered.
+How can one achieve good test cases for the model? How can one tweak the test
+generation to find test cases that are interesting in a safety critical point of
+view? Is the implemented model together with the generated tests good enough to
+reach the goals?
+
+The test generation is a big problem when verifying a model. With unit tests, one
+can argue for that each line of code has been executed (100\% code coverage),
+but that is just a statement for that everything has been executed. Have it been
+executed correctly?
+Are every combination of computations in the system necessary to ensure
+correctness, or with other words, is it possible to collapse some states in the
+system's state space without endangering the safety of the hole system?
+
+After the model has been implemented, there must be an evaluation of the
+solution. Does it ensure functional safety? How can one measure the
+size of the state space that is actually verified?
+Even if test generation has been done properly, the solution might not be within
+the ISO-standards means of functional safety.
+
+One must propose and motivate what should be done to be able to
+achieve a semi formal verification. This can include a confidence interval
+for how certain the verification is. The confidence interval would help
+describing the visited state space because it is probably not feasible to
+exhaustively visit all states due to the state space explosion problem.
+
+The main objective is to prove that it is possible to do semi formal
+verification for an AUTOSAR module and its specification.
+It should not matter which configuration that is active and even further
+how the module is implemented, because the specification should hold for all
+configurations and implementations. This gives rise to that every company that
+implements the module should be able to run the final code to achieve ``semi
+formal verification''. Since modules in AUTOSAR are dependent the work presented here
+should be generalized so it can be hooked on when implementing test suits,
+using the same techniques, for other modules.
 
 %Limitations. What should be left out and why?
 \section{Scope}
 We will use AUTOSAR 4.0 revision 3 for our thesis work.
 Since this version of AUTOSAR consists of around 80 specifications and other
-auxiliary materials\cite{AUTOSAR:URL}, we will limit our scope to one or two
-specifications. The main module of this thesis is the CryptoServiceManager. This
-module provides cryptographic functionalities for synchronous and asynchronous
-services. This module is chosen because it only got a few dependencies, is used
-%% "is used to trace development and production errors"?
-to trace development and production errors but also to incorporate cryptographic
-libraries.
-
-It is hard to test that a call to another module gives the right results. This
-is the reason why we have chosen a module with a small number of
-dependencies. The CryptoServiceManager should also have functionality which
-gives the same results no matter which state it is in, such as hash
-functions\cite{SPEC:AUTOSAR:CSM}. %% förklara varför detta är bra.
+auxiliary materials\cite{AUTOSAR:URL}, we will limit our scope to one
+specification. The module of this thesis is the WatchdogManager. This
+module provides monitoring services used to maintain correctness. This
+module is chosen because it got dependencies, is used to report
+development and production errors, but mainly because it executes
+safety-critical work.
 
 Also the aim of the work is to verify software components. In other words no
 work considered hardware or a combination of hardware and software will be
