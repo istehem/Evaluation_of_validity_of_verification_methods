@@ -12,7 +12,7 @@
 
 -import(car_xml, [get_container/2, get_containers_by_def/2, get_value/2, get_values/2]).
 
--compile(export_all).
+-compile([export_all, debug_info]).
 %-export([config_file/0, config/1, start/0, get_modes/0]).
 
 -define(EXAMPLECONFIG, "examples/WdgM_VID41_ExampleConfiguration_001_cfg1.arxml").

@@ -200,8 +200,10 @@ prop_wdgm_init() ->
                               collect_given_cmd_length(H,S,Res,Cmds),
                               aggregate(
                                 collect_cmds_in_current_mode(H,S,Res,Cmds),
-                                collect(S#state.currentMode,
-                                        Res == ok)))))))
+                                aggregate(
+                                  collect_state_transitions(H,S,Res,Cmds),
+                                  collect(S#state.currentMode,
+                                          Res == ok))))))))
                   end)).
 %%% copies the bullseye output file to current time <MS><S><mS>.cov
 copy_bullseye_cov_file() ->
@@ -273,3 +275,21 @@ collect_cmds_in_current_mode(H,S,_,Cmds) ->
         LengthOfMode(Mode)}
        || Mode <- [0,1,2,3], LengthOfMode(Mode) /= 0]
   end.
+
+
+collect_state_transitions(H,S,_Res, _Cmds) ->
+  States = H++[{S,ok}],
+  case length(States) >= 2 of
+    true ->
+      G1 = (element(1, lists:nth(1, States)))#state.globalstatus,
+      G2 = (element(1, lists:nth(2, States)))#state.globalstatus,
+      collect_state_transitions(G1, G2, lists:nthtail(2, States));
+    false -> []
+  end.
+collect_state_transitions(_, _, []) ->
+  [];
+collect_state_transitions(G1, G2, [{Ns, _}|Ss]) ->
+  case G1 /= G2 of
+    true  -> [{G1, G2}];
+    false -> []
+  end++collect_state_transitions(G2, Ns#state.globalstatus, Ss).
