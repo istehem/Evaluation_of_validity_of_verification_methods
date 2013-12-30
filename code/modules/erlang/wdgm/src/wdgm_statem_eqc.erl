@@ -3,7 +3,7 @@
 -include_lib("eqc/include/eqc.hrl").
 -include_lib("eqc/include/eqc_statem.hrl").
 
--compile(export_all).
+-compile([export_all, debug_info]).
 
 -include("wdgm_types.hrl").
 -include("wdgm_config.hrl").
@@ -16,6 +16,7 @@
 -define(COPY_FILE,ok).
 -endif.
 
+%%% QuickCheck specific functions ==============================================
 initial_state() ->
   Rs = wdgm_xml:start(),
   {_, R} = (hd(Rs)), %% why do we get a list of records?
@@ -31,22 +32,31 @@ postcondition(S, {call, _M, F, A}, R) ->
   apply(wdgm_post, list_to_atom(atom_to_list(F)++"_post"), [S, A, R]).
 
 command(S) ->
-  frequency([{weight(S, init), wdgm_command:init_command(S)},
-             {weight(S, getmode), wdgm_command:getmode_command(S)},
-             {weight(S, setmode), wdgm_command:setmode_command(S)},
-             {weight(S, deinit), wdgm_command:deinit_command(S)},
-             {weight(S, checkpointreached), wdgm_command:checkpointreached_command(S)},
-             {weight(S, getlocalstatus), wdgm_command:getlocalstatus_command(S)},
-             {weight(S, getglobalstatus), wdgm_command:getglobalstatus_command(S)},
-             {weight(S, performreset), wdgm_command:performreset_command(S)},
-             {weight(S, getfirstexpiredseid), wdgm_command:getfirstexpiredseid_command(S)},
-             {weight(S, mainfunction), wdgm_command:mainfunction_command(S)}]).
+  frequency([{weight(S, init)
+              , wdgm_command:init_command(S)},
+             {weight(S, getmode)
+              , wdgm_command:getmode_command(S)},
+             {weight(S, setmode)
+              , wdgm_command:setmode_command(S)},
+             {weight(S, deinit)
+              , wdgm_command:deinit_command(S)},
+             {weight(S, checkpointreached)
+              , wdgm_command:checkpointreached_command(S)},
+             {weight(S, getlocalstatus)
+              , wdgm_command:getlocalstatus_command(S)},
+             {weight(S, getglobalstatus)
+              , wdgm_command:getglobalstatus_command(S)},
+             {weight(S, performreset)
+              , wdgm_command:performreset_command(S)},
+             {weight(S, getfirstexpiredseid)
+              , wdgm_command:getfirstexpiredseid_command(S)},
+             {weight(S, mainfunction)
+              , wdgm_command:mainfunction_command(S)}]).
 
 %%% -WdgM_Init------------------------------------------------------------------
 
 init({Ptr, _}) ->
   ?C_CODE:'WdgM_Init'(Ptr).
-
 
 %%% -WdgM_GetMode---------------------------------------------------------------
 
@@ -62,7 +72,6 @@ getmode(Is_Null) ->
     false -> {R, eqc_c:deref(Mp)}
   end.
 
-
 %%% -WdgM_SetMode---------------------------------------------------------------
 
 setmode(Mode, CallerId) ->
@@ -72,7 +81,6 @@ setmode(Mode, CallerId) ->
 
 deinit() ->
   ?C_CODE:'WdgM_DeInit'().
-
 
 %%% -WdgM_CheckpointReached-----------------------------------------------------
 
@@ -110,24 +118,22 @@ getglobalstatus(Is_Null) ->
     false -> {R, eqc_c:deref(Sp)}
   end.
 
-
 %%% -WdgM_PerformReset----------------------------------------------------------
 
 performreset() ->
   ?C_CODE:'WdgM_PerformReset'().
-
 
 %%% -WdgM_GetFirstExpiredSEID---------------------------------------------------
 
 getfirstexpiredseid(Is_Null) ->
   Sp =
     case Is_Null of
-      true -> {ptr, "WdgM_SupervisedEntityIdType", 0};
+      true  -> {ptr, "WdgM_SupervisedEntityIdType", 0};
       false -> eqc_c:alloc("WdgM_SupervisedEntityIdType")
     end,
   R = ?C_CODE:'WdgM_GetFirstExpiredSEID'(Sp),
   case Is_Null of
-    true -> {R, null};
+    true  -> {R, null};
     false -> {R, eqc_c:deref(Sp)}
   end.
 
@@ -135,13 +141,6 @@ getfirstexpiredseid(Is_Null) ->
 
 mainfunction() ->
   ?C_CODE:'WdgM_MainFunction'().
-%% mainfunction(_A) ->
-%%   ?C_CODE:'WdgM_MainFunction'().
-%% mainfunction(_A,_B) ->
-%%   ?C_CODE:'WdgM_MainFunction'().
-%% mainfunction(_A,_B,_C) ->
-%%   ?C_CODE:'WdgM_MainFunction'().
-
 
 %%% -Frequency------------------------------------------------------------------
 
@@ -189,29 +188,41 @@ prop_wdgm_init() ->
                     ?COPY_FILE,
                     eqc_c:restart(),
                     {H,S,Res} = run_commands(?MODULE,Cmds),
-                    pretty_commands(?MODULE,Cmds,{H,S,Res},
-                                    aggregate(collect_globalstatus(H,S,Res,Cmds),
-                                              aggregate(collect_init(H,S,Res,Cmds),
-                                                        aggregate(collect_length(H,S,Res,Cmds),
-                                                                  aggregate(collect_given_cmd_length(H,S,Res,Cmds),
-                                                                            aggregate(collect_cmds_in_current_mode(H,S,Res,Cmds),
-                                                                                      collect(S#state.currentMode,
-                                                        Res == ok)))))))
+                    pretty_commands(
+                      ?MODULE, Cmds, {H,S,Res},
+                      aggregate(
+                        collect_globalstatus(H,S,Res,Cmds),
+                        aggregate(
+                          collect_init(H,S,Res,Cmds),
+                          aggregate(
+                            collect_length(H,S,Res,Cmds),
+                            aggregate(
+                              collect_given_cmd_length(H,S,Res,Cmds),
+                              aggregate(
+                                collect_cmds_in_current_mode(H,S,Res,Cmds),
+                                collect(S#state.currentMode,
+                                        Res == ok)))))))
                   end)).
-
+%%% copies the bullseye output file to current time <MS><S><mS>.cov
 copy_bullseye_cov_file() ->
  Path = wdgm_eqc:getPath(["..","coverage"]),
  file:copy(Path ++ "test.cov",
-             Path ++ (fun({X,Y,Z}) -> integer_to_list(X) ++ integer_to_list(Y) ++ integer_to_list(Z) ++ ".cov" end) (now())).
+           Path ++ ( fun({X,Y,Z}) ->
+                         integer_to_list(X) ++
+                           integer_to_list(Y) ++
+                           integer_to_list(Z) ++ ".cov"
+                     end) (now())).
 
 start () ->
   wdgm_eqc:start().
 
+%%% lists all global statuses in the states
 collect_globalstatus(H, S, _Res, _Cmds) ->
   lists:nthtail(1,
                 [GS#state.globalstatus
                  || {GS,_} <- H++[{S, ok}]]).
 
+%%% lists where init first is seen
 collect_init(_H,_S,_Res,Cmds) ->
   case collect_init(Cmds, 0) of
     -1 -> [{no_init}];
@@ -225,22 +236,27 @@ collect_init(Cmds, Nr) ->
     [_|Xs]                  -> collect_init(Xs, Nr+1)
   end.
 
+%%% lists the length of the generated command sequence
 collect_length(_,_,_,Cmds) ->
   [{length_of_CmdList, length(Cmds)}].
 
+%%% lists the number of a given command
 collect_given_cmd_length(_H,_,_,Cmds) ->
   case Cmds of
     [] -> [{none, 0}];
-    _  -> lists:map(fun ({_,_,{_,_,Cmd,_}}) ->
-                        {list_to_atom("nr_of_"++atom_to_list(Cmd)),
-                         length(
-                           lists:filter(fun ({_,_,{_,_,Name,_}}) ->
-                                            Name == Cmd
-                                        end, Cmds))}
-                    end,
-                    Cmds)
+    _  -> 
+      lists:map(fun (Cmd) ->
+                    {list_to_atom("nr_of_" ++ atom_to_list(Cmd)),
+                     length(
+                       lists:filter(fun ({_,_,{_,_,Name,_}}) ->
+                                        Name == Cmd
+                                    end,
+                                    Cmds))}
+                end,
+                lists:usort([Cmd || {_,_,{_,_,Cmd,_}} <- Cmds]))
   end.
 
+%%% lists the number of commands given the current mode
 collect_cmds_in_current_mode(H,S,_,Cmds) ->
   case Cmds of
     [] -> [{none, 0}];
@@ -249,9 +265,11 @@ collect_cmds_in_current_mode(H,S,_,Cmds) ->
                                [GS#state.currentMode
                                 || {GS,_} <- H++[{S, ok}]]),
       LengthOfMode = fun(Mode) ->
-                         length(lists:filter(fun (Elem) -> Elem == Mode end,
+                         length(lists:filter(fun (Elem) ->
+                                                 Elem == Mode end,
                                              ModeList))
                      end,
-      [ {list_to_atom("cmds_in_currentmode_" ++ integer_to_list(Mode)),
-         LengthOfMode(Mode)} || Mode <- [0,1,2,3], LengthOfMode(Mode) /= 0]
+      [{list_to_atom("cmds_in_currentmode_" ++ integer_to_list(Mode)),
+        LengthOfMode(Mode)}
+       || Mode <- [0,1,2,3], LengthOfMode(Mode) /= 0]
   end.

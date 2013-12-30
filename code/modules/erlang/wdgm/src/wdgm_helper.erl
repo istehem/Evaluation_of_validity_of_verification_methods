@@ -141,14 +141,14 @@ reset_supervised_entities(S, ModeId) ->
          {wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid),
          (lists:keyfind(SEid, 2, SEs))#supervisedentity.localstatus /= 'WDGM_LOCAL_STATUS_DEACTIVATED'}
        of
-         {true, true} -> %% [WDGM182]
+         {true, true}  -> %% [WDGM182]
            FailedAliveTol = wdgm_config_params:get_LSP_failedtolerance(ModeId, SEid),
            SE = lists:keyfind(SEid, 2, SEs),
            SE#supervisedentity{
              failed_alive_supervision_cycle_tol=FailedAliveTol,
              supervision_cycles=0};
          {true, false} -> new_SE_record(ModeId, SEid, true); %% [WDGM209];
-         {false, _} -> new_SE_record(ModeId, SEid, false) %% [WDGM207], [WDGM291]
+         {false, _}    -> new_SE_record(ModeId, SEid, false) %% [WDGM207], [WDGM291]
        end
        || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId)]
   end.
