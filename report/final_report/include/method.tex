@@ -53,21 +53,21 @@ shows that QuickCheck is reliable for verification.
 
 \section{Implementation}
 The C-code that was to be tested, using Quickcheck, was already unit tested and
-already used in lab environments at Mecel. 
+run sharp in lab environments at Mecel. 
 
 The behavior of the WdgM module was completely implemented in Erlang independent of 
-the design choose of the C-code. This could be implemented
+the design choose in the C-code. This was done
 in an iterative way. Every piece of code was not required to be implemented before
-any tests could be run. This because of that a module in AUTOSAR consist of several API
-calls. Hence it was enough to only implement the specification for one API call
+tests could be run. This because of that a module in AUTOSAR consist of several API
+calls. Hence it was enough to implement the specification for one API call
 before tests could be run. Of course this gave rise to that only a part of 
-the C-code could be tested. Also this early tests may not have fully tested the API
+the C-code was tested. Also early tests may not have fully tested the API
 call because there may have been branches in the C-code, for this call, that
 were never reached unless other API calls were called.
 
 Early in the implementation face Quickcheck found differences between the Erlang
 and C-implementation. This was expected because every programmer makes mistakes.
-Hence the question arose who was faulty? The C-code or the Erlang code? Then
+The question regarding who was faulty arose? The C-code or the Erlang code? Then
 the API was thoroughly read and a conclusion was made. Either a bug in the
 C-code was found or the Erlang-code needed to be corrected. There were however
 cases when the API was ambiguous. In those cases the C-interpretation was chosen
@@ -77,8 +77,8 @@ Surprisingly bugs in the C-code was found early, even though it already run
 sharp in lab environments; only a few API calls needed to be implemented in Erlang. 
 
 If a bug in the C-code was discovered how should the work be continued? Since
-Quickcheck terminates as soon as it founds a counter example something needs to
-be done to be able to run further tests and tests other parts of the code as
+Quickcheck terminates as soon as it finds a counter example something was needed to
+be able to run further tests and test other parts of the code as
 well. Some alternatives where discussed.
 
 \begin{enumerate}
@@ -89,10 +89,62 @@ well. Some alternatives where discussed.
                 implementation.
 \end{enumerate}
 
-Item \ref{ENUMERATE:FixCCode} was chosen.
+Item \ref{ENUMERATE:FixCCode} was chosen, see section \ref{sec:handlebugs}. 
 
+When thoroughly reading the AUTOSAR API not only ambiguous rules were found also
+rules that contradicted each other were recognized. In those cases the
+implementation in the C-code was followed. 
 
+A great tool when a clear interpretation of the AUTOSAR specification was not
+possible was to look into the C-code. Even though Quickcheck can be used to
+test libraries when the actually source code is not available.     
 
+When the full module was implemented in Erlang code there had to be some assurance
+for that every piece of code in the C implementation was actually tested. 
+Code coverage for the Erlang implementation was measured using the erlang module
+\emph{cover}. To be able to to measure the code coverage of the C-code the
+commercial tool Bullseye Coverage was used. Only by using those tools it was
+easy to see that the result was not good enough.
+
+The next step was to tweak the generators used by Quickcheck to construct
+API-calls. There was several branches in the C-code that needed a specific
+sequence of API calls with correct arguments to be reached. Also the tweaking of
+the generators could be implemented in a iterative way. Change the probability 
+properties of the generators and check the results. The results were analyzed
+and the generators were tweaked even more to make the results even better.
+
+Used checking code coverage was however not good enough for our goals ... 
+
+To get a better picture of the work flow used in this thesis see
+figure \ref{fig:workflow}. 
+
+\begin{figure}[!ht]
+\caption{Work flow}
+\label{fig:workflow}
+\fbox{
+\parbox{\linewidth}{
+\begin{enumerate}
+\item Construct a model for an AUTOSAR module in Erlang
+\item Run Quickcheck for this model and compare the results with the output from
+the c code. \label{compare}
+\item Tweak the generators for the test cases \label{generators}
+    \item Evaluate the results
+    \begin{enumerate}
+      \item What is the state space?
+      \item Which test cases are relevant?
+      \item Collapse irrelevant states
+      \item What can be said about the results?
+    \end{enumerate}
+\item Are the results good enough, does it satisfy the requirements for the ASIL
+levels?
+\item If not go the step \ref{compare}
+\end{enumerate}
+}}
+\end{figure}
+%even though correction of the C-code
+%was not part of the thesis. Since there were actually code available, not
+%only libraries, and most bugs was easy to fix this seemed like the best choice,
+%see results.       
 
 A challenging step is the analysis of the results. If the testing tool returns zero
 errors what does that say about the robustness of the input byte code? Passed
