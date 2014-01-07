@@ -47,7 +47,38 @@ shows that QuickCheck is reliable for verification.
 \item Generalize the technique.
 \end{itemize}
 
+
+\section{Choice of AUTOAR module to test}
+
+
 \section{Implementation}
+The C-code that was to be tested, using Quickcheck, was already unit tested and
+already used in lab environments at Mecel. 
+
+The behavior of the WdgM module was completely implemented in Erlang independent of 
+the design choose of the C-code. This could be implemented
+in an iterative way. Every piece of code was not required to be implemented before
+any tests could be run. This because of that a module in AUTOSAR consist of several API
+calls. Hence it was enough to only implement the specification for one API call
+before tests could be run. Of course this gave rise to that only a part of 
+the C-code could be tested. Also this early tests may not have fully tested the API
+call because there may have been branches in the C-code, for this call, that
+were never reached unless other API calls were called.
+
+Early in the implementation face Quickcheck found differences between the Erlang
+and C-implementation. This was expected because every programmer makes mistakes.
+Hence the question arose who was faulty? The C-code or the Erlang code? Then
+the API was thoroughly read and a conclusion was made. Either a bug in the
+C-code was found or the Erlang-code needed to be corrected. There were however
+cases when the API was ambiguous. In those cases the C-interpretation was chosen
+as correct and the ambiguous specification written down. 
+
+Surprisingly bugs in the C-code was found early, even though it already run
+sharp in lab environments; only a few API calls needed to be implemented in Erlang. 
+
+If a bug in the C-code was discovered how should the work be continued?  
+
+
 A challenging step is the analysis of the results. If the testing tool returns zero
 errors what does that say about the robustness of the input byte code? Passed
 100 of 100 tests is just a statement and does not say anything more than that
