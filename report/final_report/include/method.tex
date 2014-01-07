@@ -76,7 +76,22 @@ as correct and the ambiguous specification written down.
 Surprisingly bugs in the C-code was found early, even though it already run
 sharp in lab environments; only a few API calls needed to be implemented in Erlang. 
 
-If a bug in the C-code was discovered how should the work be continued?  
+If a bug in the C-code was discovered how should the work be continued? Since
+Quickcheck terminates as soon as it founds a counter example something needs to
+be done to be able to run further tests and tests other parts of the code as
+well. Some alternatives where discussed.
+
+\begin{enumerate}
+        \item Fix the C-code, in other words change the C source code.
+                \label{ENUMERATE:FixCCode} 
+        \item Mocking, in other words simulate different C-code output.
+        \item Change the Erlang module to a faulty behavior to follow the C
+                implementation.
+\end{enumerate}
+
+Item \ref{ENUMERATE:FixCCode} was chosen.
+
+
 
 
 A challenging step is the analysis of the results. If the testing tool returns zero
