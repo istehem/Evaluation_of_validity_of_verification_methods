@@ -49,7 +49,7 @@ shows that QuickCheck is reliable for verification.
 
 
 \section{Choice of AUTOAR module to test}
-
+There were a couple of AUTOSAR modules ... 
 
 \section{Implementation}
 The C-code that was to be tested, using Quickcheck, was already unit tested and
@@ -57,7 +57,7 @@ run sharp in lab environments at Mecel.
 
 The behavior of the WdgM module was completely implemented in Erlang independent of 
 the design choose in the C-code. This was done
-in an iterative way. Every piece of code was not required to be implemented before
+in an iterative way. Every piece of code were not required to be implemented before
 tests could be run. This because of that a module in AUTOSAR consist of several API
 calls. Hence it was enough to implement the specification for one API call
 before tests could be run. Of course this gave rise to that only a part of 
@@ -78,8 +78,7 @@ sharp in lab environments; only a few API calls needed to be implemented in Erla
 
 If a bug in the C-code was discovered how should the work be continued? Since
 Quickcheck terminates as soon as it finds a counter example something was needed to
-be able to run further tests and test other parts of the code as
-well. Some alternatives where discussed.
+be able to run further tests. Some alternatives where discussed.
 
 \begin{enumerate}
         \item Fix the C-code, in other words change the C source code.
@@ -104,16 +103,21 @@ for that every piece of code in the C implementation was actually tested.
 Code coverage for the Erlang implementation was measured using the erlang module
 \emph{cover}. To be able to to measure the code coverage of the C-code the
 commercial tool Bullseye Coverage was used. Only by using those tools it was
-easy to see that the result was not good enough.
+easy to see that the result was not good enough. The main problem seemed to be
+that the WdgM was put in an absorbing state and after that following commands
+did not test anything interesting. The reason for that an absorbing state was
+reached was the availing of negative testing. The testing was negative because
+invalid command sequences and arguments were generated.    
 
-The next step was to tweak the generators used by Quickcheck to construct
-API-calls. There was several branches in the C-code that needed a specific
-sequence of API calls with correct arguments to be reached. Also the tweaking of
-the generators could be implemented in a iterative way. Change the probability 
-properties of the generators and check the results. The results were analyzed
-and the generators were tweaked even more to make the results even better.
+The next step was to tweak the generators, used by Quickcheck, to construct
+valid API-calls. There were several branches in the C-code
+that needed a specific sequence of API calls, with correct arguments, to be
+reached. Also the tweaking of the generators could be implemented in a iterative
+way. Change the probability properties of the generators and check the results.
+The results were analyzed and the generators were tweaked even more to make the
+results even better.
 
-Used checking code coverage was however not good enough for our goals ... 
+Just checking code coverage was however not good enough for our goals ... 
 
 To get a better picture of the work flow used in this thesis see
 figure \ref{fig:workflow}. 
