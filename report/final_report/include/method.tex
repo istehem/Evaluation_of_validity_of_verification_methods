@@ -54,18 +54,18 @@ choice of a module to test. Since the goal was to get a proof of concept for
 that it was possible to
 get an ASIL-classification and achieve functional safety using Quickcheck, it
 seemed preferable to choose a less complicated module. It was also desirable to
-have the actual C code and not just 
+have the actual C code and not just library files.
 
 \section{Implementation}
 The C-code that was to be tested, using Quickcheck, was already unit tested and
-run sharp in lab environments at Mecel. 
+run sharp in lab environments at Mecel.
 
-The behavior of the WdgM module was completely implemented in Erlang independent of 
+The behavior of the WdgM module was completely implemented in Erlang independent of
 the design choose in the C-code. This was done
 in an iterative way. Every piece of code were not required to be implemented before
 tests could be run. This because of that a module in AUTOSAR consist of several API
 calls. Hence it was enough to implement the specification for one API call
-before tests could be run. Of course this gave rise to that only a part of 
+before tests could be run. Of course this gave rise to that only a part of
 the C-code was tested. Also early tests may not have fully tested the API
 call because there may have been branches in the C-code, for this call, that
 were never reached unless other API calls were called.
@@ -76,10 +76,10 @@ The question regarding who was faulty arose? The C-code or the Erlang code? Then
 the API was thoroughly read and a conclusion was made. Either a bug in the
 C-code was found or the Erlang-code needed to be corrected. There were however
 cases when the API was ambiguous. In those cases the C-interpretation was chosen
-as correct and the ambiguous specification written down. 
+as correct and the ambiguous specification written down.
 
 Surprisingly bugs in the C-code was found early, even though it already run
-sharp in lab environments; only a few API calls needed to be implemented in Erlang. 
+sharp in lab environments; only a few API calls needed to be implemented in Erlang.
 
 If a bug in the C-code was discovered how should the work be continued? Since
 Quickcheck terminates as soon as it finds a counter example something was needed to
@@ -87,24 +87,24 @@ be able to run further tests. Some alternatives where discussed.
 
 \begin{enumerate}
         \item Fix the C-code, in other words change the C source code.
-                \label{ENUMERATE:FixCCode} 
+                \label{ENUMERATE:FixCCode}
         \item Mocking, in other words simulate different C-code output.
         \item Change the Erlang module to a faulty behavior to follow the C
                 implementation.
 \end{enumerate}
 
-Item \ref{ENUMERATE:FixCCode} was chosen, see section \ref{sec:handlebugs}. 
+Item \ref{ENUMERATE:FixCCode} was chosen, see section \ref{sec:handlebugs}.
 
 When thoroughly reading the AUTOSAR API not only ambiguous rules were found also
 rules that contradicted each other were recognized. In those cases the
-implementation in the C-code was followed. 
+implementation in the C-code was followed.
 
 A great tool when a clear interpretation of the AUTOSAR specification was not
 possible was to look into the C-code. Even though Quickcheck can be used to
-test libraries when the actually source code is not available.     
+test libraries when the actually source code is not available.
 
 When the full module was implemented in Erlang code there had to be some assurance
-for that every piece of code in the C implementation was actually tested. 
+for that every piece of code in the C implementation was actually tested.
 Code coverage for the Erlang implementation was measured using the erlang module
 \emph{cover}. To be able to to measure the code coverage of the C-code the
 commercial tool Bullseye Coverage was used. Only by using those tools it was
@@ -112,7 +112,7 @@ easy to see that the result was not good enough. The main problem seemed to be
 that the WdgM was put in an absorbing state and after that following commands
 did not test anything interesting. The reason for that an absorbing state was
 reached was the availing of negative testing. The testing was negative because
-invalid command sequences and arguments were generated.    
+invalid command sequences and arguments were generated.
 
 The next step was to tweak the generators, used by Quickcheck, to construct
 valid API-calls. There were several branches in the C-code
@@ -122,10 +122,10 @@ way. Change the probability properties of the generators and check the results.
 The results were analyzed and the generators were tweaked even more to make the
 results even better.
 
-Just checking code coverage was however not good enough for our goals ... 
+Just checking code coverage was however not good enough for our goals ...
 
 To get a better picture of the work flow used in this thesis see
-figure \ref{fig:workflow}. 
+figure \ref{fig:workflow}.
 
 \begin{figure}[!ht]
 \caption{Work flow}
@@ -153,7 +153,7 @@ levels?
 %even though correction of the C-code
 %was not part of the thesis. Since there were actually code available, not
 %only libraries, and most bugs was easy to fix this seemed like the best choice,
-%see results.       
+%see results.
 
 A challenging step is the analysis of the results. If the testing tool returns zero
 errors what does that say about the robustness of the input byte code? Passed

@@ -77,10 +77,22 @@ implementation of verification and testing.
 \end{itemize}
 
 \subsection{QuickCheck}
+Quickcheck was invented be Koen Claessen and John Hughes, as a testing module
+for Haskell, in 2000.
+In 2006 John Hughes founded the Company Quviq together with
+Thomas Arts. Quviq offers a commercial version of Quickcheck for Erlang.
+The main difference, except from the programming paradigms, is that
+the commercial version of Quickcheck has a C-testing interface. Hence it
+possible to test C-code in Erlang with help of QuickCheck. All code for tests
+is written in Erlang and checked against API calls to the C-code. It is actually
+not necessary to have actual source code; it is enough to only have compiled library
+files.
+
 QuickCheck tests a program with specification implemented as properties that
 the program must hold \cite{QUICKCHECK:manual}. QuickCheck has guided random
 test generation, this means that the samples can be weighted to cover certain
 parts of the state-space with more likelihood.
+
 
 %% Erlang är inget verktyg per se. vi borde skriva om det, men passar det in
 %% här?

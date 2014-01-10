@@ -12,8 +12,18 @@
 
 -ifdef(bullseye).
 -define(COPY_FILE,copy_bullseye_cov_file()).
+-define(COVER_OPTS,[{d,bullseye}]).
 -else.
+-define(COVER_OPTS,[]).
 -define(COPY_FILE,ok).
+-endif.
+
+-ifdef(linecover).
+-define(SETUP_COVERAGE,setup_coverage()).
+-define(RUN_COVERAGE,run_coverage()).
+-else.
+-define(SETUP_COVERAGE,ok).
+-define(RUN_COVERAGE,ok).
 -endif.
 
 %%% QuickCheck specific functions ==============================================
@@ -180,9 +190,11 @@ weight(_S, _Cmd)                   -> 1.
 
 prop_wdgm_init() ->
   ?SETUP( fun () -> start(),
-                    fun () -> ok end
+                    ?SETUP_COVERAGE,
+                    fun () -> ?RUN_COVERAGE end
           end,
-          ?FORALL(Cmds, non_empty(commands(?MODULE)), %% Use eqc_gen:vector/2 in combination ?LET
+          ?WHENFAIL(?RUN_COVERAGE,
+            ?FORALL(Cmds, non_empty(commands(?MODULE)), %% Use eqc_gen:vector/2 in combination ?LET
                                                       %% for more commands
                   begin
                     ?COPY_FILE,
@@ -204,7 +216,8 @@ prop_wdgm_init() ->
                                   collect_state_transitions(H,S,Res,Cmds),
                                   collect(S#state.currentMode,
                                           Res == ok))))))))
-                  end)).
+                  end))).
+
 %%% copies the bullseye output file to current time <MS><S><mS>.cov
 copy_bullseye_cov_file() ->
  Path = wdgm_eqc:getPath(["..","coverage"]),
@@ -214,6 +227,13 @@ copy_bullseye_cov_file() ->
                            integer_to_list(Y) ++
                            integer_to_list(Z) ++ ".cov"
                      end) (now())).
+
+
+run_coverage() ->
+  wdgm_line_coverage:analyse(wdgm_line_coverage:modules(),[html]).
+
+setup_coverage() ->
+  wdgm_line_coverage:compile().
 
 start () ->
   wdgm_eqc:start().
@@ -246,7 +266,7 @@ collect_length(_,_,_,Cmds) ->
 collect_given_cmd_length(_H,_,_,Cmds) ->
   case Cmds of
     [] -> [{none, 0}];
-    _  -> 
+    _  ->
       lists:map(fun (Cmd) ->
                     {list_to_atom("nr_of_" ++ atom_to_list(Cmd)),
                      length(

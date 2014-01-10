@@ -10,100 +10,83 @@
 
 -define(COMMAND,wdgm_command).
 
-init([]) ->
-  {ok,wdgm_not_init,[]}.
-
 start_statem() ->
-    wdgm_eqc:start().
+    ok. %wdgm_eqc:start().
 
-start() ->
-    gen_fsm:start({global,wdgm_fsm},?MODULE,[],[]).
+wdgm_ok()
+  -> ok. % when S#state.globalstatus == 'WDGM_GLOBAL_STATUS_OK' -> S.
 
-stop() ->
-    gen_fsm:sync_send_all_state_event({global,wdgm_fsm},stop).
+wdgm_deactivated(_)
+  -> ok. %when S#state.globalstatus == 'WDGM_GLOBAL_STATUS_DEACTIVATED' -> S.
 
-handle_sync_event(stop,_,_,_) ->
-    {stop,normal,ok,[]}.
+wdgm_stopped()
+  -> ok.
 
-terminate(_,_,_) ->
-    ok.
+valid(SD,S) ->
+  case SD#state.globalstatus of
+    S -> [];
+    _ -> [elad]
+  end.
+%when S#state.globalstatus == 'WDGM_GLOBAL_STATUS_STOPPED' -> S.
 
-wdgm_not_init(S) ->
-  [{'WDGM_GLOBAL_STATUS_OK',?COMMAND:init_command(initial_state_data())}].
-
-wdgm_not_init(E,S) ->
-  {next_state,E,S}.
+'WDGM_GLOBAL_STATUS_DEACTIVATED'(S) ->
+  [{'WDGM_GLOBAL_STATUS_OK',{call,?MODULE,wdgm_ok,[]}}].
 
 'WDGM_GLOBAL_STATUS_OK'(S) ->
-  function_list('WDGM_GLOBAL_STATUS_OK',S).
+  [{'WDGM_GLOBAL_STATUS_OK',{call,?MODULE,wdgm_ok,?LAZY(valid(S,'WDGM_GLOBAL_STATUS_OK'))}},
+   %{'WDGM_GLOBAL_STATUS_DEACTIVATED',{call,?MODULE,all,[valid(S,'WDGM_GLOBAL_STATUS_DEACTIVATED')]}}].
+%   {'WDGM_GLOBAL_STATUS_EXPIRED',{call,?MODULE,all,[?LAZY(valid(S,'WDGM_GLOBAL_STATUS_EXPIRED'))]}}].
+%   {'WDGM_GLOBAL_STATUS_FAILED',{call,?MODULE,all,[valid(S,'WDGM_GLOBAL_STATUS_FAILED')]}},
+   {'WDGM_GLOBAL_STATUS_STOPPED',{call,?MODULE,wdgm_stopped,?LAZY(valid(S,'WDGM_GLOBAL_STATUS_STOPPED'))}}
+  ].
 
-'WDGM_GLOBAL_STATUS_OK'(E,S) ->
-  {next_state,E,S}.
+%'WDGM_GLOBAL_STATUS_EXPIRED'(S) ->
+%   [{'WDGM_GLOBAL_STATUS_EXPIRED',{call,?MODULE,all,[valid(S,'WDGM_GLOBAL_STATUS_EXPIRED')]}},
+%    {'WDGM_GLOBAL_STATUS_STOPPED',{call,?MODULE,all,[valid(S,'WDGM_GLOBAL_STATUS_STOPPED')]}}
+%  ].
+%
+%'WDGM_GLOBAL_STATUS_FAILED'(S) ->
+%  [{'WDGM_GLOBAL_STATUS_OK',{call,?MODULE,all,[valid(S,'WDGM_GLOBAL_STATUS_OK')]}},
+%   {'WDGM_GLOBAL_STATUS_EXPIRED',{call,?MODULE,all,[valid(S,'WDGM_GLOBAL_STATUS_EXPIRED')]}},
+%   {'WDGM_GLOBAL_STATUS_FAILED',{call,?MODULE,all,[valid(S,'WDGM_GLOBAL_STATUS_FAILED')]}},
+%   {'WDGM_GLOBAL_STATUS_STOPPED',{call,?MODULE,all,[valid(S,'WDGM_GLOBAL_STATUS_STOPPED')]}}
+%  ].
 
-'WDGM_GLOBAL_STATUS_EXPIRED'(E,S) ->
-  {next_state,E,S}.
 
-'WDGM_GLOBAL_STATUS_DEACTIVATED'(E,S) ->
-  {next_state,E,S}.
-
-'WDGM_GLOBAL_STATUS_FAILED'(E,S) ->
-  {next_state,E,S}.
-
-'WDGM_GLOBAL_STATUS_STOPPED'(E,S) ->
-  {next_state,E,S}.
-
-function_list(E,S) ->
-    [
-     {E,?COMMAND:getmode_command(S)},
-     {E,?COMMAND:setmode_command(S)},
-     {E,?COMMAND:deinit_command(S)},
-     {E,?COMMAND:checkpointreached_command(S)},
-     {E,?COMMAND:getglobalstatus_command(S)},
-     {E,?COMMAND:getlocalstatus_command(S)},
-     {E,?COMMAND:performreset_command(S)},
-     {E,?COMMAND:getfirstexpiredseid_command(S)},
-     {E,?COMMAND:mainfunction_command(S)},
-     {E,?COMMAND:init_command(S)}
-    ].
+'WDGM_GLOBAL_STATUS_STOPPED'(S) ->
+   [{'WDGM_GLOBAL_STATUS_STOPPED',{call,?MODULE,wdgm_stopped,[S]}}].
 
 initial_state() ->
-    wdgm_not_init.
+  'WDGM_GLOBAL_STATUS_DEACTIVATED'.
 
 initial_state_data() ->
   Rs = wdgm_xml:start(),
   {_, R} = (hd(Rs)), %% why do we get a list of records?
-  #state{originalCfg=R}.
+  %wdgm_command:init_command(#state{originalCfg=R}),
+  wdgm_next:init_next(#state{originalCfg=R},ok,[{ok,false}]).
+  %Rs = wdgm_xml:start(),
+  %{_, R} = (hd(Rs)), %% why do we get a list of records?
+  %#state{originalCfg=R}.
 
 %%------------------------------------------------------------------------------
 %%------------------------------------------------------------------------------
 %%------------------------------------------------------------------------------
 
 precondition(FS, _, S, {call, _M, F, A}) ->
-  case FS of
-    wdgm_not_init -> true;
-    _             -> apply(wdgm_pre, list_to_atom(atom_to_list(F)++"_pre"), [S])
-  end.
+  true.
+  %apply(wdgm_pre, list_to_atom(atom_to_list(F)++"_pre"), [S]).
 
 postcondition(FS, _, S, {call, _M, F, A}, R) ->
-  case FS of
-    wdgm_not_init -> true;
-    _             -> apply(wdgm_post, list_to_atom(atom_to_list(F)++"_post"), [S, A, R])
-  end.
+  true.
+  %    apply(wdgm_post, list_to_atom(atom_to_list(F)++"_post"), [S, A, R]).
 
 next_state_data(FS, _, S, R, {call, M, F, A}) ->
-  NewA =
-  case A of
-    [] -> [void];
-    _ -> [A]
-  end,
-  case FS of
-   wdgm_not_init -> gen_fsm:send_event({global,wdgm_fsm},'WDGM_GLOBAL_STATUS_OK'),
-                    apply(wdgm_next, list_to_atom(atom_to_list(F)++"_next"), [S,R] ++ NewA);
-   _             ->
-                    SNew = apply(wdgm_next, list_to_atom(atom_to_list(F)++"_next"), [S,R] ++ NewA),
-                    gen_fsm:send_event({global,wdgm_fsm},SNew#state.globalstatus),
-                    SNew
-  end.
+  S.
+  %  apply(wdgm_next, list_to_atom(atom_to_list(F)++"_next"), [S,R] ++ A).
+
+%%------------------------------------------------------------------------------
+%%------------------------------------------------------------------------------
+%%------------------------------------------------------------------------------
 
 prop_wdgm_fsm() ->
   ?SETUP( fun () -> start_statem(),
@@ -112,9 +95,7 @@ prop_wdgm_fsm() ->
           ?FORALL(Cmds, commands(?MODULE),
                   begin
                     eqc_c:restart(),
-                    start(),
                     {H,S,Res} = run_commands(?MODULE,Cmds),
-                    stop(),
                     pretty_commands(?MODULE,Cmds,{H,S,Res},
                                     aggregate(collect_res(H,S,Res,Cmds),
                                               Res == ok))
