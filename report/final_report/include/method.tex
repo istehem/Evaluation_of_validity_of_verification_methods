@@ -61,7 +61,20 @@ The C-code that was to be tested, using Quickcheck, was already unit tested and
 run sharp in lab environments at Mecel.
 
 The behavior of the WdgM module was completely implemented in Erlang independent of
-the design choose in the C-code. This was done
+the design choose in the C-code. The idea was to not get inspired by methods used 
+in the C-code and possibly, if the C-code contained errors, end up with the same
+faults.   
+
+The implementation of the module was done to be able to test API calls, 
+as described in theory, against the C-code and check that postconditions
+held, according to figure \ref{FIG:api_calls}. The postconditions were written 
+to test that AUTOSAR requirements held. In other words that the API calls were
+called correctly. A problem when writing the postconditions, because AUTOSAR
+specification are written in natural language, was to translate words into code.
+It was easy to see that there were room for different interpretations, which most
+likely would result in errors later.  
+
+The implementation of the AUTOSAR module in Erlang was done
 in an iterative way. Every piece of code were not required to be implemented before
 tests could be run. This because of that a module in AUTOSAR consist of several API
 calls. Hence it was enough to implement the specification for one API call
@@ -69,7 +82,13 @@ before tests could be run. Of course this gave rise to that only a part of
 the C-code was tested. Also early tests may not have fully tested the API
 call because there may have been branches in the C-code, for this call, that
 were never reached unless other API calls were called.
-
+\begin{figure}[!h]
+\label{FIG:api_calls}
+\begin{center}
+\includegraphics{pictures/api_calls.jpg}
+\end{center}
+\caption{Shows how Erlang modules states with calls against the C-code}
+\end{figure}
 Early in the implementation face Quickcheck found differences between the Erlang
 and C-implementation. This was expected because every programmer makes mistakes.
 The question regarding who was faulty arose? The C-code or the Erlang code? Then
@@ -83,7 +102,7 @@ sharp in lab environments; only a few API calls needed to be implemented in Erla
 
 If a bug in the C-code was discovered how should the work be continued? Since
 Quickcheck terminates as soon as it finds a counter example something was needed to
-be able to run further tests. Some alternatives where discussed.
+be able to run further tests. Some alternatives were discussed.
 
 \begin{enumerate}
         \item Fix the C-code, in other words change the C source code.
