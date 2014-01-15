@@ -427,6 +427,28 @@ changed to:
 % \end{lstlisting}
 % \begin{lstlisting}
 % \end{lstlisting}
-
+\newpage
+\section{WdgM\_I.h:110}
+\begin{lstlisting}
+typedef enum WdgM_GlobalStaus_Tag
+{
+   WDGM_GLOBAL_STATUS_OK,
+   WDGM_GLOBAL_STATUS_DEACTIVATED,
+   WDGM_GLOBAL_STATUS_FAILED,
+   WDGM_GLOBAL_STATUS_EXPIRED,
+   WDGM_GLOBAL_STATUS_STOPPED
+}WdgM_GlobalStatusType
+\end{lstlisting}
+changed to
+\begin{lstlisting}
+typedef enum WdgM_GlobalStaus_Tag
+{
+   WDGM_GLOBAL_STATUS_DEACTIVATED,
+   WDGM_GLOBAL_STATUS_OK,
+   WDGM_GLOBAL_STATUS_FAILED,
+   WDGM_GLOBAL_STATUS_EXPIRED,
+   WDGM_GLOBAL_STATUS_STOPPED
+}WdgM_GlobalStatusType
+\end{lstlisting}
 
 \end{document}
