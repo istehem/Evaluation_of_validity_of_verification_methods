@@ -18,7 +18,8 @@
 -define(EXAMPLECONFIG, "examples/WdgM_VID41_ExampleConfiguration_001_cfg1.arxml").
 -define(EXAMPLE_ONLY_AS, "examples/WdgM_VID41_ExampleConfiguration_ONLY_AS.arxml").
 -define(FREESCALE, "freescale/wdgm_freescale_pip.arxml").
--define(CONFIG, ?EXAMPLECONFIG).
+-define(BSI, "bsi/wdgm_bsi.arxml").
+-define(CONFIG, ?BSI).
 
 
 config_file() ->
