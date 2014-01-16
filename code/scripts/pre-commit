@@ -1,0 +1,52 @@
+#!/usr/bin/bash
+
+EBIN_PATH="code/modules/erlang/wdgm/ebin"
+COVER_PATH="code/coverage"
+USER=$(git config user.name | tr " " _)
+BASE_PATH=$(git rev-parse --show-toplevel)
+
+
+FILES="wdgm_checkpointreached.coverdata wdgm_main.coverdata wdgm_next.coverdata wdgm_post.coverdata wdgm_pre.coverdata"
+
+function handle_file
+{
+      echo "file $1 not up to date"
+      echo "adding file $1"
+      cp $BASE_PATH/$EBIN_PATH/$1 $BASE_PATH/$COVER_PATH/$USER/$1
+      git add $BASE_PATH/$COVER_PATH/$USER/$1
+}
+
+if [ ! -d $BASE_PATH/$COVER_PATH/$USER ]; then
+  echo "directory $BASE_PATH/$COVER_PATH/$USER does not exists"
+  echo "do you want to create it? Press Y for yes anything else to abort"
+  read ans
+  if [ $ans == "Y" ]; then
+    mkdir $BASE_PATH/$COVER_PATH/$USER
+  else
+    exit 0
+  fi
+fi
+
+for file in $FILES; do
+  if [ -f $BASE_PATH/$EBIN_PATH/$file ]; then
+    if [ ! -f $BASE_PATH/$COVER_PATH/$USER/$file ]; then
+      handle_file $file
+    else
+      diff="$(diff $BASE_PATH/$COVER_PATH/$USER/$file $BASE_PATH/$EBIN_PATH/$file)"
+      es=$?
+      if [ "$diff" == "" ] && [ $es == 0 ]; then
+        echo "$file up to date"
+      else
+        if [ "$diff" != "" ]; then
+          handle_file $file
+        else
+          echo "ERROR: diff terminated with exit code $es"
+          exit $es
+        fi
+      fi
+    fi
+  else
+    echo "WARNING: file $BASE_PATH/$EBIN_PATH/$file not found"
+  fi
+done
+
