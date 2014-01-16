@@ -59,8 +59,8 @@ checkpoint_gen(S) ->
                                           Xs -> Xs
                                        end)},   %% either choose one of the valid SEid
                                                 % (This demands there is at least one ActivatedSEid)
-                            {0, oneof(DeactivatedSEid)}, % (This demands there is at least one DeactivatedSEid)
-                            {0, return(999)}]), %% or a phony
+                            {1, oneof(DeactivatedSEid++[999])}, % (This demands there is at least one DeactivatedSEid)
+                            {1, return(999)}]), %% or a phony
            return(case SEid of
              999 -> [999, 999]; %% if the phony, also choose a phony CPid
              _   ->
@@ -77,7 +77,7 @@ checkpoint_gen(S) ->
 
 getlocalstatus_command(_S) ->
   {call, ?WDGMSTATEM, getlocalstatus, [frequency([{20, choose(0,4)},
-                                                  {0, return(999)}]),
+                                                  {1, return(999)}]),
                                        frequency([{20, return(false)},
                                                   {1, return(true)}])]}.
 
