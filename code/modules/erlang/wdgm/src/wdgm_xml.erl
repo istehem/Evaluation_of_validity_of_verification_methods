@@ -15,8 +15,8 @@
 -compile([export_all, debug_info]).
 %-export([config_file/0, config/1, start/0, get_modes/0]).
 
-%-define(EXAMPLECONFIG, "examples/WdgM_VID41_ExampleConfiguration_001_cfg1.arxml").
--define(EXAMPLECONFIG, "examples/WdgM_VID41_ExampleConfiguration_ONLY_AS.arxml").
+-define(EXAMPLECONFIG, "examples/WdgM_VID41_ExampleConfiguration_001_cfg1.arxml").
+-define(EXAMPLE_ONLY_AS, "examples/WdgM_VID41_ExampleConfiguration_ONLY_AS.arxml").
 -define(FREESCALE, "freescale/wdgm_freescale_pip.arxml").
 -define(CONFIG, ?EXAMPLECONFIG).
 
