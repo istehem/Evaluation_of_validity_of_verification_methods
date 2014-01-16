@@ -316,7 +316,6 @@ collect_state_transitions(G1, G2, [{Ns, _}|Ss]) ->
     false -> []
   end++collect_state_transitions(G2, Ns#state.globalstatus, Ss).
 
-
 call_seq() -> return
               ([
                {set,{var,1},{call,?MODULE,init,[{eqc_c:address_of('Tst_Cfg1'), false}]}},
