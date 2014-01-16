@@ -40,7 +40,8 @@ config(Cfg) ->
 			  version_check_foreign_module   = get_value("_/WdgMGeneral/WdgMVersionCheckForeignModule", WdgM),
 			  version_info_api   = get_value("_/WdgMGeneral/WdgMVersionInfoApi", WdgM),
 			  caller_ids         = get_values("_/WdgMGeneral/WdgMCallerIds/WdgMCallerId", WdgM) },
-  Mode = get_value("_/Tst_Cfg1/WdgMInitialMode", WdgM),
+  CfgSet = get_containers_by_def("WdgMConfigSet", car_xml:file(wdgm_xml:config_file())),
+  Mode = get_value("WdgMInitialMode", CfgSet),
   Test = #tst_cfg1{
     initial_mode_id = get_value(Mode ++ "/WdgMModeId", Cfg)
    },
