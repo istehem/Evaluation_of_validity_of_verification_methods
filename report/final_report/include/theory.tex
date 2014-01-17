@@ -88,11 +88,52 @@ is written in Erlang and checked against API calls to the C-code. It is actually
 not necessary to have actual source code; it is enough to only have compiled library
 files.
 
+
 QuickCheck tests a program with specification implemented as properties that
 the program must hold \cite{QUICKCHECK:manual}. QuickCheck has guided random
 test generation, this means that the samples can be weighted to cover certain
 parts of the state-space with more likelihood.
 
+The commercial version Quickcheck consist of several Erlang modules. 
+
+\subsubsection{Quickcheck Modules}
+The commercial version Quickcheck consist of several Erlang modules. 
+\lstset{language=erlang}
+%%eqc
+\paragraph{eqc}
+The module \emph{eqc} is the main Quickcheck module. 
+\begin{lstlisting}
+    Some Erlang code
+\end{lstlisting}
+
+\paragraph{eqc\_gen} Used for generation of test cases. 
+\begin{lstlisting}
+    Some Erlang code
+\end{lstlisting}
+
+%%% eqc_c
+\paragraph{eqc\_c} Contains the C-testing interface. 
+\begin{lstlisting}
+    Some Erlang code
+\end{lstlisting}
+%
+%%% eqc_statem
+\paragraph{eqc\_statem}
+Offers state based testing.
+\begin{lstlisting}
+    Some Erlang code
+\end{lstlisting}
+
+%car_xml
+\paragraph{car\_xml}
+Additional to the commercial version is \emph{car} module. This module is
+specifically created to parse AUTOSAR configuration files.   
+\begin{lstlisting}
+    Some Erlang code
+\end{lstlisting}
+
+\paragraph{Other modules}
+There are also other modules 
 
 %% Erlang är inget verktyg per se. vi borde skriva om det, men passar det in
 %% här?
