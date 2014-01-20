@@ -56,6 +56,8 @@ getmode_post(S, [Is_Null], {R, Mode}) ->
 
 setmode_post(S, [ModeId, Cid], Ret) ->
   DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  OffModeEnabled = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.off_mode_enabled,
+  CallerIds = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids,
   (S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_OK' andalso
    S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_FAILED' andalso
    S#state.currentMode == eqc_c:value_of('WdgM_CurrentMode')) %% [WDGM316], [WDGM145]
@@ -72,8 +74,9 @@ setmode_post(S, [ModeId, Cid], Ret) ->
              andalso
                (not wdgm_helper:is_allowed_mode(ModeId) orelse %% [WDGM020]
                 not S#state.initialized orelse %% [WDGM021]
-                %% orelse (not OffModeEnabled andalso is_disabled_watchdogs()) orelse %% [WDGM031]
-                lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)) %% [WDGM245]
+                (not OffModeEnabled andalso
+                 wdgm_config_params:will_disable_watchdog(ModeId)) orelse %% [WDGM031]
+                lists:member(Cid, CallerIds)) %% [WDGM245]
        end).
 %% [WDGM186], [WDGM142]
 
