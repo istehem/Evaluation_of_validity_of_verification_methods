@@ -18,7 +18,7 @@
 %%% -WdgM_Init------------------------------------------------------------------
 
 init_command(_S) ->
-  {call, ?WDGMSTATEM, init, [frequency([{20, return({eqc_c:address_of('Tst_Cfg1'), false})},
+  {call, ?WDGMSTATEM, init, [frequency([{20, return({eqc_c:address_of(?CONFIG_FILE), false})},
                                    {1, return({{ptr, "WdgM_ConfigType", 0}, true})}])]}.
 
 %%% -WdgM_GetMode---------------------------------------------------------------
