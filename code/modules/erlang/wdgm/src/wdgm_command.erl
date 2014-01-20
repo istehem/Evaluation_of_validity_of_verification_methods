@@ -30,7 +30,7 @@ getmode_command(_S) ->
 %%% -WdgM_SetMode---------------------------------------------------------------
 
 setmode_command(_S) ->
-  {call, ?WDGMSTATEM, setmode, [choose(0,3), choose(1,2)]}.
+  {call, ?WDGMSTATEM, setmode, [choose(0,3), choose(1,2)]}. %% borde avspegla de aktuella värdena
 
 %%% -WdgM_DeInit----------------------------------------------------------------
 
@@ -41,7 +41,7 @@ deinit_command(_S) ->
 %%% -WdgM_CheckpointReached-----------------------------------------------------
 
 checkpointreached_command(S) ->
-  {call, ?WDGMSTATEM, checkpointreached, eqc_symbolic:well_defined(checkpoint_gen(S))}.
+  {call, ?WDGMSTATEM, checkpointreached, checkpoint_gen(S)}.
 
 checkpoint_gen(S) ->
   case wdgm_pre:checkpointreached_pre(S) of
@@ -96,16 +96,10 @@ performreset_command (_S) ->
 
 getfirstexpiredseid_command(_S) ->
   {call, ?WDGMSTATEM, getfirstexpiredseid, [frequency([{20, return(false)},
-                                                   {1, return(true)}])]}.
+                                                       {1, return(true)}])]}.
 
 
 %%% -WdgM_MainFunction----------------------------------------------------------
 
 mainfunction_command(_S) ->
   {call, ?WDGMSTATEM, mainfunction, []}.
-mainfunction_command(_S,_S) ->
-  {call, ?WDGMSTATEM, mainfunction, [1]}.
-mainfunction_command(_S,_S,_S) ->
-  {call, ?WDGMSTATEM, mainfunction, [1,2]}.
-mainfunction_command(_S,_S,_S,_S) ->
-  {call, ?WDGMSTATEM, mainfunction, [1,2,3]}.
