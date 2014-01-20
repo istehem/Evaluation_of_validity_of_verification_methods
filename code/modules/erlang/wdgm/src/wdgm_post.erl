@@ -70,7 +70,7 @@ setmode_post(S, [ModeId, Cid], Ret) ->
          1 ->
            DevErrorDetect
              andalso
-               (wdgm_helper:not_within_allowed_range(ModeId) orelse %% [WDGM020]
+               (not wdgm_helper:is_allowed_mode(ModeId) orelse %% [WDGM020]
                 not S#state.initialized orelse %% [WDGM021]
                 %% orelse (not OffModeEnabled andalso is_disabled_watchdogs()) orelse %% [WDGM031]
                 lists:member(Cid, S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)) %% [WDGM245]
@@ -92,7 +92,7 @@ deinit_post(S, _Args, _Ret) ->
 
 %%% -WdgM_CheckpointReached-----------------------------------------------------
 
-checkpointreached_post(S, Args=[SEid, CPId], Ret) ->
+checkpointreached_post(S, Args, Ret) ->
   DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
   MonitorTable = eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'),
   case Ret of
@@ -101,7 +101,7 @@ checkpointreached_post(S, Args=[SEid, CPId], Ret) ->
            (S#state.supervisedentities == undefined orelse
             S#state.supervisedentities == [] orelse
             wdgm_helper:check_same_supervisionstatus(S, MonitorTable, 0));
-    0 -> NextS = wdgm_next:checkpointreached_next(S, 0, [SEid, CPId]),
+    0 -> NextS = wdgm_next:checkpointreached_next(S, 0, Args),
          wdgm_helper:check_same_supervisionstatus(NextS, MonitorTable, 0) %% [WDGM322], [WDGM323]
   end.
 

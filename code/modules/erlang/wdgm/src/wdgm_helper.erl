@@ -63,8 +63,8 @@ check_next_supervisionstatus(S, [L|Ls], C) ->
   end.
 
 
-not_within_allowed_range(ModeId) ->
-  ModeId < 0 orelse ModeId > 255.
+is_allowed_mode(ModeId) ->
+  lists:keymember(ModeId, 1, wdgm_config_params:get_modes()).
 
 
 %% used by init
