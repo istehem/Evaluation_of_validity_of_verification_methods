@@ -184,7 +184,8 @@ mainfunction_post(S, _Args, _Ret) ->
       NextS#state.expiredSEid /= undefined) %% [WDGM351]
      orelse
        (S#state.initialized andalso
-         wdgm_helper:check_same_supervisionstatus(NextS, MonitorTable, 0))), %% [WDGM325]
+        (S#state.supervisedentities == [] orelse
+         wdgm_helper:check_same_supervisionstatus(NextS, MonitorTable, 0)))), %% [WDGM325]
 
   case DefensiveBehaviour of
     true ->
