@@ -154,7 +154,7 @@ performreset_post(S, _Args, _Ret) ->
 %%% -WdgM_GetFirstExpiredSEID---------------------------------------------------
 
 getfirstexpiredseid_post(S, [Is_Null], Ret) ->
-  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior,
+  DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
   case Ret of
     {0, SEid} -> SEid == S#state.expiredSEid; %% [WDGM349]
     {1, SEid} -> (S#state.expiredSEid == undefined andalso
