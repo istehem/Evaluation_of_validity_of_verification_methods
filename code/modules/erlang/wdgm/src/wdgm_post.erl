@@ -98,7 +98,9 @@ checkpointreached_post(S, Args=[SEid, CPId], Ret) ->
   case Ret of
     1 -> DevErrorDetect andalso
            checkpoint_postcondition(S, Args) andalso %% [WDGM278], [WDGM279], [WDGM284], [WDGM319]
-           (S#state.supervisedentities == undefined orelse wdgm_helper:check_same_supervisionstatus(S, MonitorTable, 0));
+           (S#state.supervisedentities == undefined orelse
+            S#state.supervisedentities == [] orelse
+            wdgm_helper:check_same_supervisionstatus(S, MonitorTable, 0));
     0 -> NextS = wdgm_next:checkpointreached_next(S, 0, [SEid, CPId]),
          wdgm_helper:check_same_supervisionstatus(NextS, MonitorTable, 0) %% [WDGM322], [WDGM323]
   end.
