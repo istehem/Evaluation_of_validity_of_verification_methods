@@ -202,6 +202,7 @@ prop_wdgm_init() ->
                     ?COPY_FILE,
                     eqc_c:restart(),
                     {H,S,Res} = run_commands(?MODULE,Cmds),
+                    write_history_to_file(H),
                     pretty_commands(
                       ?MODULE, Cmds, {H,S,Res},
                       aggregate(
@@ -298,6 +299,14 @@ collect_cmds_in_current_mode(H,S,_,Cmds) ->
        || Mode <- [0,1,2,3], LengthOfMode(Mode) /= 0]
   end.
 
+write_history_to_file(H) ->
+  case file:open("history.txt",[append]) of
+    {ok,IODevice} ->
+                     io:fwrite(IODevice,"~w\n",[lists:map(fun({S,_}) -> S#state.globalstatus end, H)]),
+                     file:close(IODevice);
+    _             -> ok
+  end.
+
 
 collect_state_transitions(H,S,_Res, _Cmds) ->
   States = H++[{S,ok}],
@@ -318,7 +327,7 @@ collect_state_transitions(G1, G2, [{Ns, _}|Ss]) ->
 
 call_seq() -> return
               ([
-               {set,{var,1},{call,?MODULE,init,[{eqc_c:address_of('Tst_Cfg1'), false}]}},
+               {set,{var,1},{call,?MODULE,init,[{eqc_c:address_of(?CONFIG_FILE), false}]}},
                {set,{var,2},{call,?MODULE,checkpointreached,[1,7]}},
                {set,{var,3},{call,?MODULE,checkpointreached,[1,7]}},
                {set,{var,4},{call,?MODULE,mainfunction,[]}},

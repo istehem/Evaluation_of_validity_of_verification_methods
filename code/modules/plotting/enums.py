@@ -1,7 +1,7 @@
 class Status:
      Ok = 1
      Deactivated = 2
-     Failed = 3 
+     Failed = 3
      Expired = 4
      Stopped = 5
 
@@ -18,15 +18,15 @@ class Functions:
      DeInit = 10
 
 def status_names():
-    return {   
-        Status.Ok: "Ok",
-        Status.Deactivated: "Deactivated",
-        Status.Failed: "Failed",
-        Status.Expired: "Expired",
-        Status.Stopped: "Stopped"
+    return {
+        Status.Ok: 'WDGM_GLOBAL_STATUS_OK',
+        Status.Deactivated: 'WDGM_GLOBAL_STATUS_DEACTIVATED',
+        Status.Failed: 'WDGM_GLOBAL_STATUS_FAILED',
+        Status.Expired: 'WDGM_GLOBAL_STATUS_EXPIRED',
+        Status.Stopped: 'WDGM_GLOBAL_STATUS_STOPPED'
     }
 
-def function_names(): 
+def function_names():
     return {
         Functions.GetMode: "GM",
         Functions.SetMode: "SM",
@@ -40,9 +40,9 @@ def function_names():
         Functions.DeInit: "DI"
     }
 
-    
+
 def format_function(i):
-     return function_names()[i] 
+     return function_names()[i]
 
 def format_status(i):
      return status_names()[i]
