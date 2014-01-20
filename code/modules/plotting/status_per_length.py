@@ -1,5 +1,4 @@
 from enums import *
-
 from pychart import *
 
 theme.get_options()
@@ -50,14 +49,6 @@ def parse_status(d,row):
       d[s][index] = 1
   return d
 
-
-#for elem in xs:
-#  print elem
-#    return [(Status.Ok,Functions.GetMode),
-#            (Status.Deactivated,Functions.SetMode),
-#            (Status.Stopped,Functions.MainFunction),
-#            (Status.Ok,Functions.MainFunction)]
-
 def draw_plot():
     ar = area.T(
             loc = (0,50),
@@ -72,24 +63,9 @@ def draw_plot():
         ar.add_plot(line_plot.T(data = get_data_for_status(data,status_names()[i]),line_style=colors[i-1],
              label=status_names()[i][19:].lower()))
 
-
-#    ar.add_plot(line_plot.T(data = get_data_ok(),line_style=line_style.red,
-#             label="OK"))
-#
-#    ar.add_plot(line_plot.T(data = get_data_failed(),line_style=line_style.black,
-#             label="FAILED"))
-#
-#    ar.add_plot(line_plot.T(data = get_data_failed(),line_style=line_style.black,
-#             label="DEACTIVATED"))
-#
-#    ar.add_plot(line_plot.T(data = get_data_failed(),line_style=line_style.black,
-#             label="EXPIRED"))
-#
-#    ar.add_plot(line_plot.T(data = get_data_failed(),line_style=line_style.black,
-#             label="EXPIRED"))
     ar.draw()
-    #tb = text_box.T(loc=(0,0),text="shows something")
-    #tb.draw()
+    tb = text_box.T(loc=(40,130),text="Global Statuses")
+    tb.draw()
     #draw_text(data)
     #a = arrow.T(head_style=2)
     #a.draw([(1,2),(3,4)])
