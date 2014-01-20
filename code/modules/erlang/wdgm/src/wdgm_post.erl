@@ -76,7 +76,8 @@ setmode_post(S, [ModeId, Cid], Ret) ->
                 not S#state.initialized orelse %% [WDGM021]
                 (not OffModeEnabled andalso
                  wdgm_config_params:will_disable_watchdog(ModeId)) orelse %% [WDGM031]
-                lists:member(Cid, CallerIds)) %% [WDGM245]
+                lists:member(Cid, CallerIds) orelse %% [WDGM245]
+                CallerIds == [])
        end).
 %% [WDGM186], [WDGM142]
 
