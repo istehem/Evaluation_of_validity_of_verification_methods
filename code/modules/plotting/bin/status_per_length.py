@@ -14,29 +14,32 @@ colors = [line_style.black,
             line_style.blue,
             line_style.red,
             line_style.green,
-            line_style.gray30]
+            line_style.T(color = color.gold)]
 
 def get_data_for_status(d,name):
   ret = [(0,0)]
   if name in d:
     status_data = d[name]
-    for k in status_data.keys():
+    for n in sorted(status_data.keys()):
       tot = 0
-      for name in d.keys():
-        if k in d[name]:
-          tot = tot + d[name][k]
-      ret = ret + [(k,(status_data[k]/float(tot))*100)] #ret.append((k,status_data[k]))
+      for status in d.keys():
+        if n in d[status]:
+          tot = tot + d[status][n]
+      ret = ret + [(n,(status_data[n]/float(tot))*100)] #ret.append((k,status_data[k]))
   return ret
 
 def get_data():
-    f = open("history.txt",'r')
+    f = open(raw_input(''),'r')
     xs = f.readlines()
     ds = dict()
+    gr_index = 0 
     for i in status_names():
       ds[status_names()[i]] = dict()
     for row in xs:
-      ds = parse_status(ds,row)
-    return ds
+      (ds,index) = parse_status(ds,row)
+      if gr_index < index:
+          gr_index = index
+    return (ds,gr_index)
 
 def parse_status(d,row):
   xs = ''.join(filter(lambda x: x != ']' and x != '[' and x != '\n' and x != '\'' and x != ' ',row)).split(',')
@@ -47,18 +50,19 @@ def parse_status(d,row):
       d[s][index] = d[s][index] + 1
     else:
       d[s][index] = 1
-  return d
+  return (d,index)
 
 def draw_plot():
+    (data,gr_index) = get_data()
     ar = area.T(
             loc = (0,50),
             x_axis = axis.X(label = "length of command sequences",format="/a-30{}%d"),
+            x_range = (0,gr_index),
             y_axis = axis.Y(label = "Percentage in state",format="%s%%")#,
             #legend = legend.T(loc = (0,150))
             )
 
 
-    data = get_data()
     for i in status_names():
         ar.add_plot(line_plot.T(data = get_data_for_status(data,status_names()[i]),line_style=colors[i-1],
              label=status_names()[i][19:].lower()))
