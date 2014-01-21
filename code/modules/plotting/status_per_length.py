@@ -20,7 +20,7 @@ def get_data_for_status(d,name):
   ret = [(0,0)]
   if name in d:
     status_data = d[name]
-    for k in status_data.keys():
+    for k in sorted(status_data.keys()):
       tot = 0
       for name in d.keys():
         if k in d[name]:
