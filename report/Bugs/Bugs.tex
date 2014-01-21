@@ -1,0 +1,533 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{verbatim}
+\usepackage{longtable}
+
+
+\lstdefinelanguage{autosar}{
+  breaklines=false,
+  frame=l,
+  showstringspaces=false,
+  string=[s]{``}{''},
+  morestring=[b]",
+  basicstyle=\color{red},
+  keywordstyle=\color{blue},
+  commentstyle=\color{green},
+  stringstyle=\color{green},
+  moredelim=[is][\color{cyan}]{|}{|},
+  identifierstyle=\color{black},
+  emph={
+    WdgMExpiredSupervisionCycleTol,
+    WdgM_MainFunction},
+  emphstyle={\color{cyan}},
+  morekeywords={
+    WDGM\_GLOBAL\_STATUS\_OK,
+    WDGM\_GLOBAL\_STATUS\_FAILED,
+    WDGM\_GLOBAL\_STATUS\_EXPIRED,
+    WDGM\_GLOBAL\_STATUS\_STOPPED,
+    WDGM\_GLOBAL\_STATUS\_DEACTIVATED,
+    WDGM\_LOCAL\_STATUS\_OK,
+    WDGM\_LOCAL\_STATUS\_FAILED,
+    WDGM\_LOCAL\_STATUS\_EXPIRED,
+    WDGM\_LOCAL\_STATUS\_DEACTIVATED
+  }
+}
+
+
+\begin{document}
+
+\section{Bugfixes and changes to the C code}
+\begin{longtable}{l p{0.8\linewidth}}
+
+[WdgM.c:1802] & bugfix because [7.2.3.2]\\
+
+[WdgM.c:1805] & bugfix because [WDGM274]\\
+
+[WdgM.c:1864] & bugfix because [7.2.3.2]\\
+
+[WdgM.c:1867] & bugfix because [WDGM252]\\
+
+[WdgM.c:1834] & bugfix because [7.2.3.2]\\
+
+[WdgM.c:1903] & bugfix because [7.2.3.2]\\
+
+[WdgM.c:2045] & bugfix because [WDGM296]\\
+
+[WdgM.c:2056] & bugfix because [WDGM286]\\
+
+[WdgM\_Lcfg.c:223] & bugfix, added initialization to alive/deadline/logical supervision results to \verb!WDGM_CORRECT! (copied the if statement from row 199), because [p. 27]\\
+
+[WdgM.h:39] & WdgM\_PbCfg.h -> WdgM\_Pbcfg.h\\
+\end{longtable}
+
+\newpage
+\lstset{
+  language=c,
+  commentstyle=\color{purple},
+  keywordstyle=\color{violet}
+}
+
+\lstset{language=autosar}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% WdgM.c:975-1016
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WdgM.c:975-1016}
+\textbf{VIOLATIONS:} [WDGM077], [WDGM117], [WDGM215], [WDGM216], [WDGM219],
+[WDGM220]\\[0.5cm]
+
+Problems in \lstinline!WdgM_MainFunction! when changing state to
+\lstinline!WDGM_GLOBAL_STATUS_EXPIRED! or
+\lstinline!WDGM_GLOBAL_STATUS_STOPPED!.\\[0.5cm]
+The counter for \lstinline!``expired cycle counter''! is incremented when the
+\lstinline!WdgM_MainFunction! changes the global state from
+\lstinline!WDGM_GLOBAL_STATUS_OK! to \lstinline!WDGM_GLOBAL_STATUS_EXPIRED!
+violating [WDGM215],[WDGM216],[WDGM077], and [WDGM117].
+This has the consequences that violates [WDGM219], and [WDGM220].\\
+
+[WDGM215]
+\begin{lstlisting}
+  if WDGM_GLOBAL_STATUS_OK and >= 1 supervised entity is in
+  WDGM_LOCAL_STATUS_EXPIRED and WdgMExpiredSupervisionCycleTol is > 0
+  then WdgM_MainFunction shall change the global status to
+  WDGM_GLOBAL_STATUS_EXPIRED
+\end{lstlisting}~\\
+
+[WDGM216]
+\begin{lstlisting}
+  if WDGM_GLOBAL_STATUS_OK and >= 1 supervised entity is in
+  WDGM_LOCAL_STATUS_EXPIRED and WdgMExpiredSupervisionCycleTol is = 0
+  then WdgM_MainFunction shall change the global status to
+  WDGM_GLOBAL_STATUS_STOPPED
+\end{lstlisting}~\\
+
+[WDGM077]
+\begin{lstlisting}
+  if WDGM_GLOBAL_STATUS_FAILED and >= 1 supervised entity is in
+  WDGM_LOCAL_STATUS_EXPIRED and WdgMExpiredSupervisionCycleTol is = 0
+  then WdgM_MainFunction shall change the global status to
+  WDGM_GLOBAL_STATUS_STOPPED
+\end{lstlisting}~\\
+
+[WDGM117]
+\begin{lstlisting}
+  if WDGM_GLOBAL_STATUS_FAILED and >= 1 supervised entity is in
+  WDGM_LOCAL_STATUS_EXPIRED and WdgMExpiredSupervisionCycleTol is = 0
+  then WdgM_MainFunction shall change the global status to
+  WDGM_GLOBAL_STATUS_STOPPED
+\end{lstlisting}~\\
+
+[WDGM219]
+\begin{lstlisting}
+  if WDGM_GLOBAL_STATUS_EXPIRED (and >= 1 supervised entity is in
+  WDGM_LOCAL_STATUS_EXPIRED)[implicitly understood] and the ``expired cycle
+  counter'' is <= WdgMExpiredSupervisionCycleTol then WdgM_MainFunction shall
+  keep the global status WDGM_GLOBAL_STATUS_EXPIRED and increment the ``expired
+  cycle counter''
+\end{lstlisting}~\\
+
+[WDGM220]
+\begin{lstlisting}
+  if WDGM_GLOBAL_STATUS_EXPIRED (and >= 1 supervised entity is in
+  WDGM_LOCAL_STATUS_EXPIRED)[implicitly understood] and the ``expired cycle
+  counter'' is > WdgMExpiredSupervisionCycleTol then WdgM_MainFunction shall
+  change the global status to WDGM_GLOBAL_STATUS_STOPPED
+\end{lstlisting}~\\
+
+\lstset{
+  language=c,
+  commentstyle=\color{purple},
+  keywordstyle=\color{violet}
+}
+
+Changes to the c-code:
+\begin{lstlisting}
+  if ((WDGM_GLOBAL_STATUS_EXPIRED == temp_gs) ||
+  ((WdgM_GlobalStatusType)WDGM_GLOBAL_STATUS_EXPIRED == WdgM_GlobalStatus))
+  {
+    WdgM_ExpiredSupervisionCycles++;
+    /* If temp_gs is not Expired and global status is expired. Sync them */
+    temp_gs = WDGM_GLOBAL_STATUS_EXPIRED;
+  }
+  else
+  {
+    /* Nothing to be done */
+  }
+
+  if ((WdgM_ExpiredSupervisionCycles > WdgM_GetExpSupCycleTol(WdgM_CurrentMode))
+  {
+    temp_gs = (WdgM_GlobalStatusType) WDGM_GLOBAL_STATUS_STOPPED;
+    WdgM_ExpiredSupervisionCycles = 0;
+  }
+  else
+  {
+    /* Nothing to be done */
+  }
+\end{lstlisting}
+==============================================================================\\
+changed to:\\
+==============================================================================
+\begin{lstlisting}
+  if( WDGM_GLOBAL_STATUS_EXPIRED == temp_gs && WdgM_GetExpSupCycleTol(WdgM_CurrentMode) == 0 )
+  {
+    temp_gs = WDGM_GLOBAL_STATUS_STOPPED;
+    WdgM_ExpiredSupervisionCycles = 0;
+  }
+}
+else
+{
+  if ( WdgM_ExpiredSupervisionCycles <= WdgM_GetExpSupCycleTol(WdgM_CurrentMode) )
+  {
+    temp_gs = WDGM_GLOBAL_STATUS_EXPIRED;
+    WdgM_ExpiredSupervisionCycles++;
+  }
+  else
+  {
+    temp_gs = WDGM_GLOBAL_STATUS_STOPPED;
+    WdgM_ExpiredSupervisionCycles = 0;
+  }
+}
+\end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% WdgM.c:1397, 1404
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WdgM.c:1397,1404}
+\textbf{VIOLATIONS:}[WDGM182], [WDGM182]\\
+
+lstset{language=autosar}
+
+[WDGM182]
+\begin{lstlisting}
+  if WDGM_GLOBAL_STATUS_OK or WDGM_GLOBAL_STATUS_FAILED then WdgM_SetMode shall
+  retain the state for each Supervised Entity that is activated.
+\end{lstlisting}~\\
+
+\lstset{
+  language=c,
+  commentstyle=\color{purple},
+  keywordstyle=\color{violet}
+}
+
+Changes to the c-code:
+\begin{lstlisting}
+  else
+\end{lstlisting}
+==============================================================================\\
+changed to:\\
+==============================================================================
+\begin{lstlisting}
+  else if (WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[idx].supervision_status == WDGM_LOCAL_STATUS_DEACTIVATED)
+\end{lstlisting}
+and
+\begin{lstlisting}
+  if (NULL_PTR != WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr)
+\end{lstlisting}
+==============================================================================\\
+changed to:\\
+==============================================================================
+\begin{lstlisting}
+  if (NULL_PTR != WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr &&
+  // bugfix because [WDGM182]
+  WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[idx].supervision_status == WDGM_LOCAL_STATUS_DEACTIVATED)
+\end{lstlisting}
+
+\newpage
+\section{WdgM.c:1802, 1805}
+\begin{lstlisting}
+  if (SEId == idx)
+  {
+    if (FALSE == (WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag))
+    {
+      if (CheckpointId == WdgM_GetInternalGraphStartId(WdgM_CurrentMode,idx))
+      {
+        SchM_Enter_WdgM_EaLogicalSupResultProtect();
+        WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result = WDGM_CORRECT;
+        SchM_Exit_WdgM_EaLogicalSupResultProtect();
+        WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].most_recently_reported = CheckpointId;
+        SchM_Enter_WdgM_EaActivityFlagProtect();
+        WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag = TRUE;
+        SchM_Exit_WdgM_EaActivityFlagProtect();
+        logical_flag = FALSE;
+      }
+    }
+\end{lstlisting}
+changed to:
+\begin{lstlisting}
+  if (SEId == idx)
+  {
+    // bugfix: dont overwrite other logical_result of the supervised entity, because 7.2.3.2
+    WdgM_SupervisionResultType prev_log_res =
+      WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result;
+    if (FALSE == (WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag))
+    {
+      if (CheckpointId == WdgM_GetInternalGraphStartId(WdgM_CurrentMode,idx))
+      {
+        if(prev_log_res == WDGM_CORRECT) // part of bugfix above
+        {
+          SchM_Enter_WdgM_EaLogicalSupResultProtect();
+          WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result = WDGM_CORRECT;
+          SchM_Exit_WdgM_EaLogicalSupResultProtect();
+        }
+        WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].most_recently_reported = CheckpointId;
+        SchM_Enter_WdgM_EaActivityFlagProtect();
+        WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag = TRUE;
+        SchM_Exit_WdgM_EaActivityFlagProtect();
+        logical_flag = FALSE;
+      }
+      // bugfix: The else statement below is added to give the correct behavior of [WDGM274]
+      else
+      {
+        WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result = WDGM_INCORRECT;
+        WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag = FALSE;
+      }
+    }
+\end{lstlisting}
+
+\newpage
+\section{WdgM.c:1864, 1867}
+\begin{lstlisting}
+  else if (WDGM_EXTERNAL_GRAPH == LSReturn_Val.LS_GraphType)   /* External Logical Supervision*/
+  {
+    idx = LSReturn_Val.CP_GraphId;
+    graph_index=WdgM_GetExternalGraphIndex(WdgM_CurrentMode,idx);
+    if (FALSE == (WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag))
+    {
+      for (i=0; (i<WdgM_GetInitialCheckpointIdCnt(WdgM_CurrentMode,idx)); ++i)
+      {
+        if (CheckpointId==WdgM_GetExtGraphStartId(WdgM_CurrentMode,idx,i))
+        {
+          SchM_Enter_WdgM_EaLogicalSupResultProtect();
+          WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result = WDGM_CORRECT;
+          SchM_Exit_WdgM_EaLogicalSupResultProtect();
+          WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_recently_reported = CheckpointId;
+          SchM_Enter_WdgM_EaActivityFlagProtect();
+          WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag = TRUE;
+          SchM_Exit_WdgM_EaActivityFlagProtect();
+          logical_flag = FALSE;
+        }
+      }
+    }
+\end{lstlisting}
+changed to:
+\begin{lstlisting}
+  else if (WDGM_EXTERNAL_GRAPH == LSReturn_Val.LS_GraphType)   /* External Logical Supervision*/
+  {
+    idx = LSReturn_Val.CP_GraphId;
+    graph_index=WdgM_GetExternalGraphIndex(WdgM_CurrentMode,idx);
+    // bugfix: dont overwrite other logical_result of the supervised entity, because 7.2.3.2
+    WdgM_SupervisionResultType prev_log_res =
+    WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result;
+    if (FALSE == (WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag))
+    {
+      for (i=0; (i<WdgM_GetInitialCheckpointIdCnt(WdgM_CurrentMode,idx)); ++i)
+      {
+        if (CheckpointId==WdgM_GetExtGraphStartId(WdgM_CurrentMode,idx,i))
+        {
+          if(prev_log_res == WDGM_CORRECT) // part of bugfix above
+          {
+            SchM_Enter_WdgM_EaLogicalSupResultProtect();
+            WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result = WDGM_CORRECT;
+            SchM_Exit_WdgM_EaLogicalSupResultProtect();
+          }
+          WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_recently_reported = CheckpointId;
+          SchM_Enter_WdgM_EaActivityFlagProtect();
+          WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag = TRUE;
+          SchM_Exit_WdgM_EaActivityFlagProtect();
+          logical_flag = FALSE;
+        }
+      }
+      // bugfix, The if statement below is added to give the correct behavior of [WDGM252]
+      if (logical_flag)
+      {
+        WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result = WDGM_INCORRECT;
+        WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag = FALSE;
+      }
+    }
+\end{lstlisting}
+
+\newpage
+\section{Wdgm.c:1834}
+
+\begin{lstlisting}
+if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].most_recently_reported==
+  WdgM_GetInternalGraphStopId(WdgM_CurrentMode,idx,index))
+{
+  SchM_Enter_WdgM_EaLogicalSupResultProtect();
+  WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
+  SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  SchM_Enter_WdgM_EaActivityFlagProtect();
+  WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag=FALSE;
+  SchM_Exit_WdgM_EaActivityFlagProtect();
+}
+\end{lstlisting}
+
+changedto:
+
+\begin{lstlisting}
+if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].most_recently_reported==
+  WdgM_GetInternalGraphStopId(WdgM_CurrentMode,idx,index))
+{
+  if(prev_log_res==WDGM_CORRECT)
+  {
+    SchM_Enter_WdgM_EaLogicalSupResultProtect();
+    WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
+    SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  }
+  SchM_Enter_WdgM_EaActivityFlagProtect();
+  WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag=FALSE;
+  SchM_Exit_WdgM_EaActivityFlagProtect();
+}
+\end{lstlisting}
+
+\newpage
+\section{WdgM.c:1903}
+
+\begin{lstlisting}
+if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_recently_reported==
+  WdgM_GetExtGraphStopId(WdgM_CurrentMode,idx,index))
+{
+  SchM_Enter_WdgM_EaLogicalSupResultProtect();
+  WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
+  SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  SchM_Enter_WdgM_EaActivityFlagProtect();
+  WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag=FALSE;
+  SchM_Exit_WdgM_EaActivityFlagProtect();
+}
+\end{lstlisting}
+
+changed to:
+
+\begin{lstlisting}
+if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_recently_reported==
+  WdgM_GetExtGraphStopId(WdgM_CurrentMode,idx,index))
+{
+  if(prev_log_res==WDGM_CORRECT)
+  {
+    SchM_Enter_WdgM_EaLogicalSupResultProtect();
+    WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[SEId].logicalsupervision_result=WDGM_CORRECT;
+    SchM_Exit_WdgM_EaLogicalSupResultProtect();
+  }
+  SchM_Enter_WdgM_EaActivityFlagProtect();
+  WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].activity_flag=FALSE;
+  SchM_Exit_WdgM_EaActivityFlagProtect();
+}
+\end{lstlisting}
+
+\newpage
+\section{WdgM.c:2056}
+\begin{lstlisting}
+      /* Check if Logical supervised entities are configured */
+      if (NULL_PTR != WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr)
+      {
+         for (idx = 0; idx < WdgM_GetExternalLogicalSupCount(WdgMInitilMode); ++idx)
+         {
+            uint16 extlogical_index=WdgM_GetExternalGraphIndex(WdgMInitilMode,idx);
+            WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[extlogical_index].activity_flag= FALSE;
+         }
+      }
+      else
+\end{lstlisting}
+changed to:
+\begin{lstlisting}
+      /* Check if Logical supervised entities are configured */
+      if (NULL_PTR != WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr)
+      {
+        // bugfix, because [WDGM296]
+        for (idx = 0; idx < WdgM_GetLocalstatusParmCount(WdgM_CurrentMode); ++idx)
+          {
+            WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].activity_flag = FALSE;
+          }
+         for (idx = 0; idx < WdgM_GetExternalLogicalSupCount(WdgMInitilMode); ++idx)
+         {
+            uint16 extlogical_index=WdgM_GetExternalGraphIndex(WdgMInitilMode,idx);
+            WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[extlogical_index].activity_flag= FALSE;
+         }
+      }
+      else
+\end{lstlisting}
+
+\newpage
+\section{WdgM.c:2056}
+\begin{lstlisting}
+  if (TRUE == retval)
+  /* PRQA S 3358 -- */
+  /* PRQA S 3355 -- */
+  {
+\end{lstlisting}
+changed to:
+\begin{lstlisting}
+  // bugfix,updated to correct behaviour because [WDGM286]
+  if (TRUE == retval && WdgM_GlobalStatus == WDGM_GLOBAL_STATUS_OK)
+  /* PRQA S 3358 -- */
+  /* PRQA S 3355 -- */
+  {
+\end{lstlisting}
+
+\newpage
+\section{WdgM\_Lcfg.c:223}
+\begin{lstlisting}
+  else
+  {
+    status = WDGM_LOCAL_STATUS_DEACTIVATED;
+  }
+  if (NULL_PTR != WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr)
+\end{lstlisting}
+changed to:
+\begin{lstlisting}
+   else
+   {
+      status = WDGM_LOCAL_STATUS_DEACTIVATED;
+      // bugfix because [p. 27] copied the whole if statement below.
+      if (NULL_PTR != WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr)
+      {
+         WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[index].failed_reference_supervisioncycles = 0;
+         WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[index].alivesupervision_result=WDGM_CORRECT;
+         WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[index].deadlinesupervision_result=WDGM_CORRECT;
+         WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[index].logicalsupervision_result=WDGM_CORRECT;
+      }
+      else
+      {
+         /* Do Nothing*/
+      }
+    }
+    if (NULL_PTR != WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr)
+\end{lstlisting}
+
+% \newpage
+% \section{WdgM.c}
+% \begin{lstlisting}
+% \end{lstlisting}
+% \begin{lstlisting}
+% \end{lstlisting}
+\newpage
+\section{WdgM\_I.h:110}
+\begin{lstlisting}
+typedef enum WdgM_GlobalStaus_Tag
+{
+   WDGM_GLOBAL_STATUS_OK,
+   WDGM_GLOBAL_STATUS_DEACTIVATED,
+   WDGM_GLOBAL_STATUS_FAILED,
+   WDGM_GLOBAL_STATUS_EXPIRED,
+   WDGM_GLOBAL_STATUS_STOPPED
+}WdgM_GlobalStatusType
+\end{lstlisting}
+changed to
+\begin{lstlisting}
+typedef enum WdgM_GlobalStaus_Tag
+{
+   WDGM_GLOBAL_STATUS_DEACTIVATED,
+   WDGM_GLOBAL_STATUS_OK,
+   WDGM_GLOBAL_STATUS_FAILED,
+   WDGM_GLOBAL_STATUS_EXPIRED,
+   WDGM_GLOBAL_STATUS_STOPPED
+}WdgM_GlobalStatusType
+\end{lstlisting}
+
+\end{document}
