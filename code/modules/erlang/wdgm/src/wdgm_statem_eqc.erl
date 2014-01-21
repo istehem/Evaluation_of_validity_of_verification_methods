@@ -202,7 +202,8 @@ prop_wdgm_init() ->
                     ?COPY_FILE,
                     eqc_c:restart(),
                     {H,S,Res} = run_commands(?MODULE,Cmds),
-                    write_history_to_file(H),
+                    write_history_to_file(statuses, H),
+                    write_history_to_file(commands, Cmds),
                     pretty_commands(
                       ?MODULE, Cmds, {H,S,Res},
                       aggregate(
@@ -299,11 +300,14 @@ collect_cmds_in_current_mode(H,S,_,Cmds) ->
        || Mode <- [0,1,2,3], LengthOfMode(Mode) /= 0]
   end.
 
-write_history_to_file(H) ->
-  case file:open("history.txt",[append]) of
+write_history_to_file(FA, H) ->
+  case file:open("history_"++atom_to_list(FA)++".txt",[append]) of
     {ok,IODevice} ->
-                     io:fwrite(IODevice,"~w\n",[lists:map(fun({S,_}) -> S#state.globalstatus end, H)]),
-                     file:close(IODevice);
+      case FA of
+        statuses -> io:fwrite(IODevice,"~w\n",[lists:map(fun({S,_}) -> S#state.globalstatus end, H)]);
+        commands -> io:fwrite(IODevice,"~w\n",[lists:map(fun({_set, _var, {_call, _M, F, _A}}) -> F end, H)])
+      end,
+      file:close(IODevice);
     _             -> ok
   end.
 

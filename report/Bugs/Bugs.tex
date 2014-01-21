@@ -7,7 +7,11 @@
 \usepackage{verbatim}
 \usepackage{longtable}
 
-
+\lstdefinelanguage{c}{
+  language=c,
+  commentstyle=\color{purple},
+  keywordstyle=\color{violet}
+}
 \lstdefinelanguage{autosar}{
   breaklines=false,
   frame=l,
@@ -22,7 +26,12 @@
   identifierstyle=\color{black},
   emph={
     WdgMExpiredSupervisionCycleTol,
-    WdgM_MainFunction},
+    WdgM_MainFunction,
+    WdgM_SetMode,
+    WdgM_Init,
+    WdgM_DeInit,
+    WdgM_Checkpointreached
+  },
   emphstyle={\color{cyan}},
   morekeywords={
     WDGM\_GLOBAL\_STATUS\_OK,
@@ -43,10 +52,6 @@
 \section{Bugfixes and changes to the C code}
 \begin{longtable}{l p{0.8\linewidth}}
 
-[WdgM.c:1802] & bugfix because [7.2.3.2]\\
-
-[WdgM.c:1805] & bugfix because [WDGM274]\\
-
 [WdgM.c:1864] & bugfix because [7.2.3.2]\\
 
 [WdgM.c:1867] & bugfix because [WDGM252]\\
@@ -65,12 +70,7 @@
 \end{longtable}
 
 \newpage
-\lstset{
-  language=c,
-  commentstyle=\color{purple},
-  keywordstyle=\color{violet}
-}
-
+\lstset{language=c}
 \lstset{language=autosar}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -138,11 +138,7 @@ This has the consequences that violates [WDGM219], and [WDGM220].\\
   change the global status to WDGM_GLOBAL_STATUS_STOPPED
 \end{lstlisting}~\\
 
-\lstset{
-  language=c,
-  commentstyle=\color{purple},
-  keywordstyle=\color{violet}
-}
+\lstset{language=c}
 
 Changes to the c-code:
 \begin{lstlisting}
@@ -199,9 +195,12 @@ else
 %% WdgM.c:1397, 1404
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:1397,1404}
-\textbf{VIOLATIONS:}[WDGM182], [WDGM182]\\
+\textbf{VIOLATIONS:}[WDGM182], [WDGM3]\\
 
 lstset{language=autosar}
+
+\lstinline!WdgM_SetMode! does not retain the state for those supervised entities
+that is activated in the new mode violating [WDGM182].
 
 [WDGM182]
 \begin{lstlisting}
@@ -209,11 +208,7 @@ lstset{language=autosar}
   retain the state for each Supervised Entity that is activated.
 \end{lstlisting}~\\
 
-\lstset{
-  language=c,
-  commentstyle=\color{purple},
-  keywordstyle=\color{violet}
-}
+\lstset{language=c}
 
 Changes to the c-code:
 \begin{lstlisting}
@@ -225,7 +220,9 @@ changed to:\\
 \begin{lstlisting}
   else if (WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[idx].supervision_status == WDGM_LOCAL_STATUS_DEACTIVATED)
 \end{lstlisting}
-and
+==============================================================================\\
+and:\\
+==============================================================================
 \begin{lstlisting}
   if (NULL_PTR != WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr)
 \end{lstlisting}
@@ -234,12 +231,31 @@ changed to:\\
 ==============================================================================
 \begin{lstlisting}
   if (NULL_PTR != WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr &&
-  // bugfix because [WDGM182]
   WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[idx].supervision_status == WDGM_LOCAL_STATUS_DEACTIVATED)
 \end{lstlisting}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% WdgM.c:1802, 1805
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:1802, 1805}
+\textbf{VIOLATIONS:} [7.2.3.2], [WDGM274]
+
+\lstset{language=autosar}
+
+[7.2.3.2]
+\begin{lstlisting}
+
+\end{lstlisting}~\\
+
+[WDGM274]
+\begin{lstlisting}
+\end{lstlisting}~\\
+
+\lstset{language=c}
+
+Changes to the c-code:
 \begin{lstlisting}
   if (SEId == idx)
   {
@@ -258,7 +274,9 @@ changed to:\\
       }
     }
 \end{lstlisting}
-changed to:
+==============================================================================\\
+changed to:\\
+==============================================================================
 \begin{lstlisting}
   if (SEId == idx)
   {
@@ -289,9 +307,18 @@ changed to:
       }
     }
 \end{lstlisting}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% WdgM.c:1864, 1867
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:1864, 1867}
+\lstset{language=autosar}
+
+\lstset{language=c}
+
+Changes to the c-code:
 \begin{lstlisting}
   else if (WDGM_EXTERNAL_GRAPH == LSReturn_Val.LS_GraphType)   /* External Logical Supervision*/
   {
