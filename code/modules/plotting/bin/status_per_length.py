@@ -42,7 +42,7 @@ def get_data():
     return (ds,gr_index)
 
 def parse_status(d,row):
-  xs = ''.join(filter(lambda x: x != ']' and x != '[' and x != '\n' and x != '\'' and x != ' ',row)).split(',')
+  xs = ''.join(filter(lambda x: "[] \n\'".find(x) == -1,row)).split(',')
   xs = [] + filter(lambda x: x != '' and x != '\n',xs)
   index = len(xs)
   for s in xs:
