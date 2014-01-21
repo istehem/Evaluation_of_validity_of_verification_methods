@@ -30,7 +30,7 @@
     WdgM_SetMode,
     WdgM_Init,
     WdgM_DeInit,
-    WdgM_Checkpointreached
+    WdgM_CheckpointReached
   },
   emphstyle={\color{cyan}},
   morekeywords={
@@ -195,9 +195,9 @@ else
 %% WdgM.c:1397, 1404
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:1397,1404}
-\textbf{VIOLATIONS:}[WDGM182], [WDGM3]\\
+\textbf{VIOLATIONS:} [WDGM182], [WDGM3]\\
 
-lstset{language=autosar}
+\lstset{language=autosar}
 
 \lstinline!WdgM_SetMode! does not retain the state for those supervised entities
 that is activated in the new mode violating [WDGM182].
@@ -246,11 +246,23 @@ changed to:\\
 
 [7.2.3.2]
 \begin{lstlisting}
+Assuming N internal graphs for a Supervised Entity, means that there are N
+results from the internal Logical Supervision.
 
+Assuming M external graphs for a Supervised Entity, means that there are M
+results from the external Logical Supervision.
+
+There are N+M results in total from Logical Supervision for each Supervised Entity.
 \end{lstlisting}~\\
 
 [WDGM274]
 \begin{lstlisting}
+WdgM_CheckpointReached shall verify that the reported checkpoint belonging to an
+``Internal Graph'' is correct by checking:
+if ``Activity Flag'' = false and Checkpoint $ \in $ ``Initial Checkpoints''
+or ``Activity Flag'' = true and Checkpoint $ \succ $ of ``Stored Checkpoint''
+then WDGM_CORRECT
+else WDGM_INCORRECT
 \end{lstlisting}~\\
 
 \lstset{language=c}
