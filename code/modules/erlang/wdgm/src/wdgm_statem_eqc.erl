@@ -301,7 +301,10 @@ collect_cmds_in_current_mode(H,S,_,Cmds) ->
   end.
 
 write_history_to_file(FA, H) ->
-  case file:open("history_"++atom_to_list(FA)++".txt",[append]) of
+  File = "history_"++
+    atom_to_list(FA)++"_"++
+    atom_to_list(wdgm_xml:which_config())++".txt",
+  case file:open(File,[append]) of
     {ok,IODevice} ->
       case FA of
         statuses -> io:fwrite(IODevice,"~w\n",[lists:map(fun({S,_}) -> S#state.globalstatus end, H)]);

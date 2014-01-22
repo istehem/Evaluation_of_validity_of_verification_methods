@@ -30,7 +30,9 @@
     WdgM_SetMode,
     WdgM_Init,
     WdgM_DeInit,
-    WdgM_CheckpointReached
+    WdgM_CheckpointReached,
+    WdgM_CalculateAliveSupervision,
+    WdgM_CheckLogicalSupervisedEntities
   },
   emphstyle={\color{cyan}},
   morekeywords={
@@ -56,11 +58,13 @@
 %% WdgM.c:975-1016
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:975-1016}
+%%% Violations, list the references to AUTOSAR
 \textbf{VIOLATIONS:} [WDGM077], [WDGM117], [WDGM215], [WDGM216], [WDGM219],
 [WDGM220]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 Problems in \lstinline!WdgM_MainFunction! when changing state to
 \lstinline!WDGM_GLOBAL_STATUS_EXPIRED! or
 \lstinline!WDGM_GLOBAL_STATUS_STOPPED!.\\[0.5cm]
@@ -71,6 +75,7 @@ The counter for \lstinline!``expired cycle counter''! is incremented when the
 violating [WDGM215],[WDGM216],[WDGM077], and [WDGM117].
 This has the consequences that violates [WDGM219], and [WDGM220].\\
 
+%%% List and describe the main parts of the violated requirements
 [WDGM215]
 \begin{lstlisting}
   if WDGM_GLOBAL_STATUS_OK and >= 1 supervised entity is in
@@ -122,6 +127,7 @@ This has the consequences that violates [WDGM219], and [WDGM220].\\
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
   if ((WDGM_GLOBAL_STATUS_EXPIRED == temp_gs) ||
@@ -177,13 +183,16 @@ else
 %% WdgM.c:1397, 1404
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:1397,1404}
-\textbf{VIOLATIONS:} [WDGM182], [WDGM3]\\[0.5cm]
+%%% Violations, list the references to AUTOSAR
+\textbf{VIOLATIONS:} [WDGM182]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 \lstinline!WdgM_SetMode! does not retain the state for those supervised entities
 that is activated in the new mode violating [WDGM182].\\
 
+%%% List and describe the main parts of the violated requirements
 [WDGM182]
 \begin{lstlisting}
   if WDGM_GLOBAL_STATUS_OK or WDGM_GLOBAL_STATUS_FAILED then WdgM_SetMode shall
@@ -192,6 +201,7 @@ that is activated in the new mode violating [WDGM182].\\
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
   else
@@ -222,10 +232,12 @@ changed to:\\
 %% WdgM.c:1511  , 1689, 1692
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:1511}
+%%% Violations, list the references to AUTOSAR
 \textbf{VIOLATIONS:} [WDGM203], [WDGM204], [WDGM300], [WDGM205]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 \lstinline!WdgM_CalculateAliveSupervision!\\
 
 []
@@ -234,6 +246,7 @@ changed to:\\
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code: %% missing context
 \begin{lstlisting}
   if (seid == WdgM_GetAliveSupEntityId(mode,id))
@@ -273,14 +286,17 @@ changed to:\\
 %% WdgM.c:1808, 1827
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:1808, 1827}
+%%% Violations, list the references to AUTOSAR
 \textbf{VIOLATIONS:} [7.2.3.2], [WDGM274]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 \lstinline!WdgM_CheckLogicalSupervisedEntities!, a helper function for
 \lstinline!WdgM_CheckpointReached!, overwrites the results for internal Logical
 supervision if there are multiple graphs for a Supervised Entity.\\
 
+%%% List and describe the main parts of the violated requirements
 [7.2.3.2]
 \begin{lstlisting}
 Assuming N internal graphs for a Supervised Entity, means that there are N
@@ -305,6 +321,7 @@ else WDGM_INCORRECT
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
   if (SEId == idx)
@@ -364,14 +381,17 @@ changed to:\\
 %% WdgM.c:1879, 1901
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:1879, 1901}
+%%% Violations, list the references to AUTOSAR
 \textbf{VIOLATIONS:} [7.2.3.2], [WDGM252]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 \lstinline!WdgM_CheckLogicalSupervisedEntities!, a helper function for
 \lstinline!WdgM_CheckpointReached!, overwrites the results for external Logical
 supervision if there are multiple graphs for a Supervised Entity.\\
 
+%%% List and describe the main parts of the violated requirements
 [7.2.3.2]
 \begin{lstlisting}
 Assuming N internal graphs for a Supervised Entity, means that there are N
@@ -396,6 +416,7 @@ else WDGM_INCORRECT
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
   else if (WDGM_EXTERNAL_GRAPH == LSReturn_Val.LS_GraphType)   /* External Logical Supervision*/
@@ -465,14 +486,17 @@ changed to:\\
 %% WdgM.c:1850
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Wdgm.c:1850}
+%%% Violations, list the references to AUTOSAR
 \textbf{VIOLATIONS:} [7.2.3.2]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 \lstinline!WdgM_CheckLogicalSupervisedEntities!, a helper function for
 \lstinline!WdgM_CheckpointReached!, overwrites the results for internal Logical
 supervision if there are multiple graphs for a Supervised Entity.\\
 
+%%% List and describe the main parts of the violated requirements
 [7.2.3.2]
 \begin{lstlisting}
 Assuming N internal graphs for a Supervised Entity, means that there are N
@@ -487,6 +511,7 @@ Entity.
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
 if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].most_recently_reported==
@@ -525,14 +550,17 @@ if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[idx].most_recently_rep
 %% WdgM.c:1924
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:1924}
+%%% Violations, list the references to AUTOSAR
 \textbf{VIOLATIONS:} [7.2.3.2]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 \lstinline!WdgM_CheckLogicalSupervisedEntities!, a helper function for
 \lstinline!WdgM_CheckpointReached!, overwrites the results for internal Logical
 supervision if there are multiple graphs for a Supervised Entity.\\
 
+%%% List and describe the main parts of the violated requirements
 [7.2.3.2]
 \begin{lstlisting}
 Assuming N internal graphs for a Supervised Entity, means that there are N
@@ -547,6 +575,7 @@ Entity.
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
 if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_recently_reported==
@@ -585,12 +614,15 @@ if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_rece
 %% WdgM.c:2046
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:2046}
+%%% Violations, list the references to AUTOSAR
 \textbf{VIOLATIONS:} [WDGM296]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 \lstinline!WdgM_Init! doesn't reset activity flag for internal graphs\\
 
+%%% List and describe the main parts of the violated requirements
 [WDGM296]
 \begin{lstlisting}
   WdgM_Init shall set the ``Activity Flag'' for each graph [logical supervision]
@@ -599,6 +631,7 @@ if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_rece
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
       /* Check if Logical supervised entities are configured */
@@ -639,14 +672,17 @@ changed to:\\
 %% WdgM.c:2120
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:2120}
+%%% Violations, list the references to AUTOSAR
 \textbf{VIOLATIONS:} [WDGM286]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 \lstinline!WdgM_DeInit! changes the global status to
 \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED! even if the global status is not in
 \lstinline!WDGM_GLOBAL_STATUS_OK!\\
 
+%%% List and describe the main parts of the violated requirements
 [WDGM286]
 \begin{lstlisting}
 if WDGM_GLOBAL_STATUS_OK and WdgM_DeInit then WDGM_GLOBAL_STATUS_DEACTIVATED
@@ -654,6 +690,7 @@ if WDGM_GLOBAL_STATUS_OK and WdgM_DeInit then WDGM_GLOBAL_STATUS_DEACTIVATED
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
   if (TRUE == retval)
@@ -677,12 +714,15 @@ changed to:\\
 %% WdgM.c:2092
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:2092}
+%%% Violations, list the references to AUTOSAR
 \textbf{VIOLATIONS:} [WDGM255]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 The function \verb!WdgM_Init! changes the global status if a null pointer is passed as an argument.\\
 
+%%% List and describe the main parts of the violated requirements
 [WDGM255]
 \begin{lstlisting}
   If WdgMDevErrorDetect then WdgM_Init shall check if ConfigPtr [argument] ==
@@ -692,6 +732,7 @@ The function \verb!WdgM_Init! changes the global status if a null pointer is pas
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
   else
@@ -716,13 +757,16 @@ changed to:\\
 %% WdgM_Lcfg.c:223
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM\_Lcfg.c:223}
+%%% Violations, list the references to AUTOSAR
 \textbf{VIOLATIONS:} [p. 27]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 initialization to alive/deadline/logical supervision results to
 \verb!WDGM_CORRECT!\\
 
+%%% List and describe the main parts of the violated requirements
 [p. 27]
 \begin{lstlisting}
 At Watchdog Manager initialization, all the Results are set to correct.
@@ -730,6 +774,7 @@ At Watchdog Manager initialization, all the Results are set to correct.
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
   else
@@ -767,18 +812,22 @@ changed to:\\
 %% WdgM_I.h:110
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM\_I.h:110}
+%%% Violations, list the references to AUTOSAR
 \textbf{VIOLATIONS:} [Figure 4]\\[0.5cm]
 
 \lstset{language=autosar}
 
+%%% Summarize the problem
 At initialization, the global status should be
 \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED! and not \lstinline!WDGM_GLOBAL_STATUS_OK!\\
 
+%%% List and describe the main parts of the violated requirements
 [Figure 4]
 Shows a picture of the state machine for the global status starting in \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!\\
 
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
 typedef enum WdgM_GlobalStaus_Tag
@@ -810,8 +859,16 @@ typedef enum WdgM_GlobalStaus_Tag
 %% WdgM.h:39
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.h:39}
+%%% Violations, list the references to AUTOSAR
+\textbf{VIOLATIONS:}
+
+%%% Summarize the problem
+
+%%% List and describe the main parts of the violated requirements
+
 \lstset{language=c}
 
+%%% Changes to the c-code
 Changes to the c-code:
 \begin{lstlisting}
 #include ``WdgM_PbCfg.h''

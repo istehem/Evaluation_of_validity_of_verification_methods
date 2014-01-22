@@ -48,3 +48,15 @@ config(Cfg) ->
    },
 %  Names = [N || {container, N, _XmlRef, _Hash, _Type, _Params, _Children, _Na, _Cont} <- car_xml:remove_children(car_xml:get_containers_by_def("WdgMMode", Cfg))],
   #wdgm{wdgmgeneral=General, tst_cfg1=Test}.
+
+which_config() ->
+  case ?CONFIG of
+    ?BSI ->
+      bsi;
+    ?EXAMPLECONFIG ->
+      example;
+    ?EXAMPLE_ONLY_AS ->
+      example_as;
+    ?FREESCALE ->
+      freescale
+  end.
