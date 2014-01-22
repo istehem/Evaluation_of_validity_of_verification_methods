@@ -28,18 +28,17 @@ def status_names():
 
 def function_names():
     return {
-        Functions.GetMode: "GM",
-        Functions.SetMode: "SM",
-        Functions.MainFunction: "MF",
-        Functions.CheckpointReached: "CR",
-        Functions.PerformReset: "PR",
-        Functions.GetFirstExpiredSeid: "GFES",
-        Functions.Init: "I",
-        Functions.GetLocalStatus: "GLS",
-        Functions.GetGlobalStatus: "GGS",
-        Functions.DeInit: "DI"
+        Functions.GetMode: "getmode",
+        Functions.SetMode: "setmode",
+        Functions.MainFunction: "mainfunction",
+        Functions.CheckpointReached: "checkpointreached",
+        Functions.PerformReset: "performreset",
+        Functions.GetFirstExpiredSeid: "getfirstexpiredseid",
+        Functions.Init: "init",
+        Functions.GetLocalStatus: "getlocalstatus",
+        Functions.GetGlobalStatus: "getglobalstatus",
+        Functions.DeInit: "deinit"
     }
-
 
 def format_function(i):
      return function_names()[i]
