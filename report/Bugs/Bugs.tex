@@ -49,21 +49,8 @@
 
 \begin{document}
 
-\section{Bugfixes and changes to the C code}
-\begin{longtable}{l p{0.8\linewidth}}
-
-[WdgM.c:2045] & bugfix because [WDGM296]\\
-
-[WdgM.c:2056] & bugfix because [WDGM286]\\
-
-[WdgM\_Lcfg.c:223] & bugfix, added initialization to alive/deadline/logical supervision results to \verb!WDGM_CORRECT! (copied the if statement from row 199), because [p. 27]\\
-
-[WdgM.h:39] & WdgM\_PbCfg.h -> WdgM\_Pbcfg.h\\
-\end{longtable}
 
 \newpage
-\lstset{language=c}
-\lstset{language=autosar}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% WdgM.c:975-1016
@@ -71,6 +58,8 @@
 \section{WdgM.c:975-1016}
 \textbf{VIOLATIONS:} [WDGM077], [WDGM117], [WDGM215], [WDGM216], [WDGM219],
 [WDGM220]\\[0.5cm]
+
+\lstset{language=autosar}
 
 Problems in \lstinline!WdgM_MainFunction! when changing state to
 \lstinline!WDGM_GLOBAL_STATUS_EXPIRED! or
@@ -225,6 +214,57 @@ changed to:\\
 \begin{lstlisting}
   if (NULL_PTR != WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr &&
   WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[idx].supervision_status == WDGM_LOCAL_STATUS_DEACTIVATED)
+\end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% WdgM.c:1511  , 1689, 1692
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WdgM.c:1511}
+\textbf{VIOLATIONS:} [WDGM203], [WDGM204], [WDGM300], [WDGM205]\\[0.5cm]
+
+\lstset{language=autosar}
+
+\lstinline!WdgM_CalculateAliveSupervision!\\
+
+[]
+\begin{lstlisting}
+\end{lstlisting}~\\
+
+\lstset{language=c}
+
+Changes to the c-code: %% missing context
+\begin{lstlisting}
+  if (seid == WdgM_GetAliveSupEntityId(mode,id))
+  {
+    /* Increment the number of supervision cycles */
+    SchM_Enter_WdgM_EaSupervisionCycleProtect();
+    WdgM_MonitorTableRef.AliveSupervisionMonitorTablePtr[id].supervision_cycles++;
+    SchM_Exit_WdgM_EaSupervisionCycleProtect();
+
+    /*
+    * Monitor the checkpoint alive status of every supervision reference cycle
+    * of the respective checkpoint
+    */
+\end{lstlisting}
+==============================================================================\\
+changed to:\\
+==============================================================================
+\begin{lstlisting}
+  if (seid == WdgM_GetAliveSupEntityId(mode,id))
+  {
+    /* Increment the number of supervision cycles */
+    SchM_Enter_WdgM_EaSupervisionCycleProtect();
+    WdgM_MonitorTableRef.AliveSupervisionMonitorTablePtr[id].supervision_cycles++;
+    SchM_Exit_WdgM_EaSupervisionCycleProtect();
+
+    // bugfix: uppdatera failed reference cycle! borde inte ens göras i denna functionen. [WDGM203], [WDGM204], [WDGM300], [WDGM205]
+    localalivesupervisionsttaus = WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr[seid].alivesupervision_result; //
+    /*
+    * Monitor the checkpoint alive status of every supervision reference cycle
+    * of the respective checkpoint
+    */
 \end{lstlisting}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
@@ -549,10 +589,12 @@ if(WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr[graph_index].most_rece
 
 \lstset{language=autosar}
 
-\\
+\lstinline!WdgM_Init! doesn't reset activity flag for internal graphs\\
 
 [WDGM296]
 \begin{lstlisting}
+  WdgM_Init shall set the ``Activity Flag'' for each graph [logical supervision]
+  to false.
 \end{lstlisting}~\\
 
 \lstset{language=c}
@@ -570,6 +612,9 @@ Changes to the c-code:
       }
       else
 \end{lstlisting}
+==============================================================================\\
+changed to:\\
+==============================================================================
 \begin{lstlisting}
       /* Check if Logical supervised entities are configured */
       if (NULL_PTR != WdgM_MonitorTableRef.LogicalSupervisionMonitorTablePtr)
@@ -594,14 +639,17 @@ Changes to the c-code:
 %% WdgM.c:2120
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM.c:2120}
-\textbf{VIOLATIONS:} []\\[0.5cm]
+\textbf{VIOLATIONS:} [WDGM286]\\[0.5cm]
 
 \lstset{language=autosar}
 
-\\
+\lstinline!WdgM_DeInit! changes the global status to
+\lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED! even if the global status is not in
+\lstinline!WDGM_GLOBAL_STATUS_OK!\\
 
-[]
+[WDGM286]
 \begin{lstlisting}
+if WDGM_GLOBAL_STATUS_OK and WdgM_DeInit then WDGM_GLOBAL_STATUS_DEACTIVATED
 \end{lstlisting}~\\
 
 \lstset{language=c}
@@ -613,7 +661,9 @@ Changes to the c-code:
   /* PRQA S 3355 -- */
   {
 \end{lstlisting}
-changed to:
+==============================================================================\\
+changed to:\\
+==============================================================================
 \begin{lstlisting}
   // bugfix,updated to correct behaviour because [WDGM286]
   if (TRUE == retval && WdgM_GlobalStatus == WDGM_GLOBAL_STATUS_OK)
@@ -623,11 +673,64 @@ changed to:
 \end{lstlisting}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% WdgM.c:2092
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WdgM.c:2092}
+\textbf{VIOLATIONS:} [WDGM255]\\[0.5cm]
+
+\lstset{language=autosar}
+
+The function \verb!WdgM_Init! changes the global status if a null pointer is passed as an argument.\\
+
+[WDGM255]
+\begin{lstlisting}
+  If WdgMDevErrorDetect then WdgM_Init shall check if ConfigPtr [argument] ==
+  NULL
+  In case of error WdgM_Init shall not be executed.
+\end{lstlisting}~\\
+
+\lstset{language=c}
+
+Changes to the c-code:
+\begin{lstlisting}
+  else
+  {
+    WdgM_GlobalStatus = WDGM_GLOBAL_STATUS_DEACTIVATED;
+  }
+\end{lstlisting}
+==============================================================================\\
+changed to:\\
+==============================================================================
+\begin{lstlisting}
+  // bugfix, because [WDGM255]
+  //  else
+  //  {
+  //    WdgM_GlobalStatus = WDGM_GLOBAL_STATUS_DEACTIVATED;
+  //  }
+\end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% WdgM_Lcfg.c:223
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM\_Lcfg.c:223}
+\textbf{VIOLATIONS:} [p. 27]\\[0.5cm]
+
+\lstset{language=autosar}
+
+initialization to alive/deadline/logical supervision results to
+\verb!WDGM_CORRECT!\\
+
+[p. 27]
+\begin{lstlisting}
+At Watchdog Manager initialization, all the Results are set to correct.
+\end{lstlisting}~\\
+
+\lstset{language=c}
+
+Changes to the c-code:
 \begin{lstlisting}
   else
   {
@@ -635,7 +738,9 @@ changed to:
   }
   if (NULL_PTR != WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr)
 \end{lstlisting}
-changed to:
+==============================================================================\\
+changed to:\\
+==============================================================================
 \begin{lstlisting}
    else
    {
@@ -655,15 +760,26 @@ changed to:
     }
     if (NULL_PTR != WdgM_MonitorTableRef.SupervisedEntityMonitorTablePtr)
 \end{lstlisting}
-
-% \newpage
-% \section{WdgM.c}
-% \begin{lstlisting}
-% \end{lstlisting}
-% \begin{lstlisting}
-% \end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% WdgM_I.h:110
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WdgM\_I.h:110}
+\textbf{VIOLATIONS:} [Figure 4]\\[0.5cm]
+
+\lstset{language=autosar}
+
+At initialization, the global status should be
+\lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED! and not \lstinline!WDGM_GLOBAL_STATUS_OK!\\
+
+[Figure 4]
+Shows a picture of the state machine for the global status starting in \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!\\
+
+\lstset{language=c}
+
+Changes to the c-code:
 \begin{lstlisting}
 typedef enum WdgM_GlobalStaus_Tag
 {
@@ -674,7 +790,9 @@ typedef enum WdgM_GlobalStaus_Tag
    WDGM_GLOBAL_STATUS_STOPPED
 }WdgM_GlobalStatusType
 \end{lstlisting}
-changed to
+==============================================================================\\
+changed to:\\
+==============================================================================
 \begin{lstlisting}
 typedef enum WdgM_GlobalStaus_Tag
 {
@@ -685,5 +803,27 @@ typedef enum WdgM_GlobalStaus_Tag
    WDGM_GLOBAL_STATUS_STOPPED
 }WdgM_GlobalStatusType
 \end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% WdgM.h:39
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WdgM.h:39}
+\lstset{language=c}
+
+Changes to the c-code:
+\begin{lstlisting}
+#include ``WdgM_PbCfg.h''
+\end{lstlisting}
+==============================================================================\\
+changed to:\\
+==============================================================================
+\begin{lstlisting}
+#include ``WdgM_Pbcfg.h''
+\end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
 
 \end{document}
