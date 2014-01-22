@@ -12,7 +12,8 @@ def draw_plot():
     (data,gr_index) = get_data(status_names())
     ar = area.T(
             loc = (0,50),
-            x_axis = axis.X(label = "length of command sequences",format="/a-30{}%d"),
+            x_axis = axis.X(label = "length of command sequences",format="/a-30{}%d",
+              tic_interval=20),
             x_range = (0,gr_index),
             y_range = (0,100),
             y_axis = axis.Y(label = "Percentage in state",format="%s%%", tic_interval=10)#,
