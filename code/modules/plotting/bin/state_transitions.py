@@ -1,22 +1,22 @@
-from enums import *
-from pychart import *
+def parse_data():
+    f = open(raw_input(''),'r')
+    xs = f.readlines()
+    d = dict()
+    tot = 0
+    for row in xs:
+        ys = ''.join(filter(lambda x: "[] \n\'".find(x) == -1,row)).split(',')
+        ys = [] + filter(lambda x: x != '' and x != '\n',ys)
+        transes = zip(ys,ys[1:])
+        for trans in transes:
+            if not trans in d:
+                d[trans] = 1
+            else:
+                d[trans] = d[trans] + 1
+            tot = tot + 1
+    return (d,tot)
 
-theme.get_options()
-#theme.scale_factor = 1
-#theme.reinitialize()
-#chart_object.set_defaults(line_plot.T, line_style=line_style.T(cap_style=2,color=color.red))
-#chart_object.set_defaults(line_plot.T, line_style=None)
-
-locations = []
-
-def draw_plot():
-    ok = text_box.T(loc=(50,150),text="Ok")
-    ok_info = text_box.T(loc=(50,125),text="100%",line_style=None)
-    deactivated = text_box.T(loc=(50,100),text="Deactivated")
-    ok_info.draw()
-    deactivated.draw()
-    ok.add_arrow((50,110),arrow=arrow.a0)
-    ok.draw()
+def gen_tex_file():
+    print "nothing yet"
 
 if __name__ == "__main__":
-    draw_plot()
+    gen_tex_file()   
