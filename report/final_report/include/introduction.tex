@@ -19,10 +19,9 @@ computational power and less energy consumption
 (electronic computation units)
 \cite{Springer:advanced_microsystems}\cite{QUVIQ:COURSE} and to deal with
 (integrate?) the extra functionality, each ECU will \textit{(also?)} need to
-become more complex \cite{Springer:advanced_microsystems}. \textit{(F\"{o}rklara
-  mer ing{\aa}ende att ECU blir mer komplex pga man typ inte kan l\"{a}gga in
-  fler ECUs i bilar f\"{o}r d{\aa} \"{o}kar energianv\"{a}ndningen mer \"{a}n om
-  man fixar b\"{a}ttre ECUer \cite{Springer:advanced_microsystems}.)}
+become more complex \cite{Springer:advanced_microsystems}. This could be done
+with the use of multicore ECUs, which can provide more computational power in a
+more energy effective way \cite{Springer:advanced_microsystems}.
 
 \subsection{Extent of software in modern Vehicles}
 Developing a new car model costs up to one billion \euro
@@ -220,7 +219,7 @@ Since this version of AUTOSAR consists of around 80 specifications and other
 auxiliary materials\cite{AUTOSAR:URL}, we will limit our scope to one
 specification. The module of this thesis is the WatchdogManager. This
 module provides monitoring services used to maintain correctness. This
-module is chosen because it got dependencies, is used to report
+module is chosen because it got dependencies, and is used to report
 development and production errors, but mainly because it executes
 safety-critical work.
 
