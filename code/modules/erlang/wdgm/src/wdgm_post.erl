@@ -204,3 +204,13 @@ mainfunction_post(S, _Args, _Ret) ->
       end; %% [WDGM039]
     false -> Behaviour
   end.
+
+%%% -WdgM_GetVersionInfo--------------------------------------------------------
+
+getversioninfo_post(S, [Is_Null], {_Ret, Value}) ->
+  case Is_Null of
+    true  ->
+      S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect; %% [WDGM256]
+    false ->
+      Value == {'Std_VersionInfoType', 41, 13, 5, 1, 1} %% [WDGM110]
+  end.

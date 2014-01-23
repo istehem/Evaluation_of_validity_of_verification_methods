@@ -1,6 +1,9 @@
--define(CONFIG_FILE,list_to_atom(car_xml:name_of(
-                                hd(car_xml:get_containers_by_def
-                                   ("WdgMConfigSet", car_xml:file(wdgm_xml:config_file())))))).
+-define(CONFIG_FILE,
+        list_to_atom(
+          car_xml:name_of(
+            hd(car_xml:get_containers_by_def(
+                 "WdgMConfigSet",
+                 car_xml:file(wdgm_xml:config_file())))))).
 
 -record(wdgmgeneral,
         {defensive_behavior,

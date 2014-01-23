@@ -117,3 +117,7 @@ mainfunction_next(S, _Ret, _Args) ->
     true  -> wdgm_main:global_status(S);
     false -> S
   end.
+
+%%% -WdgM_GetVersionInfo--------------------------------------------------------
+getversioninfo_next(S, _Ret, _Args) ->
+  S.

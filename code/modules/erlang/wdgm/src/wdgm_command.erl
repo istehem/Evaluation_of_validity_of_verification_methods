@@ -103,3 +103,9 @@ getfirstexpiredseid_command(_S) ->
 
 mainfunction_command(_S) ->
   {call, ?WDGMSTATEM, mainfunction, []}.
+
+%%% -WdgM_GetVersionInfo--------------------------------------------------------
+
+getversioninfo_command(_S) ->
+  {call, ?WDGMSTATEM, getversioninfo, [frequency([{20, return(false)},
+                                                  {1, return(true)}])]}.

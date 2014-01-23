@@ -78,3 +78,8 @@ getfirstexpiredseid_pre(_S) ->
 mainfunction_pre(S) ->
   S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior orelse
     S#state.initialized. %% [WDGM039]
+
+%%% -WdgM_GetVersionInfo----------------------------------------------------------
+
+getversioninfo_pre(S) ->
+  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.version_info_api. %% [WDGM110]

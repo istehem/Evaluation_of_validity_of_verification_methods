@@ -29,7 +29,7 @@ valid(SD,S) ->
   end.
 %when S#state.globalstatus == 'WDGM_GLOBAL_STATUS_STOPPED' -> S.
 
-'WDGM_GLOBAL_STATUS_DEACTIVATED'(S) ->
+'WDGM_GLOBAL_STATUS_DEACTIVATED'(_S) ->
   [{'WDGM_GLOBAL_STATUS_OK',{call,?MODULE,wdgm_ok,[]}}].
 
 'WDGM_GLOBAL_STATUS_OK'(S) ->
@@ -72,15 +72,15 @@ initial_state_data() ->
 %%------------------------------------------------------------------------------
 %%------------------------------------------------------------------------------
 
-precondition(FS, _, S, {call, _M, F, A}) ->
+precondition(_FS, _, _S, {call, _M, _F, _A}) ->
   true.
   %apply(wdgm_pre, list_to_atom(atom_to_list(F)++"_pre"), [S]).
 
-postcondition(FS, _, S, {call, _M, F, A}, R) ->
+postcondition(_FS, _, _S, {call, _M, _F, _A}, _R) ->
   true.
   %    apply(wdgm_post, list_to_atom(atom_to_list(F)++"_post"), [S, A, R]).
 
-next_state_data(FS, _, S, R, {call, M, F, A}) ->
+next_state_data(_FS, _, S, _R, {call, _M, _F, _A}) ->
   S.
   %  apply(wdgm_next, list_to_atom(atom_to_list(F)++"_next"), [S,R] ++ A).
 

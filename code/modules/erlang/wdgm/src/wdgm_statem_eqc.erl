@@ -61,7 +61,9 @@ command(S) ->
              {weight(S, getfirstexpiredseid)
               , wdgm_command:getfirstexpiredseid_command(S)},
              {weight(S, mainfunction)
-              , wdgm_command:mainfunction_command(S)}]).
+              , wdgm_command:mainfunction_command(S)},
+             {weight(S, getversioninfo)
+              , wdgm_command:getversioninfo_command(S)}]).
 
 %%% -WdgM_Init------------------------------------------------------------------
 
@@ -152,6 +154,20 @@ getfirstexpiredseid(Is_Null) ->
 mainfunction() ->
   ?C_CODE:'WdgM_MainFunction'().
 
+%%% -WdgM_GetVersionInfo--------------------------------------------------------
+
+getversioninfo(Is_Null) ->
+  Sp =
+    case Is_Null of
+      true  -> {ptr, "Std_VersionInfoType", 0};
+      false -> eqc_c:alloc("Std_VersionInfoType")
+    end,
+  R = ?C_CODE:'WdgM_GetVersionInfo'(Sp),
+  case Is_Null of
+    true  -> {R, null};
+    false -> {R, eqc_c:deref(Sp)}
+  end.
+
 %%% -Frequency------------------------------------------------------------------
 
 weight(S, setmode) ->
@@ -184,6 +200,7 @@ weight(_S, getmode)                -> 2;
 weight(_S, getlocalstatus)         -> 2;
 weight(_S, getglobalstatus)        -> 2;
 weight(_S, performreset)           -> 2;
+weight(_S, getversioninfo)         -> 2;
 weight(_S, _Cmd)                   -> 1.
 
 %%% -Properties-----------------------------------------------------------------
