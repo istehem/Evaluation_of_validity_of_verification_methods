@@ -32,21 +32,18 @@ def gen_tex_file():
     (d,tot) = parse_data()
     t = gen_tuple(d,tot)
     st = '''
-    \\begin{table}
     \\begin{tabular}{r|ccccc}
-                    & DEACTIVATED & EXPIRED & FAILED & OK & STOPPED \\\\
+        (From,To)   & DEACTIVATED & EXPIRED & FAILED & OK & STOPPED \\\\
         \hline
         DEACTIVATED & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% \\\\
         EXPIRED     & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% \\\\
         FAILED      & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% \\\\
         OK          & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% \\\\
-        STOPPED     & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% 
+        STOPPED     & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%% & %5.2f\\%%
       \\end{tabular}
-    \\caption{Procentage of state transitions hit}
-    \\end{table} 
     ''' % t
     sys.stderr.write(st)
     print st
 
 if __name__ == "__main__":
-    gen_tex_file()   
+    gen_tex_file()

@@ -88,52 +88,146 @@ is written in Erlang and checked against API calls to the C-code. It is actually
 not necessary to have actual source code; it is enough to only have compiled library
 files.
 
-
 QuickCheck tests a program with specification implemented as properties that
 the program must hold \cite{QUICKCHECK:manual}. QuickCheck has guided random
 test generation, this means that the samples can be weighted to cover certain
 parts of the state-space with more likelihood.
 
-The commercial version Quickcheck consist of several Erlang modules. 
+\lstset{language=erlang}
+
+\subsubsection{Introductions to QuickCheck}
+When testing C code with QuickCheck one uses state based testing. Which means
+that a model state $S$ is passed around and checked against API calls according to
+figure \ref{FIG:API_CALLS}.
+
+\begin{figure}[!h]
+\label{FIG:API_CALLS}
+\caption{Shows state based testing against API and model state}
+\includegraphics{pictures/api_calls.jpg}
+\end{figure}
+
+A property in quickcheck is written in the following way.
+\lstset{language=erlang}
+\begin{lstlisting}
+prop() ->
+  ?FORALL(Cmds,commands(),
+          begin
+            ... = run_commands(Cmds)
+          end).
+
+command(S) ->
+      [{call, Mod, CFunction, arg_generator(S)},
+        ... ].
+\end{lstlisting}
+
+Every commands has, additional to the command definition,
+a precondition, postcondition and a next state function, see
+paragraph \ref{PAR:EQC_STATEM}.
+
+A property is then tested as:
+
+\begin{lstlisting}
+eqc:quickcheck(eqc:numtest(N,prop())).
+\end{lstlisting}
+
+Alternative the model states can be shown.
+
+\begin{lstlisting}
+eqc:quickcheck(eqc:numtest(N,eqc_statem:show_states(prop()))).
+\end{lstlisting}
 
 \subsubsection{Quickcheck Modules}
-The commercial version Quickcheck consist of several Erlang modules. 
-\lstset{language=erlang}
+The commercial version Quickcheck consist of several Erlang modules.
 %%eqc
 \paragraph{eqc}
-The module \emph{eqc} is the main Quickcheck module. 
+The module \emph{eqc} is the main Quickcheck module. This module defines a lot
+of macros that can be used when writing properties and also the basic function
+like \emph{quickcheck}.
 \begin{lstlisting}
     Some Erlang code
 \end{lstlisting}
 
-\paragraph{eqc\_gen} Used for generation of test cases. 
+\paragraph{eqc\_gen} Used for generation of test cases.
 \begin{lstlisting}
     Some Erlang code
 \end{lstlisting}
 
 %%% eqc_c
-\paragraph{eqc\_c} Contains the C-testing interface. 
+\paragraph{eqc\_c} Contains the C-testing interface. In other words how to
+communicate with C-code.
+
 \begin{lstlisting}
-    Some Erlang code
+  eqc_c:start(suit,[{c_src,"suit_api.h"},{additional_files,["myprog.o"]}])
 \end{lstlisting}
-%
+The code above starts the C-program \emph{myprog.o} and a Erlang module
+\emph{suit}, the name of the first parameter, is created. This module can now be
+used within Erlang to get information about the C-program. For example the
+following function, that counts the number of spaces in a string, might be
+declared in \emph{suit\_api.h} and defined in the \emph{myprog.o}.
+\lstset{language=C}
+\begin{lstlisting}
+extern int spaces(char *str)
+\end{lstlisting}
+Then we can make the following call in the Erlang:
+\lstset{language=Erlang}
+\begin{lstlisting}
+suit:spaces("this is a string")
+\end{lstlisting}
+If the function \emph{spaces} is defined correctly the output will be 3.
 %%% eqc_statem
 \paragraph{eqc\_statem}
-Offers state based testing.
+\label{PAR:EQC_STATEM}
+Offers state based testing. A command has a definition, precondition,
+postcondition, and a next function. If we wanted to test \emph{spaces} function
+one may have written.
 \begin{lstlisting}
-    Some Erlang code
+
+%Defines the initial model state
+initial_state() ->
+  [].
+
+%Takes the model state as a parameter
+%Defines what we want to test
+spaces_command(_S) ->
+  % Generates an integer, binds it to Pat and returns a list with length pat
+  % with elements of type char
+  Xs = ?LET(int(),Pat,eqc_gen:vector(Pat,char()))
+  suit:spaces(Xs).
+
+%Takes the model state as a parameter
+%The spaces function has no pre conditions
+spaces_pre(_S) ->
+  true.
+
+%Pramaters: S = ModelState, Args = arguments to the command
+%Defines what should hold after the command
+spaces_post(_S,Args=[Arg],Ret) ->
+  length(lists:filter(fun(X) -> X == 32 end,Arg)) == Ret.
+
+%Parameters: S    = model sate before the call,
+%            Ret  = return value from command,
+%            Args = argements to command
+%Return the new model sate after the command is called
+spaces_next(S,_Ret,_Args) ->
+  S.
 \end{lstlisting}
+
+Noticeable is that only the post function may depend on the C-code. QuickCheck
+has a generation step where tests are generated according to the precondition
+and the model state. The C-code is run first after the generation step and can
+only be used to check post conditions. This is actually what one want because it
+seems pointless to test a program according to how the same program is executed.
 
 %car_xml
 \paragraph{car\_xml}
 Additional to the commercial version is \emph{car} module. This module is
-specifically created to parse AUTOSAR configuration files.   
+specifically created to parse AUTOSAR configuration files.
 \begin{lstlisting}
     Some Erlang code
 \end{lstlisting}
 
 \paragraph{Other modules}
-There are also other modules 
+There are also other modules
 
 %% Erlang är inget verktyg per se. vi borde skriva om det, men passar det in
 %% här?

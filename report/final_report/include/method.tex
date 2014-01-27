@@ -61,18 +61,18 @@ The C-code that was to be tested, using Quickcheck, was already unit tested and
 run sharp in lab environments at Mecel.
 
 The behavior of the WdgM module was completely implemented in Erlang independent of
-the design choose in the C-code. The idea was to not get inspired by methods used 
+the design choose in the C-code. The idea was to not get inspired by methods used
 in the C-code and possibly, if the C-code contained errors, end up with the same
-faults.   
+faults.
 
-The implementation of the module was done to be able to test API calls, 
+The implementation of the module was done to be able to test API calls,
 as described in theory, against the C-code and check that postconditions
-held, according to figure \ref{FIG:api_calls}. The postconditions were written 
+held, according to figure \ref{FIG:api_calls}. The postconditions were written
 to test that AUTOSAR requirements held. In other words that the API calls were
 called correctly. A problem when writing the postconditions, because AUTOSAR
 specification are written in natural language, was to translate words into code.
 It was easy to see that there were room for different interpretations, which most
-likely would result in errors later.  
+likely would result in errors later.
 
 The implementation of the AUTOSAR module in Erlang was done
 in an iterative way. Every piece of code were not required to be implemented before
@@ -179,6 +179,18 @@ errors what does that say about the robustness of the input byte code? Passed
 100 of 100 tests is just a statement and does not say anything more than that
 some tests passed. Can tests be implemented in a clever way so that it is
 possible to get some kind of confidence interval on the correctness of the code?
+
+\section{Configurations}
+When the code coverage was calculated it was recognized that every piece of code
+wasn't executed. The reason seemed to be that the current configuration
+disallowed, even though the program behaved correctly, the execution of those
+lines of code. Because of that the implementation of the Erlang module was done
+independent of configuration it was easy to to run tests on several
+configuration which resulted in that everything was executed.
+
+The tweaking of generators, to achieve better test cases, seemed in some sense to be
+configuration dependent. Better test cases were generated if the generators were
+tweaked according to a specific configuration, see results.
 
 \begin{figure}[!ht]
 \input{pictures/box.tex}
