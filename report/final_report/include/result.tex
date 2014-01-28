@@ -12,20 +12,20 @@
 
 \section{Plots}
 
-\subsection{bsi}
+\subsection{BSI}
 \begin{figure}[h!]
+\label{FIG:BSI}
+\caption{BSI configuration}
+\begin{center}
+\subfigure[Shows percentage of each possible command executed]{
 \label{FIG:COMMANDS_BSI}
-\caption{bsi configuration}
-\begin{center}
 \includegraphics{generated_pictures/history_commands_bsi.pdf}
-\end{center}
-\end{figure}
+}
 
-\begin{figure}[h!]
+\subfigure[Shows percentage of each possible global status hit]{
 \label{FIG:STATUSES_BSI}
-\caption{bsi configuration}
-\begin{center}
 \includegraphics{generated_pictures/history_statuses_bsi.pdf}
+}
 \end{center}
 \end{figure}
 
@@ -38,18 +38,18 @@
 \subsection{freescale}
 
 \begin{figure}[h!]
-\label{FIG:COMMANDS_FREESCALE}
-\caption{freescale configuration}
+\label{FIG:FREESCALE}
+\caption{Freescale configuration}
 \begin{center}
-\includegraphics{generated_pictures/history_commands_freescale.pdf}
-\end{center}
-\end{figure}
 
-\begin{figure}[h!]
+\subfigure[Shows percentage of each possible command executed]{
+\includegraphics{generated_pictures/history_commands_freescale.pdf}
+\label{FIG:COMMANDS_FREESCALE}
+}
+\subfigure[Shows percentage of each possible global status hit]{
 \label{FIG:STATUSES_FREESCALE}
-\caption{freescale configuration}
-\begin{center}
 \includegraphics{generated_pictures/history_statuses_freescale.pdf}
+}
 \end{center}
 \end{figure}
 
@@ -62,18 +62,20 @@
 \subsection{example}
 
 \begin{figure}[h!]
-\label{FIG:COMMANDS_EXAMPLE}
-\caption{example configuration}
+\caption{Example configuration}
+\label{FIG:EXAMPLE}
 \begin{center}
-\includegraphics{generated_pictures/history_commands_example.pdf}
-\end{center}
-\end{figure}
 
-\begin{figure}[h!]
+\subfigure[Shows percentage of each possible command executed]{
+\label{FIG:COMMANDS_EXAMPLE}
+\includegraphics{generated_pictures/history_commands_example.pdf}
+}
+
+\subfigure[Shows percentage of each possible global status hit]{
 \label{FIG:STATUSES_EXAMPLE}
-\caption{example configuration}
-\begin{center}
 \includegraphics{generated_pictures/history_statuses_example.pdf}
+}
+
 \end{center}
 \end{figure}
 

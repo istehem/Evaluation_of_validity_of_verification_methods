@@ -182,21 +182,26 @@ postcondition, and a next function. If we wanted to test \emph{spaces} function
 one may have written.
 \begin{lstlisting}
 
-%Defines the initial model state
+% Defines the initial model state
 initial_state() ->
   [].
 
-%Takes the model state as a parameter
-%Defines what we want to test
-spaces_command(_S) ->
-  % Generates an integer, binds it to Pat and returns a list with length pat
-  % with elements of type char
-  Xs = ?LET(int(),Pat,eqc_gen:vector(Pat,char()))
-  suit:spaces(Xs).
+% Takes the model state as a parameter
+% Returns a tuple of the format
+%   {call,Module,Function_to_call,Arguments_to_function}
+spaces_command(_State) ->
+  % Generates a natural number, binds it to Pat and generates a
+  % list with length Pat with elements of type char
+  Xs = ?LET(Pat,nat(),vector(Pat,char())),
+  {call,?MODULE,spaces,[Xs]}.
+
+% The actual call to the C-code
+spaces(Xs) ->
+  suite:spaces(eqc_c:create_string(Xs)).
 
 %Takes the model state as a parameter
 %The spaces function has no pre conditions
-spaces_pre(_S) ->
+spaces_pre(_State) ->
   true.
 
 %Pramaters: S = ModelState, Args = arguments to the command
@@ -218,16 +223,22 @@ and the model state. The C-code is run first after the generation step and can
 only be used to check post conditions. This is actually what one want because it
 seems pointless to test a program according to how the same program is executed.
 
+The example above is actually not state dependent since \emph{spaces} only
+depend on the argument string. However one can imagine the same function being
+dependent on some global variable and according to that variable change its output.
 %car_xml
 \paragraph{car\_xml}
 Additional to the commercial version is \emph{car} module. This module is
-specifically created to parse AUTOSAR configuration files.
+specifically created to parse AUTOSAR XML configuration files.
 \begin{lstlisting}
     Some Erlang code
 \end{lstlisting}
 
 \paragraph{Other modules}
-There are also other modules
+There are also other modules; for instance a module for mocking C-code. Or in
+other words, if one has a C-function that is declared but the
+definition is missing, one can simulate its output. This is
+however not used in this thesis.
 
 %% Erlang är inget verktyg per se. vi borde skriva om det, men passar det in
 %% här?
