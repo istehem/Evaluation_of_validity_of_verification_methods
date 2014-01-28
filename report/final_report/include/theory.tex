@@ -141,16 +141,33 @@ The commercial version Quickcheck consist of several Erlang modules.
 %%eqc
 \paragraph{eqc}
 The module \emph{eqc} is the main Quickcheck module. This module defines a lot
-of macros that can be used when writing properties and also the basic function
+of macros that can be used when writing properties and also basic functions
 like \emph{quickcheck}.
 \begin{lstlisting}
     Some Erlang code
 \end{lstlisting}
 
-\paragraph{eqc\_gen} Used for generation of test cases.
+\paragraph{eqc\_gen} Used for generation of test cases. The module contains various functions
+and macros for this purpose. There are some predefined generators for instance
+for integers and characters etcetera, but it is quite easy to construct a
+generator for almost any data type. Just to get the idea follows code for
+a string generator.
 \begin{lstlisting}
-    Some Erlang code
+    ?LET(Pat,nat(),vector(Pat,char()))
 \end{lstlisting}
+The macro \emph{?LET} binds the second generators arguments to Pat which can be
+used in the third argument. The above code binds a natural number to \emph{Pat}
+and creates a vector with length \emph{Pat} of characters.
+
+A generator can also be weighted, or in other words certain values can be more
+likely to be generated then others.
+
+\begin{lstlisting}
+?LET(Pat,nat(),vector(Pat,frequency([{1, choose(0,127)}, {3, 32}])))
+\end{lstlisting}
+The code above will also generate a string of length \emph{Pat} but the
+generation of the white space character will be 3 times more likely to happen
+than then a uniformly random character.
 
 %%% eqc_c
 \paragraph{eqc\_c} Contains the C-testing interface. In other words how to
