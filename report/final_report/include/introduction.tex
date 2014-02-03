@@ -65,17 +65,32 @@ development should be carried out from beginning to end \cite{ISO26262}.
  Nyskriven text under, hitta referencer och kontrollera!
 ==============================================================================
 \end{comment}
-This standard is built on top of another industrial standard IEC 61508 named
-``XXX'' which purpose was to ensure functional safety in industries. Hazards in
-the industry is given certain safety integrity levels called SILs, depending on
-how dangerous, what consequences and how probable they are. There are four
-different SILs ranged from 1-4, where 4 is the most dangerous classification. To
-ensure safety, SILs with classification 4 are tested and documented the most.
-An example for hazards with SIL 4 is a nuclear power plant XXX. This has
-classification 4 because it would mean considerable damage to a whole society.
-Because of these damages is not probable to happened in the automotive industry,
-SIL 1-4 are replaced with ASIL A-D, automotive safety integrity levels.
-The highest ASIL, D, corresponds with SIL 3.
+This standard is built on top of another industrial standard IEC 61508
+\cite{ISO26262}, named ``Functional safety of electrical/electronic/programmable
+electronic safety-related systems'' \cite{IEC61508}, which purpose is to ensure
+functional safety in computer based system's overall life cycles
+\cite{IEC61508}. IEC 61508 introduces four safety integrity levels called SIL,
+which each has a specified target failure measure \cite{Advances:IEC61508}.
+A SIL is a level of measure of the reliability of a safety function \cite{Advances:SIL4}.
+The targeted SIL of the safety function that is going to be implemented has a
+determined number of measurements needed to be taken to achieve the
+classification \cite{Advances:IEC61508}.
+The failure of a safety function can lead to a hazardous event, so the required
+safety integrity of a specific safety function must be of such a level to ensure
+that the failure frequency is sufficiently low or that the consequences of the
+hazardous event are modified to meet a tolerable risk
+\cite{Advances:IEC61508}\cite{Advances:SIL4}. There are four different SILs
+ranged from 1-4, where 4 is the highest classification
+\cite{IEC61508}\cite{Advances:IEC61508}. To ensure safety, functions with SIL 4
+need to be tested, and documented the most \cite{IEC61508}.
+
+An example of industries that need to have SIL 4 is nuclear power plants. These
+have classification 4 because it would mean considerable damage to a whole
+society if a computer that monitors safe reactor operations fail \cite{}.
+
+Because of such serious hazards are not probable to happened in the automotive
+industry, SIL 1-4 are substituted with ASIL A-D, automotive safety integrity
+levels, but there are no direct correlation between the two \cite{TI:safety_critical}.
 \begin{comment}
 ==============================================================================
 SLUT NYSKRIVEN TEXT!
