@@ -16,6 +16,7 @@ class Functions:
      GetLocalStatus = 8
      GetGlobalStatus = 9
      DeInit = 10
+     GetVersionInfo = 11
 
 def status_names():
     return {
@@ -37,7 +38,8 @@ def function_names():
         Functions.Init: "init",
         Functions.GetLocalStatus: "getlocalstatus",
         Functions.GetGlobalStatus: "getglobalstatus",
-        Functions.DeInit: "deinit"
+        Functions.DeInit: "deinit",
+        Functions.GetVersionInfo: "getversioninfo"
     }
 
 def format_function(i):

@@ -96,6 +96,7 @@ parts of the state-space with more likelihood.
 \lstset{style=erlang}
 
 \subsubsection{Introductions to QuickCheck}
+\label{SEC:QuickCheckIntro}
 Lets say that one created a \emph{sort} function that takes a list $Xs$ of any
 sortable items and returns the sorted version $Ys$ of $Xs$. Then one can specify
 certain properties that must hold for to the sort function. For instance:
@@ -170,19 +171,16 @@ The commercial version Quickcheck consist of several Erlang modules.
 The module \emph{eqc} is the main Quickcheck module. This module defines a lot
 of macros that can be used when writing properties and also basic functions
 like \emph{quickcheck}.
-\begin{lstlisting}
-    Some Erlang code
-\end{lstlisting}
 
-\paragraph{eqc\_gen} Used for generation of test cases. The module contains various functions
-and macros for this purpose. There are some predefined generators for instance
-for integers and characters etcetera, but it is quite easy to construct a
-generator for almost any data type. Just to get the idea follows code for
-a string generator.
+\paragraph{eqc\_gen} The module is used for generation of test cases. The module
+contains various functions and macros for this purpose. There are some
+predefined generators for instance for integers and characters etcetera, but it
+is quite easy to construct a generator for almost any data type. Just to get the
+idea follows code for a string generator.
 \begin{lstlisting}
     ?LET(Pat,nat(),vector(Pat,char()))
 \end{lstlisting}
-The macro \emph{?LET} binds the second generators arguments to Pat which can be
+The macro \emph{?LET} binds the second generators arguments to \emph{Pat} which can be
 used in the third argument. The above code binds a natural number to \emph{Pat}
 and creates a vector with length \emph{Pat} of characters.
 
