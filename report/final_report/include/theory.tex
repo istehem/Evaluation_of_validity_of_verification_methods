@@ -93,7 +93,7 @@ the program must hold \cite{QUICKCHECK:manual}. QuickCheck has guided random
 test generation, this means that the samples can be weighted to cover certain
 parts of the state-space with more likelihood.
 
-\lstset{language=erlang}
+\lstset{style=erlang}
 
 \subsubsection{Introductions to QuickCheck}
 \label{SEC:QuickCheckIntro}
@@ -135,7 +135,7 @@ figure \ref{FIG:API_CALLS}.
 \end{figure}
 
 A property in quickcheck is written in the following way.
-\lstset{language=erlang}
+\lstset{style=erlang}
 \begin{lstlisting}
 prop() ->
   ?FORALL(Cmds,commands(),
@@ -155,13 +155,13 @@ paragraph \ref{PAR:EQC_STATEM}.
 A property is then tested as:
 
 \begin{lstlisting}
-eqc:quickcheck(eqc:numtest(N,prop())).
+eqc:quickcheck(eqc:numtests(N, prop())).
 \end{lstlisting}
 
 Alternative the model states can be shown.
 
 \begin{lstlisting}
-eqc:quickcheck(eqc:numtest(N,eqc_statem:show_states(prop()))).
+eqc:quickcheck(eqc:numtests(N, eqc_statem:show_states(prop()))).
 \end{lstlisting}
 
 \subsubsection{Quickcheck Modules}
@@ -206,12 +206,12 @@ The code above starts the C-program \emph{myprog.o} and a Erlang module
 used within Erlang to get information about the C-program. For example the
 following function, that counts the number of spaces in a string, might be
 declared in \emph{suit\_api.h} and defined in the \emph{myprog.o}.
-\lstset{language=C}
+\lstset{style=c}
 \begin{lstlisting}
 extern int spaces(char *str)
 \end{lstlisting}
 Then we can make the following call in the Erlang:
-\lstset{language=Erlang}
+\lstset{style=erlang}
 \begin{lstlisting}
 suit:spaces("this is a string")
 \end{lstlisting}

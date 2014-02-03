@@ -1,9 +1,9 @@
-In the first sections of this chapter we outline the background, purpose and
-objectives and the last section describes the scope of our research. Chapter 2
-contains the theory needed for understanding the thesis, existing software and
-some verification methods described in the standards. Methods is described in
-Chapter 3 and the results in Chapter 4. In Chapter 5 and 6 we have a discussion
-and some conclusions about the results.
+% In the first sections of this chapter we outline the background, purpose and
+% objectives and the last section describes the scope of our research. Chapter 2
+% contains the theory needed for understanding the thesis, existing software and
+% some verification methods described in the standards. Methods is described in
+% Chapter 3 and the results in Chapter 4. In Chapter 5 and 6 we have a discussion
+% and some conclusions about the results.
 
 %Background to the assignment. Why is it relevant?
 \section{Background}
@@ -19,9 +19,9 @@ computational power and less energy consumption
 (electronic computation units)
 \cite{Springer:advanced_microsystems}\cite{QUVIQ:COURSE} and to deal with
 the extra functionality, each ECU will need to
-become more complex \cite{Springer:advanced_microsystems}. This could be done
-with the use of multicore ECUs, which can provide more computational power in a
-more energy effective way \cite{Springer:advanced_microsystems}.
+become more complex \cite{Springer:advanced_microsystems}.%  This could be done
+% with the use of multicore ECUs, which can provide more computational power in a
+% more energy effective way \cite{Springer:advanced_microsystems}.
 
 \subsection{Extent of software in modern Vehicles}
 Developing a new car model costs up to one billion \euro
@@ -51,7 +51,7 @@ million lines of code \cite{IEEESpectrum:car_code}.
 Because of the high development costs, and the complexity of modern cars, car
 manufacturers, suppliers and other companies related to the automotive industry
 joined efforts in 2003 and created AUTOSAR, short for Automotive open system
-architecture \cite{AUTOSAR:basic_info}. The main id\'{e} is to make it possible
+architecture \cite{AUTOSAR:basic_info}. The main purpose is to make it possible
 for car manufacturers to buy independent components from different software
 suppliers; the AUTOSAR motto is ``Cooperate on standards, compete on
 implementation'' \cite{AUTOSAR:basic_info}.
@@ -60,6 +60,27 @@ Functional safety was introduced to the automotive industry with ISO 26262 in
 late 2011 \cite{ISO26262}. ISO 26262 named ``Road vehicles -- Functional safety''
 is a general standard on how the implementation of functional safety in vehicle
 development should be carried out from beginning to end \cite{ISO26262}.
+\begin{comment}
+==============================================================================
+ Nyskriven text under, hitta referencer och kontrollera!
+==============================================================================
+\end{comment}
+This standard is built on top of another industrial standard IEC 61508 named
+``XXX'' which purpose was to ensure functional safety in industries. Hazards in
+the industry is given certain safety integrity levels called SILs, depending on
+how dangerous, what consequences and how probable they are. There are four
+different SILs ranged from 1-4, where 4 is the most dangerous classification. To
+ensure safety, SILs with classification 4 are tested and documented the most.
+An example for hazards with SIL 4 is a nuclear power plant XXX. This has
+classification 4 because it would mean considerable damage to a whole society.
+Because of these damages is not probable to happened in the automotive industry,
+SIL 1-4 are replaced with ASIL A-D, automotive safety integrity levels.
+The highest ASIL, D, corresponds with SIL 3.
+\begin{comment}
+==============================================================================
+SLUT NYSKRIVEN TEXT!
+==============================================================================
+\end{comment}
 
 \subsection{Testing}
 Functional safety demands testing \cite{ISO26262}, and testing accounts for
