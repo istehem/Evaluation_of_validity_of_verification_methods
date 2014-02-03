@@ -10,7 +10,8 @@ colors = [line_style.black,
             line_style.T(color = color.khaki),
             line_style.T(color = color.rosybrown),
             line_style.T(color = color.tan),
-            line_style.T(color = color.hotpink)
+            line_style.T(color = color.hotpink),
+            line_style.T(color = color.orange2)
             ]
 
 def get_data(item_names):
