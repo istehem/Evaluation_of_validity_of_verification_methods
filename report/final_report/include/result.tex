@@ -1,5 +1,24 @@
 
 \section{State Machine}
+The watchdog manager has a state machine \ref{FIG:GLOBALSTATUSES},
+which which transitions depend on the on global variables, changes of global
+variables, and the current state. If the behavior of the watchdog manager is
+correct and the manager is actually running, or in other words not deactivated,
+it stays in 'WDGM\_GLOBAL\_STATUS\_OK'. There are however lots of reasons for
+that the status will change from the correct state. It depends on arguments to
+the API calls but also in which order commands are called. Also the supplied
+AUTOASAR configuration is relevant, because it specifies tolerances of faulty
+behavior, it may indirect disable some states and state transition or make some
+transition more likely to happen. The indirect affect can for instance come from
+the number of checkpoints supplied in the configuration. A correct behavior of
+the watchdog manager depends on that checkpoints are reached and does so in the
+right order.
+
+The only function that can change the global status is the mainfunction. The
+main function is continuously called in a given time interval, note that the
+timing is not used when using quickcheck \ref{SEC:CALLING_COMMANDS}, schedule be
+the run time environment (RTE).
+
 \begin{figure}[h!]
 \label{FIG:GLOBALSTATUSES}
 \caption{State diagram that shows possible trasitions between states}
@@ -87,5 +106,9 @@
 
 \section{Handle bugs in the C code}
 \label{sec:handlebugs}
+
+\section{Functional safety analysis}
+\subsection{Definition of time}
+\label{SEC:FUNCTIONAL_SAFETY_TIME}
 
 \section{Statistics}

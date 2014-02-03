@@ -96,32 +96,33 @@ parts of the state-space with more likelihood.
 \lstset{language=erlang}
 
 \subsubsection{Introductions to QuickCheck}
+\label{SEC:QuickCheckIntro}
 Lets say that one created a \emph{sort} function that takes a list $Xs$ of any
 sortable items and returns the sorted version $Ys$ of $Xs$. Then one can specify
 certain properties that must hold for to the sort function. For instance:
 
-The arity of $Y$ must be the same. 
+The arity of $Y$ must be the same.
 \begin{equation}
-        |Xs| = |Ys| 
+        |Xs| = |Ys|
 \end{equation}
 
 The elements of $Ys$ must actually be sorted.
 \begin{equation}
-    y_{i-1} \leq y_i, \forall y_i \in Ys, i \neq 0 
+    y_{i-1} \leq y_i, \forall y_i \in Ys, i \neq 0
 \end{equation}
 
-For all permutations $Pe(Xs)$ holds:  
+For all permutations $Pe(Xs)$ holds:
 \begin{equation}
-sort(Zs) = Ys, \forall Zs \in Pe(Xs) 
+sort(Zs) = Ys, \forall Zs \in Pe(Xs)
 \end{equation}
 
 The sets $Xs$ and $Ys$ contains the same elements.
 \begin{equation}
-        x \in Xs \leftrightarrow x \in Ys 
+        x \in Xs \leftrightarrow x \in Ys
 \end{equation}
 Instead of specifying own test cases Quickcheck makes it possible to write such
 properties, automatically generates test cases and checks that the properties
-specified actually holds. 
+specified actually holds.
 
 When testing C code with QuickCheck one uses state based testing. Which means
 that a model state $S$ is passed around and checked against API calls according to
@@ -170,19 +171,16 @@ The commercial version Quickcheck consist of several Erlang modules.
 The module \emph{eqc} is the main Quickcheck module. This module defines a lot
 of macros that can be used when writing properties and also basic functions
 like \emph{quickcheck}.
-\begin{lstlisting}
-    Some Erlang code
-\end{lstlisting}
 
-\paragraph{eqc\_gen} Used for generation of test cases. The module contains various functions
-and macros for this purpose. There are some predefined generators for instance
-for integers and characters etcetera, but it is quite easy to construct a
-generator for almost any data type. Just to get the idea follows code for
-a string generator.
+\paragraph{eqc\_gen} The module is used for generation of test cases. The module
+contains various functions and macros for this purpose. There are some
+predefined generators for instance for integers and characters etcetera, but it
+is quite easy to construct a generator for almost any data type. Just to get the
+idea follows code for a string generator.
 \begin{lstlisting}
     ?LET(Pat,nat(),vector(Pat,char()))
 \end{lstlisting}
-The macro \emph{?LET} binds the second generators arguments to Pat which can be
+The macro \emph{?LET} binds the second generators arguments to \emph{Pat} which can be
 used in the third argument. The above code binds a natural number to \emph{Pat}
 and creates a vector with length \emph{Pat} of characters.
 
