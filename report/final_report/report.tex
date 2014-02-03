@@ -25,7 +25,76 @@
       \vfill
 }}}
 
-\def\keywords#1{\begin{center}{\bf Keywords}\\{#1}\end{center}} %
+\def\keywords#1{\begin{center}{\bf Keywords}\\{#1}\end{center}}
+
+\lstdefinestyle{erlang}{
+   language        = erlang,
+   showstringspaces= false,
+   breaklines      = true,
+   keywordstyle    = {\bfseries},
+   keywordstyle    = [2]{\color{green}},
+   keywordstyle    = [3]{\color{red}},
+   alsoletter      = {?, :},
+   morekeywords    = {
+     fun,
+     begin},
+   morekeywords    = [2]{
+     ?FORALL,
+     ?LET},
+   morekeywords    = [3]{
+     eqc:numtests,
+     eqc:quickcheck,
+     eqc_c:start,
+     eqc\_statem:show\_states,
+     car,
+     car\_xml}
+}
+\lstdefinestyle{c}{
+  language        = c,
+  commentstyle    = \color{purple},
+  keywordstyle    = \color{violet},
+  showstringspaces= false
+}
+\lstdefinestyle{autosar}{
+  breaklines      = false,
+  frame           = l,
+  showstringspaces= false,
+  string          = [s]{``}{''},
+  morestring      = [b]",
+  basicstyle      = \color{red},
+  keywordstyle    = \color{blue},
+  commentstyle    = \color{green},
+  stringstyle     = \color{green},
+  moredelim       = [is][\color{cyan}]{|}{|},
+  literate        = {<=}{{$\leq$}}{1} %% observe no comma
+                    {>=}{{$\geq$}}{1},
+  identifierstyle = \color{black},
+  emph            = {
+    WdgMExpiredSupervisionCycleTol,
+    WdgM_MainFunction,
+    WdgM_SetMode,
+    WdgM_Init,
+    WdgM_DeInit,
+    WdgM_CheckpointReached,
+    WdgM_CalculateAliveSupervision,
+    WdgM_CheckLogicalSupervisedEntities
+  },
+  emphstyle       = {\color{cyan}},
+  morekeywords    = {
+    WDGM\_CORRECT,
+    WDGM\_INCORRECT,
+    WDGM\_GLOBAL\_STATUS\_OK,
+    WDGM\_GLOBAL\_STATUS\_FAILED,
+    WDGM\_GLOBAL\_STATUS\_EXPIRED,
+    WDGM\_GLOBAL\_STATUS\_STOPPED,
+    WDGM\_GLOBAL\_STATUS\_DEACTIVATED,
+    WDGM\_LOCAL\_STATUS\_OK,
+    WDGM\_LOCAL\_STATUS\_FAILED,
+    WDGM\_LOCAL\_STATUS\_EXPIRED,
+    WDGM\_LOCAL\_STATUS\_DEACTIVATED
+  }
+}
+
 
 \begin{document}
 \pagenumbering{Alph}
