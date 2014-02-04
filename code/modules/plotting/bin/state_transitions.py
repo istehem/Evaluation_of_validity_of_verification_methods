@@ -33,7 +33,8 @@ def gen_tex_file():
     t = gen_tuple(d,tot)
     st = '''
     \\begin{tabular}{r|ccccc}
-        (From,To)   & DEACTIVATED & EXPIRED & FAILED & OK & STOPPED \\\\
+        \\backslashbox{From}{To}
+                    & DEACTIVATED & EXPIRED & FAILED & OK & STOPPED \\\\
         \hline
         DEACTIVATED & \\bf{%05.2f}\\%% & %05.2f\\%%       & %05.2f\\%%       & \\bf{%05.2f}\\%% & %05.2f\\%% \\\\
         EXPIRED     & %05.2f\\%%       & \\bf{%05.2f}\\%% & %05.2f\\%%       & %05.2f\\%%       & \\bf{%05.2f}\\%% \\\\
