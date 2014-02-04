@@ -77,12 +77,12 @@ implementation of verification and testing.
 \end{itemize}
 
 \subsection{QuickCheck}
-Quickcheck was invented be Koen Claessen and John Hughes, as a testing module
+QuickCheck was invented be Koen Claessen and John Hughes, as a testing module
 for Haskell, in 2000.
 In 2006 John Hughes founded the Company Quviq together with
-Thomas Arts. Quviq offers a commercial version of Quickcheck for Erlang.
+Thomas Arts. Quviq offers a commercial version of QuickCheck for Erlang.
 The main difference, except from the programming paradigms, is that
-the commercial version of Quickcheck has a C-testing interface. Hence it
+the commercial version of QuickCheck has a C-testing interface. Hence it
 possible to test C-code in Erlang with help of QuickCheck. All code for tests
 is written in Erlang and checked against API calls to the C-code. It is actually
 not necessary to have actual source code; it is enough to only have compiled library
@@ -101,26 +101,26 @@ Lets say that one created a \emph{sort} function that takes a list $Xs$ of any
 sortable items and returns the sorted version $Ys$ of $Xs$. Then one can specify
 certain properties that must hold for to the sort function. For instance:
 
-The arity of $Y$ must be the same.
+\noindent The arity of $Y$ must be the same.
 \begin{equation}
         |Xs| = |Ys|
 \end{equation}
 
-The elements of $Ys$ must actually be sorted.
+\noindent The elements of $Ys$ must actually be sorted.
 \begin{equation}
     y_{i-1} \leq y_i, \forall y_i \in Ys, i \neq 0
 \end{equation}
 
-For all permutations $Pe(Xs)$ holds:
+\noindent For all permutations $Pe(Xs)$ holds:
 \begin{equation}
 sort(Zs) = Ys, \forall Zs \in Pe(Xs)
 \end{equation}
 
-The sets $Xs$ and $Ys$ contains the same elements.
+\noindent The sets $Xs$ and $Ys$ contains the same elements.
 \begin{equation}
         x \in Xs \leftrightarrow x \in Ys
 \end{equation}
-Instead of specifying own test cases Quickcheck makes it possible to write such
+Instead of specifying own test cases QuickCheck makes it possible to write such
 properties, automatically generates test cases and checks that the properties
 specified actually holds.
 
@@ -129,16 +129,16 @@ that a model state $S$ is passed around and checked against API calls according 
 figure \ref{FIG:API_CALLS}.
 
 \begin{figure}[!h]
-\label{FIG:API_CALLS}
-\caption{Shows state based testing against API and model state}
-\includegraphics{pictures/api_calls.jpg}
+  \includegraphics{pictures/api_calls.jpg}
+  \caption{Shows state based testing against API and model state}
+  \label{FIG:API_CALLS}
 \end{figure}
 
-A property in quickcheck is written in the following way.
+A property in QuickCheck is written in the following way.
 \lstset{style=erlang}
 \begin{lstlisting}
 prop() ->
-  ?FORALL(Cmds,commands(),
+  ?FORALL(Cmds, commands(),
           begin
             ... = run_commands(Cmds)
           end).
@@ -148,49 +148,57 @@ command(S) ->
         ... ].
 \end{lstlisting}
 
-Every commands has, additional to the command definition,
-a precondition, postcondition and a next state function, see
-paragraph \ref{PAR:EQC_STATEM}.
+The function \emph{commands()} is a generator and looks in the module after a
+function called \emph{command(S)} which takes a state and returns a list of
+functions that one want to test.
 
-A property is then tested as:
+Every command has, additional to the command definition,
+a precondition, postcondition and a next state function. For more information
+about this, see paragraph \ref{PAR:EQC_STATEM}.
+
+After the property has been implemented, it could be tested by:
 
 \begin{lstlisting}
-eqc:quickcheck(eqc:numtests(N, prop())).
+eqc:quickcheck(prop()).
 \end{lstlisting}
 
-Alternative the model states can be shown.
+One can also define how many tests QuickCheck should execute and also if the
+states of the model should be shown:
 
 \begin{lstlisting}
 eqc:quickcheck(eqc:numtests(N, eqc_statem:show_states(prop()))).
 \end{lstlisting}
 
-\subsubsection{Quickcheck Modules}
-The commercial version Quickcheck consist of several Erlang modules.
+\subsubsection{QuickCheck Modules}
+The commercial version QuickCheck consist of several Erlang modules.
 %%eqc
 \paragraph{eqc}
-The module \emph{eqc} is the main Quickcheck module. This module defines a lot
+The module \emph{eqc} is the main QuickCheck module. This module defines a lot
 of macros that can be used when writing properties and also basic functions
 like \emph{quickcheck}.
 
 \paragraph{eqc\_gen} The module is used for generation of test cases. The module
 contains various functions and macros for this purpose. There are some
-predefined generators for instance for integers and characters etcetera, but it
+predefined generators, for instance for integers and characters etcetera, but it
 is quite easy to construct a generator for almost any data type. Just to get the
 idea follows code for a string generator.
 \begin{lstlisting}
-    ?LET(Pat,nat(),vector(Pat,char()))
+    ?LET(Pat, nat(), vector(Pat, char()))
 \end{lstlisting}
-The macro \emph{?LET} binds the second generators arguments to \emph{Pat} which can be
-used in the third argument. The above code binds a natural number to \emph{Pat}
-and creates a vector with length \emph{Pat} of characters.
+The macro \emph{?LET} binds a generated value from the second argument, to \emph{Pat} which can be
+used in the third argument. The above code binds a natural number, from the
+generator \emph{nat()}, to \emph{Pat} and creates a vector with length
+\emph{Pat} of characters.
 
 A generator can also be weighted, or in other words certain values can be more
 likely to be generated then others.
 
 \begin{lstlisting}
-?LET(Pat,nat(),vector(Pat,frequency([{1, choose(0,127)}, {3, 32}])))
+?LET(Pat, nat(), vector(Pat,
+                        frequency([{1, choose(0,127)},
+                                   {3, 32}])))
 \end{lstlisting}
-The code above will also generate a string of length \emph{Pat} but the
+The code above will also generate a string of length \emph{Pat}, but the
 generation of the white space character will be 3 times more likely to happen
 than then a uniformly random character.
 
@@ -199,11 +207,12 @@ than then a uniformly random character.
 communicate with C-code.
 
 \begin{lstlisting}
-  eqc_c:start(suit,[{c_src,"suit_api.h"},{additional_files,["myprog.o"]}])
+eqc_c:start(suit, [{c_src, "suit_api.h"},
+                   {additional_files, ["myprog.o"]}])
 \end{lstlisting}
-The code above starts the C-program \emph{myprog.o} and a Erlang module
-\emph{suit}, the name of the first parameter, is created. This module can now be
-used within Erlang to get information about the C-program. For example the
+The code above starts the C-program \emph{myprog.o}, and an Erlang module is
+created with the name of the first parameter, \emph{suit}. This module can now
+be used within Erlang to get information about the C-program. For example the
 following function, that counts the number of spaces in a string, might be
 declared in \emph{suit\_api.h} and defined in the \emph{myprog.o}.
 \lstset{style=c}
@@ -221,7 +230,7 @@ If the function \emph{spaces} is defined correctly the output will be 3.
 \label{PAR:EQC_STATEM}
 Offers state based testing. A command has a definition, precondition,
 postcondition, and a next function. If we wanted to test \emph{spaces} function
-one may have written.
+one may write:
 \begin{lstlisting}
 
 % Defines the initial model state
@@ -242,7 +251,7 @@ spaces(Xs) ->
   suite:spaces(eqc_c:create_string(Xs)).
 
 %Takes the model state as a parameter
-%The spaces function has no pre conditions
+%The spaces function has no preconditions
 spaces_pre(_State) ->
   true.
 
@@ -262,20 +271,27 @@ spaces_next(S,_Ret,_Args) ->
 Noticeable is that only the post function may depend on the C-code. QuickCheck
 has a generation step where tests are generated according to the precondition
 and the model state. The C-code is run first after the generation step and can
-only be used to check post conditions. This is actually what one want because it
-seems pointless to test a program according to how the same program is executed.
+only be used to check postconditions. This is actually what one want because it
+would be pointless to execute a program and then test it depending on the
+execution of the same program and not the model itself. For instance if we let
+the next state function depend on the C-program, then the model will be
+faulty
+if the C-program has incorrect behaviour.
 
+\begin{comment}
+==============================================================================
+  När exemplet ovan ändras, skriv om detta stycke också.
+==============================================================================
+\end{comment}
 The example above is actually not state dependent since \emph{spaces} only
 depend on the argument string. However one can imagine the same function being
 dependent on some global variable and according to that variable change its output.
 %car_xml
 \paragraph{car\_xml}
-Additional to the commercial version is \emph{car} module. This module is
+Additional to the commercial version, there is a \emph{car} module. This module is
 specifically created to parse AUTOSAR XML configuration files.
-\begin{lstlisting}
-    Some Erlang code
-\end{lstlisting}
 
+%% relevans?
 \paragraph{Other modules}
 There are also other modules; for instance a module for mocking C-code. Or in
 other words, if one has a C-function that is declared but the
@@ -319,8 +335,8 @@ checks safety properties and the other is used for checking the liveness
 properties. McErlang also implements weak process fairness, by omitting non-fair
 loops from the accepting runs in its liveness algorithm.
 
-%% jag tror mcerlang ingår i quickcheck suiten. den blir installerad tillsammans
-%% med quickcheck iaf.
+%% jag tror mcerlang ingår i QuickCheck suiten. den blir installerad tillsammans
+%% med QuickCheck iaf.
 
 \subsection{$\mu$CRL toolset} $\mu$CRL is a process algebraic language which is
 suited for the analysis of distributed systems. The toolkit is built on this
