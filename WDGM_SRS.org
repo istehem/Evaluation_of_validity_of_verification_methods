@@ -1,0 +1,109 @@
+
+* Number of SRS [66/106]
+** TODO [WDGM127] check file structure
+** TODO [WDGM126] check file structure
+** TODO [WDGMFCK] check file structure
+** TODO [WDGM014] check file structure
+** TODO [WDGM013] version check
+** DONE [WDGM200]
+** DONE [WDGM238]
+** DONE [WDGM268]
+** DONE [WDGM269]
+** DONE [WDGM201]
+** DONE [WDGM202]
+** DONE [WDGM203]
+** DONE [WDGM204]
+** DONE [WDGM300]
+** DONE [WDGM205]
+** DONE [WDGM206]
+** DONE [WDGM207]
+** DONE [WDGM291]
+** DONE [WDGM208]
+** DONE [WDGM209]
+** DONE [WDGM213]
+** DONE [WDGM239]
+** DONE [WDGM214]
+** DONE [WDGM285]
+** DONE [WDGM286]
+** DONE [WDGM078]
+** DONE [WDGM076]
+** DONE [WDGM215]
+** DONE [WDGM216]
+** DONE [WDGM217]
+** DONE [WDGM218]
+** DONE [WDGM077]
+** DONE [WDGM117]
+** DONE [WDGM219]
+** DONE [WDGM220]
+** DONE [WDGM221]
+** TODO [WDGM139] if WdgIf fails => GLOBAL_STATUS_STOPPED
+** DONE [WDGM085]
+** DONE [WDGM240] (indirectly) alive counters shall be available for debugging
+** DONE [WDGM098]
+** DONE [WDGM074]
+** DONE [WDGM115]
+** DONE [WDGM083]
+** DONE [WDGM293] derive data resources for deadline supervision
+** DONE [WDGM298]
+** DONE [WDGM228]
+** DONE [WDGM229]
+** DONE [WDGM294]
+** DONE [WDGM299]
+** DONE [WDGM241] (indirectly) timestamp available for debugging
+** DONE [WDGM293] derive data resources for logical supervision
+** DONE [WDGM271]
+** DONE [WDGM296]
+** DONE [WDGM295] identify which graph
+** DONE [WDGM246]
+** DONE [WDGM274]
+** DONE [WDGM252]
+** DONE [WDGM332]
+** DONE [WDGM331]
+** DONE [WDGM297]
+** DONE [WDGM273]
+** DONE [WDGM329] ambiguous
+** DONE [WDGM242] (indirectly) data resources available for debugging
+** TODO [WDGM129] Report to DEM
+** TODO [WDGM225] OS application configured
+** TODO [WDGM113] call Mcu_PerformReset
+** TODO [WDGM114] notification to RTE
+** TODO [WDGM002] multiple watchdogs
+** TODO [WDGM223] set trigger conditions
+** TODO [WDGM292] if DEACTIVATED dont call WdgIf_SetTriggerConditions
+** TODO [WDGM119] if OK call all watchdogs not in WDGIF_OFF_MODE
+** TODO [WDGM120] if FAILED call all watchdogs not in WDGIF_OFF_MODE
+** TODO [WDGM121] if EXPIRED call all watchdogs not in WDGIF_OFF_MODE
+** TODO [WDGM122] if STOPPED call all watchdogs not in WDGIF_OFF_MODE
+** TODO [WDGM259] Error values are of type uint8
+** TODO [WDGM004] WdgM should be able to detect errors
+** TODO [WDGM047] (configuration) WdgMDevErrorDetect
+** DONE [WDGM260]
+** TODO [WDGM015] production code errors cannot be turned off
+** TODO [WDGM048] report errors to DET
+** TODO [WDGM006] report errors to DEM
+** DONE [WDGM234] each variable accessable for debugging shall be global
+** TODO [WDGM235] all type definitions shall be accessable for WdgM.h
+** TODO [WDGM236] possible to calc size of variables with size_of
+** TODO [WDGM237] accessible variable shall be described
+** TODO [WDGM304] (configuration) each SE should have a unique identifier
+** TODO [WDGM306] (configuration) each BSW-module shall use its id as SEid
+** TODO [WDGM305] (configuration) no SW-C...
+** TODO [WDGM307] (configuration) the generator shall reject bad configurations
+** DONE [WDGM282]
+** DONE [WDGM283]
+** TODO [WDGM311] (configuration) the generator shall reject trusted os:es?
+** TODO [WDGM212] (configuration) the generator shall reject bad configurations
+** TODO [WDGM308] (configuration) WDGM shall reject bad configurations
+** TODO [WDGM309] (configuration) WDGM shall reject bad configurations
+** TODO [WDGM181] (configuration) watchdog instances
+** TODO [WDGM178] (configuration) each mode of the WDGM has an unique identifier
+** DONE [WDGM179] (configuration) initial mode
+** TODO [WDGM310] (configuration) WDGM shall reject bad configurations
+** TODO [WDGM313] (configuration) WDGM shall reject bad configurations
+** TODO [WDGM314] (configuration) WDGM shall reject bad configurations
+** DONE [WDGM182]
+** DONE [WDGM315]
+** DONE [WDGM316]
+** DONE [WDGM317]
+** TODO [WDGM186] WdgIf_SetMode
+**
