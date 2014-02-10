@@ -9,7 +9,7 @@ theme.get_options()
 #chart_object.set_defaults(line_plot.T, line_style=None)
 
 def draw_plot():
-    (data,gr_index) = get_data(function_names())
+    (data,gr_index,num_of_tests) = get_data(function_names())
     ar = area.T(
             loc = (0,50),
             x_axis = axis.X(label = "length of command sequences",format="/a-30{}%d",
@@ -28,6 +28,10 @@ def draw_plot():
     ar.draw()
     tb = text_box.T(loc=(40,130),text="Commands")
     tb.draw()
+    tb_nt = text_box.T(loc=(0,0),
+        text="Total number of tests: " + str(num_of_tests),
+        line_style=None)
+    tb_nt.draw()
     #draw_text(data)
     #a = arrow.T(head_style=2)
     #a.draw([(1,2),(3,4)])

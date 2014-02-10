@@ -16,11 +16,11 @@ def parse_data():
             else:
                 d[trans] = d[trans] + 1
             tot = tot + 1
-    return (d,tot)
+    return (d,tot,len(xs))
 
 
-def gen_tuple(d,tot):
-    xs = []
+def gen_tuple(d,tot,n_of_tsts):
+    xs = [n_of_tsts]
     for trans in sorted([(status_names()[i],status_names()[j]) for i in status_names() for j in status_names()]):
         if trans in d:
            xs = xs + [(d[trans]/float(tot))*100]
@@ -29,10 +29,13 @@ def gen_tuple(d,tot):
     return tuple(xs)
 
 def gen_tex_file():
-    (d,tot) = parse_data()
-    t = gen_tuple(d,tot)
+    (d,tot,n_of_tsts) = parse_data()
+    t = gen_tuple(d,tot,n_of_tsts)
     st = '''
     \\begin{tabular}{r|ccccc}
+        \\hline
+        \\multicolumn{6}{c}{Number of tests: %i} \\\\
+        \\hline
         \\backslashbox{From}{To}
                     & DEACTIVATED & EXPIRED & FAILED & OK & STOPPED \\\\
         \hline
