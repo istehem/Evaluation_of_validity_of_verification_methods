@@ -15,12 +15,38 @@
 -compile([export_all, debug_info]).
 %-export([config_file/0, config/1, start/0, get_modes/0]).
 
--define(EXAMPLECONFIG, "examples/WdgM_VID41_ExampleConfiguration_001_cfg1.arxml").
--define(EXAMPLE_ONLY_AS, "examples/WdgM_VID41_ExampleConfiguration_ONLY_AS.arxml").
--define(FREESCALE, "freescale/wdgm_freescale_pip.arxml").
--define(BSI, "bsi/wdgm_bsi.arxml").
--define(CONFIG, ?EXAMPLECONFIG).
+-define(EXAMPLE_CONFIG, "examples/WdgM_VID41_ExampleConfiguration_001_cfg1.arxml").
+-define(FREESCALE_CONFIG, "freescale/wdgm_freescale_pip.arxml").
+-define(BSI_CONFIG, "bsi/wdgm_bsi.arxml").
+-define(EXAMPLE_ONLY_AS_CONFIG, "examples/WdgM_VID41_ExampleConfiguration_ONLY_AS.arxml").
 
+-ifdef(EXAMPLE).
+-ifndef(CONFIG).
+-define(CONFIG, ?EXAMPLE_CONFIG).
+-endif.
+-endif.
+
+-ifdef(FREESCALE).
+-ifndef(CONFIG).
+-define(CONFIG, ?FREESCALE_CONFIG).
+-endif.
+-endif.
+
+-ifdef(BSI).
+-ifndef(CONFIG).
+-define(CONFIG, ?BSI_CONFIG).
+-endif.
+-endif.
+
+-ifdef(EXAMPLE_ONLY_AS).
+-ifndef(CONFIG).
+-define(CONFIG, ?EXAMPLE_ONLY_AS_CONFIG).
+-endif.
+-endif.
+
+-ifndef(CONFIG).
+-define(CONFIG, ?EXAMPLE_CONFIG).
+-endif.
 
 config_file() ->
         wdgm_eqc:getPath(["c","WdgM","cfg"]) ++ ?CONFIG.
@@ -51,12 +77,12 @@ config(Cfg) ->
 
 which_config() ->
   case ?CONFIG of
-    ?BSI ->
+    ?BSI_CONFIG ->
       bsi;
-    ?EXAMPLECONFIG ->
+    ?EXAMPLE_CONFIG ->
       example;
-    ?EXAMPLE_ONLY_AS ->
+    ?EXAMPLE_ONLY_AS_CONFIG ->
       example_as;
-    ?FREESCALE ->
+    ?FREESCALE_CONFIG ->
       freescale
   end.
