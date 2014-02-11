@@ -14,10 +14,11 @@ the number of checkpoints supplied in the configuration. A correct behavior of
 the watchdog manager depends on that checkpoints are reached and does so in the
 right order.
 
-The only function that can change the global status is the mainfunction. The
+The only function that can change the global status is the main function. The
 main function is continuously called in a given time interval, note that the
 timing is not used when using quickcheck \ref{SEC:CALLING_COMMANDS}, schedule be
 the run time environment (RTE).
+
 
 \begin{figure}[h!]
 \label{FIG:GLOBALSTATUSES}
@@ -29,9 +30,26 @@ the run time environment (RTE).
 
 
 
-\section{Plots}
+\section{Configurations}
+The WdgM was tested using three different configurations.
+% Which are they and why were they chosen
 
 \subsection{BSI}
+A highly simplified configuration \emph{BSI} gives in some sense good results.
+Using this configuration the WdgM was never hitting the absorbing state
+according to \ref{FIG:GLOBALSTATUSES}.  However looking at the state
+transitions, comparing figure \ref{FIG:GLOBALSTATUSES} and table
+\ref{TABLE:STATUSES_BSI}, only two states are hit. This happens
+because the configuration is to simply, it is actually impossible to hit
+any other states then \emph{'GLOBAL\_STATUS\_OK'} or
+\emph{'GLOBAL\_STATUS\_DEACTIVATED'}. There are no checkpoints or supervision
+algorithms configured for the \emph{BSI} configuration.
+Hence it is easy to run tests using this configuration but it does, by it self,
+not fully test the code because some specification requirements will never be
+tested. The untested requirements are mainly requirements for supervision algorithms
+that are, according to the configuration, never supposed to be run. Those
+untested requirements leaves also other requirements untested because
+the watchdog manager never reaches a state when those other requirements must hold.
 \begin{figure}[h!]
 \label{FIG:BSI}
 \caption{BSI configuration}

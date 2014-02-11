@@ -25,7 +25,7 @@ def get_data(item_names):
       (ds,index) = parse_item(ds,row)
       if gr_index < index:
           gr_index = index
-    return (ds,gr_index)
+    return (ds,gr_index,len(xs))
 
 def get_data_for_item(d,name):
   ret = [(0,0)]
