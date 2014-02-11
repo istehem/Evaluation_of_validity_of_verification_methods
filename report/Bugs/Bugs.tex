@@ -79,7 +79,16 @@ The counter for \lstinline!``expired cycle counter''! is incremented when the
 \lstinline!WdgM_MainFunction! changes the global state from
 \lstinline!WDGM_GLOBAL_STATUS_OK! to \lstinline!WDGM_GLOBAL_STATUS_EXPIRED!
 violating [WDGM215],[WDGM216],[WDGM077], and [WDGM117].
-This has the consequences that violates [WDGM219], and [WDGM220].\\
+This has the consequences that violates [WDGM219], and [WDGM220].\\[0.5cm]
+
+\textbf{Reproducing the error:}
+WdgM_Init({{ptr, "WdgM_ConfigType", 4235840}, false}) -> ok\\
+WdgM_SetMode(0, 1) -> 0\\
+WdgM_CheckpointReached(0, 1) -> 0\\
+WdgM_MainFunction() -> ok\\
+WdgM_MainFunction() -> ok\\
+WdgM_MainFunction() -> ok\\
+
 
 %%% List and describe the main parts of the violated requirements
 \textbf{[WDGM215]}
@@ -783,6 +792,9 @@ initialization to alive/deadline/logical supervision results to
 \begin{lstlisting}
 At Watchdog Manager initialization, all the Results are set to correct.
 \end{lstlisting}~\\
+
+\textbf{Reproducing the error:}\\
+WdgM_Init({ptr, "WdgM_ConfigType", 4235264})\\
 
 \lstset{style=c}
 
