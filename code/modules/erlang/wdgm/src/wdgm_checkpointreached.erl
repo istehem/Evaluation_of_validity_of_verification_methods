@@ -52,11 +52,19 @@ logicalreached(S, SEid, CPid) ->
               true  -> false; %% [WDGM331]
               false -> true %% [WDGM332]
             end,
+          SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
           S#state{logicalTable=
                     (S#state.logicalTable--
                        [LR])++
                     [LR#logical{storedCP=CPid, %% [WDGM246]
-                                activity=ActivityFlag}]};
+                                activity=ActivityFlag}],
+                  supervisedentities=          %% Added to follow the c codes behavaior
+                                               %% Overwrite the previos result, seems strange
+                        lists:keyreplace(SEid,
+                                         2,
+                                         S#state.supervisedentities,
+                                         SE#supervisedentity{locallogicalstatus='WDGM_CORRECT'})
+                 };
         'WDGM_INCORRECT' ->
           SE = lists:keyfind(SEid, 2, S#state.supervisedentities),
           case SE of
