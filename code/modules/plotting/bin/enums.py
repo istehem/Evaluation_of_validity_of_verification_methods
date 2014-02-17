@@ -27,6 +27,15 @@ def status_names():
         Status.Stopped: 'WDGM_GLOBAL_STATUS_STOPPED'
     }
 
+def from_status_names():
+  return {
+      'WDGM_GLOBAL_STATUS_OK': Status.Ok,
+      'WDGM_GLOBAL_STATUS_DEACTIVATED': Status.Deactivated,
+      'WDGM_GLOBAL_STATUS_FAILED': Status.Failed,
+      'WDGM_GLOBAL_STATUS_EXPIRED': Status.Expired,
+      'WDGM_GLOBAL_STATUS_STOPPED': Status.Stopped
+     }
+
 def function_names():
     return {
         Functions.GetMode: "getmode",

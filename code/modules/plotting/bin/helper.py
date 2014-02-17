@@ -42,8 +42,7 @@ def get_data_for_item(d,name):
   return ret
 
 def parse_item(d,row):
-  xs = ''.join(filter(lambda x: "[] \n\'".find(x) == -1,row)).split(',')
-  xs = [] + filter(lambda x: x != '' and x != '\n',xs)
+  xs = row_to_list(row)
   index = len(xs)
   for s in xs:
     if index in d[s]:
@@ -52,3 +51,18 @@ def parse_item(d,row):
       d[s][index] = 1
   return (d,index)
 
+def row_to_list(row):
+  xs = ''.join(filter(lambda x: "[] \n\'".find(x) == -1,row)).split(',')
+  return ([] + filter(lambda x: x != '' and x != '\n',xs))
+
+def get_greatest_seq():
+  f = open(raw_input(''),'r')
+  xs = f.readlines()
+  if len(xs) < 1:
+    return None
+  greatest_seq = row_to_list(xs[0])
+  for row in xs[1:]:
+    tmp_seq = row_to_list(row)
+    if len(tmp_seq) > len(greatest_seq):
+      greatest_seq = tmp_seq
+  return greatest_seq
