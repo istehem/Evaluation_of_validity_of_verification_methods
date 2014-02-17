@@ -234,7 +234,40 @@ checkpoints reached in a graph.
   Deadline supervision does the same as alive supervision but aperiodically.
 \end{itemize}
 
-\section{Global and Local Statuses}
+\section{Global Status}
+The global status represents the current state of the hole watchdog
+manager. There are five different statuses.
+\begin{itemize}
+\item WDGM\_GLOBALSTATUS\_DEACTIVATED \\
+  The watchdog manager is deactivated
+\item WDGM\_GLOBALSTATUS\_OK \\
+  The watchdog manager is in a correct state \\
+\item WDGM\_GLOBALSTATUS\_FAILED \\
+  ...
+\item WDGM\_GLOBALSTATUS\_EXPIRED \\
+  ...
+\item WDGM\_GLOBALSTATUS\_STOPPED \\
+  ...
+\end{itemize}
+The different statuses are related to each other according to figure \ref{APP:FIG:GLOBALSTATUS}.
+The only function that can change the global status is the main function. This
+is done by locking at the local statuses of supervised entities and the
+current global status.
+
+\begin{figure}
+\includegraphics{pictures/globalstatuses.jpg}
+\label{APP:FIG:GLOBALSTATUS}
+\caption{The possible global statuses represented as a graph}
+\end{figure}
+
+\section{Local Status}
+A local status is a status of a supervised entity and is set
+according to the current local status and the results of the supervision
+algorithms. There are four different local statuses.
+
+\begin{itemize}
+\item trams
+\end{itemize}
 
 \section{API functions}
 \subsection{WdgM\_Init}
