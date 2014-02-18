@@ -219,8 +219,8 @@ prop_wdgm_init() ->
                     ?COPY_FILE,
                     eqc_c:restart(),
                     {H,S,Res} = run_commands(?MODULE,Cmds),
-                    write_history_to_file(statuses, H),
-                    write_history_to_file(commands, Cmds),
+                    %write_history_to_file(statuses, H),
+                    %write_history_to_file(commands, Cmds),
                     pretty_commands(
                       ?MODULE, Cmds, {H,S,Res},
                       aggregate(

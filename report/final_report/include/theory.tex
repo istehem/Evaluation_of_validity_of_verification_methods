@@ -9,7 +9,7 @@ forms \cite[8:9.2]{ISO26262}.
 \subsection{Semi formal verification}
 %Skriv något än mer luddigt
 
-\section{Industrial Safety Standards} It is useful to distinguish between
+\section{Industrial Standards} It is useful to distinguish between
 systems with different levels of dependability, and determine where the hazards
 exists\cite{COURSEBOOK:safety-critical}. When this risk analysis is completed
 %% överväg kommatecken mellan dessa satser
@@ -49,15 +49,63 @@ translate to SIL 3.
 \subsection{AUTOSAR (AUTomotive Open System ARchitecture)}
 %Beskriv vad fan det är
 %Källa http://www.autosar.org/
-AUTOSAR is a worldwide development partnership of car manufacturers, suppliers
-and other companies from the electronics, semiconductor and software industry.
+The AUTOSAR platform has a layered software architecture. This means that the
+architecture is divided to a number of different layers as seen in Figure~\ref{FIG:AUTOSAR:architecture}, such as the application
+layer, runtime environment, the basic software layer, and the
+microcontroller.
 
-Some of the specifications in AUTOSAR is left quite open for interpretation.
-%% beskriv varför dessa inte är tillräckligt definierade, och varför olika
-%% konfigurationer existerar.
-This makes it possible for vehicle developers to have different specifications
-for a configuration. Some parts of those configuration specifications is
-generated into code, while other is manually written or added as a configurable.
+\begin{figure}
+  \begin{center}
+    \includegraphics{pictures/autosar_architecture.jpg}
+  \end{center}
+  \label{FIG:AUTOSAR:architecture}
+  \caption{The AUTOSAR software architecture}
+\end{figure}
+
+The runtime environment is the OS, and the microcontroller is the hardware. The
+software running in the application layer could be applications such as sensors
+and actuators.
+
+The basic software layer could be further divided; into services, ECU
+abstraction, microcontroller abstraction, and complex drivers.
+
+%% Saxxat från AUTOSAR Layered software
+% Automotive ECUs have the properties: strong interaction with hardware,
+% connection to vehicle networks, limited computing power and memory, real time
+% system, program execution from internal or external flash memory.
+
+% The AUTOSAR architecture is a generic approach, standard modules can have
+% extended functionality and still be compliant.
+
+One example is the watchdog which consist of several parts as seen in Figure~\ref{FIG:AUTOSAR:watchdog}. The
+microcontroller abstraction layer has the drivers for the watchdog, the
+interaction with the microcontroller. Then there is the watchdog interface at
+the ECU abstraction layer. The watchdog interface is the onboard device
+abstraction. Last is the watchdog manager which runs as a system service in the
+service layer.
+
+\begin{figure}
+  \begin{center}
+    \includegraphics{pictures/watchdog_architecture.jpg}
+  \end{center}
+  \label{FIG:AUTOSAR:watchdog}
+  \caption{The Watchdog architecture}
+\end{figure}
+
+The watchdog have a number of dependencies to other services in the basic
+software layer. For example when an error is found by the watchdog, it should be
+reported to either the diagnostic event manager or the development error
+tracer. Two services used for error management.
+
+% AUTOSAR is a worldwide development partnership of car manufacturers, suppliers
+% and other companies from the electronics, semiconductor and software industry.
+
+% Some of the specifications in AUTOSAR is left quite open for interpretation.
+% %% beskriv varför dessa inte är tillräckligt definierade, och varför olika
+% %% konfigurationer existerar.
+% This makes it possible for vehicle developers to have different specifications
+% for a configuration. Some parts of those configuration specifications is
+% generated into code, while other is manually written or added as a configurable.
 
 \section{Existing Software}
 There are a number of existing software tools whose aim are to simplify the

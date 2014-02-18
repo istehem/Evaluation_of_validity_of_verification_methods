@@ -89,9 +89,9 @@ were never reached unless other API calls were called.
 \end{center}
 \caption{Shows Erlang modeled states with calls against the C-code}
 \end{figure}
-Early in the implementation face Quickcheck found differences between the Erlang
+Early in the implementation phase Quickcheck found differences between the Erlang
 and C-implementation. This was expected because every programmer makes mistakes.
-The question regarding who was faulty arose? The C-code or the Erlang code? Then
+The question was whether the fault was in the C-code or the Erlang code. Then
 the API was thoroughly read and a conclusion was made. Either a bug in the
 C-code was found or the Erlang-code needed to be corrected. There were however
 cases when the API was ambiguous. In those cases the C-interpretation was chosen
@@ -230,6 +230,3 @@ considered less relevant then the readability of the model state. The idea was
 to make it easy to find the actual bug, when there was conflicts between the
 C-code and the Erlang module, and running the actual tests was not considered
 time or memory critical.
-
-
-
