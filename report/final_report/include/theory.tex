@@ -6,6 +6,11 @@ forms \cite[8:9.2]{ISO26262}.
 
 \subsection{Formal Verification}
 %Skriv något luddigt
+Formal verification is very hard to achieve for software, due to the state space
+explosion problem. To achieve formal verification, one must visit every state
+that exists, and prove for each of those states, that the code is correct. State
+space explosion occur when a small increase of elements rapidly raises the
+number of combinations to a computational maximum. %% SKRIV OM!!!!!!!!!!!
 
 \subsection{Semi formal verification}
 %Skriv något än mer luddigt
@@ -51,25 +56,24 @@ translate to SIL 3.
 %Beskriv vad fan det är
 %Källa http://www.autosar.org/
 The AUTOSAR platform has a layered software architecture. This means that the
-architecture is divided to a number of different layers as seen in Figure~\ref{FIG:AUTOSAR:architecture}, such as the application
+architecture is divided to a number of different layers, such as the application
 layer, runtime environment, the basic software layer, and the
-microcontroller.
+microcontroller. In the Figure~\ref{FIG:AUTOSAR:architecture} the basic software
+layer is represented as four different parts; services, ECU
+abstraction, microcontroller abstraction, and complex drivers.
 
 \begin{figure}[!ht]
   \begin{center}
     \includegraphics[keepaspectratio, width=\linewidth]{pictures/autosar_architecture.jpg}
   \end{center}
   \caption{The AUTOSAR software architecture. Noticeable is that the basic
-    software layer (BSW) is divided further into three categories with more subsections.}
+    software layer is divided further into three categories with more subsections.}
   \label{FIG:AUTOSAR:architecture}
 \end{figure}
 
 The runtime environment is the OS, and the microcontroller is the hardware. The
 software running in the application layer is applications such as sensors and
-actuators.
-
-The basic software layer could be further divided; into services, ECU
-abstraction, microcontroller abstraction, and complex drivers.
+actuators. %% skriva något mer om applikationslagret.
 
 %% Saxxat från AUTOSAR Layered software
 % Automotive ECUs have the properties: strong interaction with hardware,
@@ -79,7 +83,8 @@ abstraction, microcontroller abstraction, and complex drivers.
 % The AUTOSAR architecture is a generic approach, standard modules can have
 % extended functionality and still be compliant.
 
-One example is the watchdog which consist of several parts as seen in Figure~\ref{FIG:AUTOSAR:watchdog}. The
+One example of how the different parts in the basic software layer is
+integrated, is the watchdog, which consist of several parts as seen in Figure~\ref{FIG:AUTOSAR:watchdog}. The
 microcontroller abstraction layer has the drivers for the watchdog, the
 interaction with the microcontroller. Then there is the watchdog interface at
 the ECU abstraction layer. The watchdog interface is the onboard device
@@ -97,16 +102,20 @@ service layer.
 The watchdog have a number of dependencies to other services in the basic
 software layer. For example when an error is found by the watchdog, it should be
 reported to either the diagnostic event manager or the development error
-tracer. Two services used for error management.
+tracer. Two services used for error management. %% bra eller anus att skriva av
+                                %% den ska skicka fel till DEM eller DET när vi
+                                %% skriver i nästa avsnitt att det går att ta
+                                %% bort DEM rapporteringen?
 
 AUTOSARs concept is to make it possible for vehicle manufacturers to buy modules
 from different software developers, which will still work together in
 unison. For vehicle manufacturers to have different work done by the same
 software developer's
-module, the standard introduce configurations. There exist a number of variables to
-configure. In the watchdog manager, there is for example variables that specify
-if the watchdog manager should report errors to the diagnostic event manager
-(DEM), or which type of supervision that should be done and what to supervise.
+module, the standard introduce configurations. There exist a number of variables
+to configure. In the watchdog manager, there is for example variables that
+specify if the watchdog manager should report errors to the diagnostic event
+manager (DEM), or which type of supervision that should be done and what to
+supervise.
 
 
 % Some of the specifications in AUTOSAR is left quite open for interpretation.
