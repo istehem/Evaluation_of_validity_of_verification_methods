@@ -60,9 +60,13 @@ def get_greatest_seq():
   xs = f.readlines()
   if len(xs) < 1:
     return None
+  statuses = [status_names()[i+1] for i, s in enumerate(status_names())]
   greatest_seq = row_to_list(xs[0])
+  max_s = len(filter(lambda x: x, [i in greatest_seq for i in statuses]))
   for row in xs[1:]:
     tmp_seq = row_to_list(row)
-    if len(tmp_seq) > len(greatest_seq):
+    tmp_s = len(filter(lambda x: x, [i in tmp_seq for i in statuses]))
+    if max_s < tmp_s or (max_s == tmp_s and len(greatest_seq) < len(tmp_seq)):
       greatest_seq = tmp_seq
+      max_s = tmp_s
   return greatest_seq

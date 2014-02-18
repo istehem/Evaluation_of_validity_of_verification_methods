@@ -133,6 +133,18 @@ did not test anything interesting. The reason for that an absorbing state was
 reached was the availing of negative testing. The testing was negative because
 invalid command sequences and arguments were generated.
 
+Figure \ref{FIG:ONERUN} shows how the status of the watchdog manager changes
+during the execution of API calls. After a number of commands the absorbing
+state \emph{stopped} is reached. 
+
+\begin{figure}
+\begin{center}
+\includegraphics{generated_pictures/one_test_history_statuses_freescale.pdf}
+\label{FIG:ONERUN}
+\caption{Shows how the status changes in the execution of one QuickCheck test} 
+\end{center}
+\end{figure}
+
 The next step was to tweak the generators, used by Quickcheck, to construct
 valid API-calls. There were several branches in the C-code
 that needed a specific sequence of API calls, with correct arguments, to be
