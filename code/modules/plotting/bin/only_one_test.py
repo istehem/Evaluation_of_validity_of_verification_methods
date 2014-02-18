@@ -9,6 +9,16 @@ theme.get_options()
 #chart_object.set_defaults(line_plot.T, line_style=line_style.T(cap_style=2,color=color.red))
 #chart_object.set_defaults(line_plot.T, line_style=None)
 
+
+
+def format_statuses(i):
+    if i == 0:
+        ret = ''
+    else:
+        ret = status_names()[i].split('_')[-1]
+    return ret 
+
+
 def draw_plot():
     #(data,gr_index,num_of_tests) = get_data(function_names())
     data = []
@@ -22,25 +32,15 @@ def draw_plot():
               tic_interval=20),
             x_range = (0,len(data)),
             y_range = (0,len(status_names())),
-            y_axis = axis.Y(label = "status",format="%s", tic_interval=1)#,
+            y_axis = axis.Y(label = "statuses",format=format_statuses, tic_interval=1)
             #legend = legend.T(loc = (0,150))
             )
 
 
-#    for i in function_names():
-#        ar.add_plot(line_plot.T(data = get_data_for_item(data,function_names()[i]),line_style=colors[i-1],
-#             label=function_names()[i].lower()))
-    ar.add_plot(line_plot.T(data = data,line_style=colors[0]))
+    ar.add_plot(line_plot.T(data = data,line_style=colors[0],label='s per c'))
     ar.draw()
-    tb = text_box.T(loc=(40,130),text="For one test")
+    tb = text_box.T(loc=(40,145),text="For one test")
     tb.draw()
-#    tb_nt = text_box.T(loc=(0,0),
-#        text="Total number of tests: " + str(num_of_tests),
-#        line_style=None)
-#    tb_nt.draw()
-    #draw_text(data)
-    #a = arrow.T(head_style=2)
-    #a.draw([(1,2),(3,4)])
 
 if __name__ == "__main__":
     draw_plot()
