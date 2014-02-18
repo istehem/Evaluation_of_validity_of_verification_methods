@@ -6,6 +6,7 @@ forms \cite[8:9.2]{ISO26262}.
 
 \subsection{Formal Verification}
 %Skriv något luddigt
+
 \subsection{Semi formal verification}
 %Skriv något än mer luddigt
 
@@ -54,17 +55,18 @@ architecture is divided to a number of different layers as seen in Figure~\ref{F
 layer, runtime environment, the basic software layer, and the
 microcontroller.
 
-\begin{figure}
+\begin{figure}[!ht]
   \begin{center}
-    \includegraphics{pictures/autosar_architecture.jpg}
+    \includegraphics[keepaspectratio, width=\linewidth]{pictures/autosar_architecture.jpg}
   \end{center}
+  \caption{The AUTOSAR software architecture. Noticeable is that the basic
+    software layer (BSW) is divided further into three categories with more subsections.}
   \label{FIG:AUTOSAR:architecture}
-  \caption{The AUTOSAR software architecture}
 \end{figure}
 
 The runtime environment is the OS, and the microcontroller is the hardware. The
-software running in the application layer could be applications such as sensors
-and actuators.
+software running in the application layer is applications such as sensors and
+actuators.
 
 The basic software layer could be further divided; into services, ECU
 abstraction, microcontroller abstraction, and complex drivers.
@@ -84,12 +86,12 @@ the ECU abstraction layer. The watchdog interface is the onboard device
 abstraction. Last is the watchdog manager which runs as a system service in the
 service layer.
 
-\begin{figure}
+\begin{figure}[!ht]
   \begin{center}
     \includegraphics{pictures/watchdog_architecture.jpg}
   \end{center}
+  \caption{The Watchdog and some other related modules.}
   \label{FIG:AUTOSAR:watchdog}
-  \caption{The Watchdog architecture}
 \end{figure}
 
 The watchdog have a number of dependencies to other services in the basic
@@ -97,8 +99,15 @@ software layer. For example when an error is found by the watchdog, it should be
 reported to either the diagnostic event manager or the development error
 tracer. Two services used for error management.
 
-% AUTOSAR is a worldwide development partnership of car manufacturers, suppliers
-% and other companies from the electronics, semiconductor and software industry.
+AUTOSARs concept is to make it possible for vehicle manufacturers to buy modules
+from different software developers, which will still work together in
+unison. For vehicle manufacturers to have different work done by the same
+software developer's
+module, the standard introduce configurations. There exist a number of variables to
+configure. In the watchdog manager, there is for example variables that specify
+if the watchdog manager should report errors to the diagnostic event manager
+(DEM), or which type of supervision that should be done and what to supervise.
+
 
 % Some of the specifications in AUTOSAR is left quite open for interpretation.
 % %% beskriv varför dessa inte är tillräckligt definierade, och varför olika
