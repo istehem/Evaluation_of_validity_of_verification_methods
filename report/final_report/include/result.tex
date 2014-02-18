@@ -75,6 +75,12 @@ the watchdog manager never reaches a state when those other requirements must ho
 \end{table}
 
 \subsection{freescale}
+The freescale configuration is, compared to BSI, a more realistic configuration.
+All supervision algorithms are configured and there are both external and
+internal graphs for logical supervision. It is also the configuration, mainly
+used at Mecel. The state machine for the global status is totally covered by
+running QuickCheck, see table \ref{TABLE:STATUSES_FREESCALE} and figure \ref{FIG:GLOBALSTATUSES}.  
+
 
 \begin{figure}[h!]
 \label{FIG:FREESCALE}
