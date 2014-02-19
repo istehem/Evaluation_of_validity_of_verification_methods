@@ -16,10 +16,11 @@ the number of checkpoints supplied in the configuration. A correct behavior of
 the watchdog manager depends on that checkpoints are reached and does so in the
 right order.
 
-The only function that can change the global status is the main function. The
-main function is continuously called in a given time interval, note that the
-timing is not used when using quickcheck \ref{SEC:CALLING_COMMANDS}, schedule be
-the run time environment (RTE).
+The only function that can give rise to state transitions for the global status,
+from other states then between the deactivated and ok states, is the main
+function. The main function is continuously called in a given time interval,
+note that the timing is not used when using quickcheck
+\ref{SEC:CALLING_COMMANDS}, schedule be the run time environment (RTE).
 
 
 \begin{figure}[h!]
@@ -79,7 +80,8 @@ The freescale configuration is, compared to BSI, a more realistic configuration.
 All supervision algorithms are configured and there are both external and
 internal graphs for logical supervision. It is also the configuration, mainly
 used at Mecel. The state machine for the global status is totally covered by
-running QuickCheck, see table \ref{TABLE:STATUSES_FREESCALE} and figure \ref{FIG:GLOBALSTATUSES}.  
+running QuickCheck, see table \ref{TABLE:STATUSES_FREESCALE} and figure
+\ref{FIG:GLOBALSTATUSES}.  
 
 
 \begin{figure}[h!]
@@ -138,3 +140,19 @@ running QuickCheck, see table \ref{TABLE:STATUSES_FREESCALE} and figure \ref{FIG
 \label{SEC:FUNCTIONAL_SAFETY_TIME}
 
 \section{Statistics}
+
+\section{Functional safety analysis}
+Since one important part of the functional safety concept is that it must be
+taken in consideration during the hole development process, one can not simply
+say that QuickCheck makes it possible to acquire functional safety. There must
+first be a number of assumptions. Not even if it is assumed that
+every step in the development, until the actual implementation of the watchdog
+manager, satisfies the requirements one also has to assume that the remaining
+part of the development, towards a finished vehicle, follows the same
+constrains. Even further, if this is assumed, there is one important
+assumption left before
+one can even reason about how QuickCheck can benefit. 
+This assumptions lies in that the model for the watchdog
+manager is correct, namely the AUTOSAR specification. 
+
+
