@@ -15,8 +15,6 @@
 # under the License.
 #
 
-SHELL = C:/cygwin/bin/sh.exe
-
 ERLFLAGS= -pa $(CURDIR)/.eunit -pa $(CURDIR)/ebin -pa $(CURDIR)/deps/*/ebin
 
 DEPS_PLT=$(CURDIR)/.deps_plt
@@ -32,7 +30,7 @@ $(error "Erlang not available on this system")
 endif
 
 
-REBAR="$(shell which rebar).cmd"
+REBAR="$(shell which rebar)" -C "$(shell pwd)/rebar.config"
 
 ifeq ($(REBAR),)
 $(error "Rebar not available on this system")
