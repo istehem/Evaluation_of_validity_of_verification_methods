@@ -46,6 +46,26 @@ because of the state-space complexity this is hard to achieve.
 %% SKRIV OM V-modellen i ISO~26262
 %% Och integrationstester mot unittester etc, (6-9, 6-10, 6-11 i ISO)
 
+ISO~26262 describes the full development process from concept to production,
+with functional safety in mind. For software development, the standard has a
+reference model with different phases of the process, see
+figure~\ref{FIG:ISO:phases}. Each phase in the reference model is dependent on
+the earlier phases. The reference model has the shape of a V, where the left
+side contains all development phases, and the right side contains the test
+phases. The work flow from this view starts with the phase ``specification of
+software safety requirements''. This phase specifies the software requirements
+needed to ensure the stability of the system. They are derived from the
+system design specification. This is part of the integration between software
+and hardware. The second phase is the ``software architectural design''. It
+represent the interaction between all software components. The third phase and
+the last development phase, in the model is the ``software unit design and
+implementation''. %%%% FORTSÄTT HÄR!!
+
+\begin{figure}
+  \includegraphics[keepaspectratio, width=\linewidth]{V}
+  \caption{Phases of software development in the standard ISO~26262}
+  \label{FIG:ISO:phases}
+\end{figure}
 
 % ISO~26262 is built on IEC~61508 which is titled Functional Safety of
 % Electrical/Electronic/Programmable Electronic Safety-related Systems. IEC~61508
