@@ -244,13 +244,16 @@ manager. There are five different statuses.
 \item WDGM\_GLOBAL\_STATUS\_OK \\
   The watchdog manager is in a correct state.\\
 \item WDGM\_GLOBAL\_STATUS\_FAILED \\
-  A failure has happened to an alive supervision and the watchdog is configured
+  A failure has occurred for an alive supervision and the watchdog is configured
   to have a tolerance against this kind of fault.
 \item WDGM\_GLOBAL\_STATUS\_EXPIRED \\
   A fault has happened and the watchdog is configured to postpone the error
-  reaction (the final transition to the stopped state).
+  reaction. In contradiction to
+  \emph{WDGM\_GLOBAL\_STATUS\_FAILED} there is no recovery mechanism for this
+  state and the watchdog manager will eventually reach the state
+  \emph{WDGM\_GLOBAL\_STATUS\_STOPPED}. 
 \item WDGM\_GLOBAL\_STATUS\_STOPPED \\
-  This is the final state of the watchdog state machine. Recovery mechanisms
+  This is an absorbing state of the watchdog state machine. Recovery mechanisms
   will be started and usually a watchdog reset will occur.
 \end{itemize}
 The different statuses are related to each other according to figure~\ref{APP:FIG:GLOBALSTATUS}.
@@ -285,6 +288,14 @@ are four different local statuses. Init setmode mainfunction
     will save the identification of the first supervised entity which reach this
     state.
 \end{itemize}
+Figure \ref{APP:FIG:LOCALSTATUSES} describes the state machine for the local
+status of a supervised entity. 
+
+\begin{figure}
+\includegraphics{pictures/localstatuses.jpg}
+\label{APP:FIG:LOCALSTATUSES}
+\caption{The possible local statuses represented as a graph}
+\end{figure}
 
 \section{API functions}
 \subsection{WdgM\_Init}
