@@ -1,26 +1,30 @@
 %% kolla att allt är i imperfekt
 %% verb i passiv form
 
-\section{Choose of tool for verification}
+\section{Choice of tool for verification}
 Software unit testing can be achieved by almost any tool.
 %% motivera.
-Consequently this phase is not the most interesting when it comes to the choose
+Consequently this phase is not the most interesting when it comes to the choice
 of a tool verification. Of course one can take the simplicity to achieve good
 %% "simplicity" - av vad?
 unit testing into account, but still it is not what makes a verification tool
 especially unique for the project goals.
 
-Since the purpose is about benchmarking software the phase ''verification of
-software safety requirements'' will not influence the choose. To be able to test
+Since the purpose is about benchmarking software the phase ``verification of
+%% what now? Introduce ISO-phases!
+software safety requirements'' will not influence the choice. To be able to test
 this phase, a greater amount of components of the whole system must be
-available. Such components may include hardware etcetera. Implementation wise
-%% "etcetera" borde arbetas bort.
-should everything be able to run on a standard PC-machine.
+available. Such components include hardware, and this report will not cover
+hardware integration. The implementation should be able to run on a standard
+PC-machine.
 
-The most interesting part is the software integration and testing. Is there a
+The most interesting part is the phase ``software integration and testing''. Is there a
 tool that one can use to easily combine test and requirements from different
 modules? Is it possible to test functional safety concept from this
 combination, for example by corrupting some software elements?
+
+%% SKRIV OM vilka delar i ISO~26262 vi kan testa mha Quickcheck (6-9, 6-10,
+%% 6-11)
 
 \subsection{Why QuickCheck and Erlang?}
 
@@ -47,9 +51,6 @@ shows that QuickCheck is reliable for verification.
 \item Generalize the technique.
 \end{itemize}
 
-%% SKRIV OM vilka delar i ISO~26262 vi kan testa mha Quickcheck (6-9, 6-10,
-%% 6-11)
-
 \section{Choice of AUTOSAR module to test}
 There were several modules that were up for discussion when it came to the
 choice of a module to test. Since the goal was to get a proof of concept for
@@ -62,13 +63,12 @@ have the actual C code and not just library files.
 The C-code that was to be tested, using Quickcheck, was already unit tested and
 run sharp in lab environments at Mecel.
 
-The behavior of the WdgM module was completely implemented in Erlang independent of
-the design choose in the C-code. The idea was to not get inspired by methods used
-in the C-code and possibly, if the C-code contained errors, end up with the same
-faults.
+The WdgM model was completely implemented in Erlang, independent of the design
+choices of the C-code. The idea was to ensure an independent model; if the model
+was inspired by the C-code, it could have transmitted errors.
 
 The implementation of the module was done to be able to test API calls,
-as described in theory, against the C-code and check that postconditions
+also described in appendix~\ref{APP:QUICKCHECK}, against the C-code and check that postconditions
 held, according to figure \ref{FIG:api_calls}. The postconditions were written
 to test that AUTOSAR requirements held. In other words that the API calls were
 called correctly. A problem when writing the postconditions, because AUTOSAR

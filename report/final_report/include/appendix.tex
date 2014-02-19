@@ -330,3 +330,26 @@ new values of the local statuses.
 %%   \end{lstlistings}
 
 \chapter{Ambiguities in AUTOSAR}
+\paragraph{Bad transition}
+The transition \lstlisting!WDGM_GLOBAL_STATUS_DEACTIVATED! to
+\lstlisting!WDGM_GLOBAL_STATUS_STOPPED! is possible due to [WDGM139]
+
+\paragraph{Incorrect reference}
+[WDGM329] could be the same as [WDGM]
+Initial/Final?
+
+\paragraph{Optional or mandatory}
+[WDGM344] and [WDGM258] is the same, with one difference: one is optional, the
+other mandatory.
+
+\paragraph{Logical supervision results}
+AUTOSAR does not specify if it is possible to overwrite logical supervision
+results from the same supervised entity.
+I.e.
+\begin{lstlisting}
+WdgM_CheckpointReached() -> incorrect result for SEx
+WdgM_CheckpointReached() -> Correct result for SEx
+\end{lstlisting}
+
+\paragraph{Wrong spelling}
+[WDGM344_CONF] WdgMInternallCheckpointFinalRef
