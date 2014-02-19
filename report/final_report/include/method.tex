@@ -47,8 +47,10 @@ shows that QuickCheck is reliable for verification.
 \item Generalize the technique.
 \end{itemize}
 
+%% SKRIV OM vilka delar i ISO~26262 vi kan testa mha Quickcheck (6-9, 6-10,
+%% 6-11)
 
-\section{Choice of AUTOAR module to test}
+\section{Choice of AUTOSAR module to test}
 There were several modules that were up for discussion when it came to the
 choice of a module to test. Since the goal was to get a proof of concept for
 that it was possible to
@@ -135,14 +137,14 @@ invalid command sequences and arguments were generated.
 
 Figure \ref{FIG:ONERUN} shows how the status of the watchdog manager changes
 during the execution of API calls. After a number of commands the absorbing
-state \emph{stopped} is reached. 
+state \emph{stopped} is reached.
 
 \begin{figure}
-\begin{center}
-\includegraphics{generated_pictures/one_test_history_statuses_freescale.pdf}
-\label{FIG:ONERUN}
-\caption{Shows how the status changes in the execution of one QuickCheck test} 
-\end{center}
+  \begin{center}
+    \includegraphics{generated_pictures/one_test_history_statuses_freescale.pdf}
+    \label{FIG:ONERUN}
+    \caption{Shows how the status changes in the execution of one QuickCheck test}
+  \end{center}
 \end{figure}
 
 The next step was to tweak the generators, used by Quickcheck, to construct

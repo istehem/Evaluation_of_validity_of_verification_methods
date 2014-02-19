@@ -250,8 +250,8 @@ manager. There are five different statuses.
   A fault has happened and the watchdog is configured to postpone the error
   reaction (the final transition to the stopped state).
 \item WDGM\_GLOBAL\_STATUS\_STOPPED \\
-  This is the final state of the watchdog state machine. Recovery mechanism will
-  be started and usually a watchdog reset will occur.
+  This is the final state of the watchdog state machine. Recovery mechanisms
+  will be started and usually a watchdog reset will occur.
 \end{itemize}
 The different statuses are related to each other according to figure~\ref{APP:FIG:GLOBALSTATUS}.
 There is only a small number of functions that is allowed to change the global
@@ -320,4 +320,13 @@ status depending on the current state of the watchdog manager; this includes the
 new values of the local statuses.
 
 \chapter{Bugs in C-code}
+%% \section{-Some summary-}
+%%   A longer summary with AUTOSAR requirements which is violated
+%% \subsection{Severity:}\\
+%%   Why?
+%% \subsection{Steps to reproduce:}
+%%   \begin{lstlistings}
+%%     WdgM_Init
+%%   \end{lstlistings}
+
 \chapter{Ambiguities in AUTOSAR}
