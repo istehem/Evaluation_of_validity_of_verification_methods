@@ -3,15 +3,15 @@
 
 \section{State Machine}
 The watchdog manager has a state machine \ref{FIG:GLOBALSTATUSES},
-which which transitions depend on the on global variables, changes of global
+which transitions depend on the on global variables, changes of global
 variables, and the current state. If the behavior of the watchdog manager is
 correct and the manager is actually running, or in other words not deactivated,
 it stays in 'WDGM\_GLOBAL\_STATUS\_OK'. There are however lots of reasons for
 that the status will change from the correct state. It depends on arguments to
 the API calls but also in which order commands are called. Also the supplied
 AUTOASAR configuration is relevant, because it specifies tolerances of faulty
-behavior, it may indirect disable some states and state transition or make some
-transition more likely to happen. The indirect affect can for instance come from
+behavior, it may indirectly disable some states and state transition or make some
+transition more likely to happen. The effect can for instance come from
 the number of checkpoints supplied in the configuration. A correct behavior of
 the watchdog manager depends on that checkpoints are reached and does so in the
 right order.
@@ -75,6 +75,12 @@ the watchdog manager never reaches a state when those other requirements must ho
 \end{table}
 
 \subsection{freescale}
+The freescale configuration is, compared to BSI, a more realistic configuration.
+All supervision algorithms are configured and there are both external and
+internal graphs for logical supervision. It is also the configuration, mainly
+used at Mecel. The state machine for the global status is totally covered by
+running QuickCheck, see table \ref{TABLE:STATUSES_FREESCALE} and figure \ref{FIG:GLOBALSTATUSES}.  
+
 
 \begin{figure}[h!]
 \label{FIG:FREESCALE}

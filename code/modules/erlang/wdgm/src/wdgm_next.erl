@@ -26,9 +26,9 @@ init_next(S, _Ret, [{_,Is_Null}]) ->
            expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
            globalstatus  = 'WDGM_GLOBAL_STATUS_OK',
            deadlineTable = wdgm_helper:reset_deadline_table(ModeId), %% [WDGM298]
-           logicalTable  = wdgm_helper:reset_logical_table(wdgm_config_params:get_internal_graphs(),
+           logicalTable  = wdgm_helper:reset_logical_table(wdgm_config_params:get_internal_graphs(), %% [WDGM296]
                                                true)
-                        ++ wdgm_helper:reset_logical_table(wdgm_config_params:get_external_graphs(ModeId),
+                        ++ wdgm_helper:reset_logical_table(wdgm_config_params:get_external_graphs(ModeId), %% [WDGM296]
                                                false),
            aliveTable    = wdgm_helper:reset_alive_table(ModeId)},
     NewS#state{supervisedentities = wdgm_helper:reset_supervised_entities(NewS, ModeId)};

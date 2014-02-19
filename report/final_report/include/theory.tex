@@ -6,10 +6,19 @@ forms \cite[8:9.2]{ISO26262}.
 
 \subsection{Formal Verification}
 %Skriv något luddigt
+Formal verification is very hard to achieve for software, due to the state space
+explosion problem. To achieve formal verification, one must visit every state
+that exists, and prove for each of those states, that the code is correct. State
+space explosion occur when a small increase of elements rapidly raises the
+number of combinations to a computational maximum. %% SKRIV OM!!!!!!!!!!!
+                                %% framför allt sista meningen men också binda
+                                %% ihop med ISO~26262 och "state-space
+                                %% complexity"
+
 \subsection{Semi formal verification}
 %Skriv något än mer luddigt
 
-\section{Industrial Safety Standards} It is useful to distinguish between
+\section{Industrial Standards} It is useful to distinguish between
 systems with different levels of dependability, and determine where the hazards
 exists\cite{COURSEBOOK:safety-critical}. When this risk analysis is completed
 %% överväg kommatecken mellan dessa satser
@@ -24,40 +33,108 @@ more defined in standards IEC~61508 and ISO~26262.
 
 \subsection {IEC~61508 and ISO~26262}
 
+%% SKRIV OM IEC~61508
+
 %Gör skillnad på verifikation och verifikation. Dvs vilken fas handlar det om?
 Automotive software for safety related systems is required to be designed,
 implemented and verified by the standard ISO~26262, which handles functional
 safety for automotive equipment. For a higher level of integrity ISO~26262
 strongly recommends that semi formal verification of each module should be
-executed \cite[Part 6]{ISO26262}.  It also recommends a formal verification, but
+executed \cite[Part 6]{ISO26262}. It also recommends a formal verification, but
 because of the state-space complexity this is hard to achieve.
 
-ISO~26262 is built on IEC~61508 which is titled Functional Safety of
-Electrical/Electronic/Programmable Electronic Safety-related Systems. IEC~61508
-can be applied to any kind of industry while ISO~26262 is defined only for the
-automotive industry. IEC~61508 have four safety integrity levels (SIL) ranked
-1-4. SIL 4 is the highest and should be applied where a failure can
-do devastating damage to a large area. %% är det inte också så att om det är
-%% ganska farligt men riskerar att hända ofta så ska den också klassas som SIL 4.
-The automotive industry is improbable to have this risk. That is why ISO~26262
-%% "that is why" - syftar på att detta är huvudanledningen. det är nog många
-%% olika anledningar att ISO26262 har utvecklats.
-exists which also defines four levels of SIL called automotive safety integrity
-level (ASIL). The ASIL range from A-D, where D is the highest and roughly
-translate to SIL 3.
+%% SKRIV OM V-modellen i ISO~26262
+%% Och integrationstester mot unittester etc, (6-9, 6-10, 6-11 i ISO)
+
+
+% ISO~26262 is built on IEC~61508 which is titled Functional Safety of
+% Electrical/Electronic/Programmable Electronic Safety-related Systems. IEC~61508
+% can be applied to any kind of industry while ISO~26262 is defined only for the
+% automotive industry. IEC~61508 have four safety integrity levels (SIL) ranked
+% 1-4. SIL 4 is the highest and should be applied where a failure can
+% do devastating damage to a large area. %% är det inte också så att om det är
+% %% ganska farligt men riskerar att hända ofta så ska den också klassas som SIL 4.
+% The automotive industry is improbable to have this risk. That is why ISO~26262
+% %% "that is why" - syftar på att detta är huvudanledningen. det är nog många
+% %% olika anledningar att ISO26262 har utvecklats.
+% exists which also defines four levels of SIL called automotive safety integrity
+% level (ASIL). The ASIL range from A-D, where D is the highest and roughly
+% translate to SIL 3.
 
 \subsection{AUTOSAR (AUTomotive Open System ARchitecture)}
 %Beskriv vad fan det är
 %Källa http://www.autosar.org/
-AUTOSAR is a worldwide development partnership of car manufacturers, suppliers
-and other companies from the electronics, semiconductor and software industry.
+The AUTOSAR platform has a layered software architecture. This means that the
+architecture is divided to a number of different layers, such as the application
+layer, runtime environment, the basic software layer, and the
+microcontroller. In the Figure~\ref{FIG:AUTOSAR:architecture} the basic software
+layer is represented as four different parts; services, ECU
+abstraction, microcontroller abstraction, and complex drivers.
 
-Some of the specifications in AUTOSAR is left quite open for interpretation.
-%% beskriv varför dessa inte är tillräckligt definierade, och varför olika
-%% konfigurationer existerar.
-This makes it possible for vehicle developers to have different specifications
-for a configuration. Some parts of those configuration specifications is
-generated into code, while other is manually written or added as a configurable.
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics[keepaspectratio, width=\linewidth]{pictures/autosar_architecture.jpg}
+  \end{center}
+  \caption{The AUTOSAR software architecture. Noticeable is that the basic
+    software layer is divided further into three categories with more subsections.}
+  \label{FIG:AUTOSAR:architecture}
+\end{figure}
+
+The runtime environment is the OS, and the microcontroller is the hardware. The
+software running in the application layer is applications such as sensors and
+actuators. %% skriva något mer om applikationslagret.
+
+%% Saxxat från AUTOSAR Layered software
+% Automotive ECUs have the properties: strong interaction with hardware,
+% connection to vehicle networks, limited computing power and memory, real time
+% system, program execution from internal or external flash memory.
+
+% The AUTOSAR architecture is a generic approach, standard modules can have
+% extended functionality and still be compliant.
+
+One example of how the different parts in the basic software layer is
+integrated, is the watchdog, which consist of several parts as seen in Figure~\ref{FIG:AUTOSAR:watchdog}. The
+microcontroller abstraction layer has the drivers for the watchdog, the
+interaction with the microcontroller. Then there is the watchdog interface at
+the ECU abstraction layer. The watchdog interface is the onboard device
+abstraction. Last is the watchdog manager which runs as a system service in the
+service layer.
+
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics{pictures/watchdog_architecture.jpg}
+  \end{center}
+  \caption{The Watchdog and some other related modules.}
+  \label{FIG:AUTOSAR:watchdog}
+\end{figure}
+
+The watchdog have a number of dependencies to other services in the basic
+software layer. For example when an error is found by the watchdog, it should be
+reported to either the diagnostic event manager or the development error
+tracer. Two services used for error management. %% bra eller anus att skriva av
+                                %% den ska skicka fel till DEM eller DET när vi
+                                %% skriver i nästa avsnitt att det går att ta
+                                %% bort DEM rapporteringen?
+
+AUTOSARs concept is to make it possible for vehicle manufacturers to buy modules
+from different software developers, which will still work together in
+unison. For vehicle manufacturers to have different work done by the same
+software developer's
+module, the standard introduce configurations. There exist a number of variables
+to configure. In the watchdog manager, there is for example variables that
+specify if the watchdog manager should report errors to the diagnostic event
+manager (DEM), or which type of supervision that should be done and what to
+supervise.
+
+%% SKRIV OM introduktionen av functional safety i version 4 av AUTOSAR
+
+
+% Some of the specifications in AUTOSAR is left quite open for interpretation.
+% %% beskriv varför dessa inte är tillräckligt definierade, och varför olika
+% %% konfigurationer existerar.
+% This makes it possible for vehicle developers to have different specifications
+% for a configuration. Some parts of those configuration specifications is
+% generated into code, while other is manually written or added as a configurable.
 
 \section{Existing Software}
 There are a number of existing software tools whose aim are to simplify the

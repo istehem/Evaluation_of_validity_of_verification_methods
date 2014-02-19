@@ -1,5 +1,5 @@
 \chapter{Introductions to QuickCheck}
-
+\label{APP:QUICKCHECK}
 \lstset{style=erlang}
 \label{SEC:QuickCheckIntro}
 Lets say that one created a \emph{sort} function that takes a list $Xs$ of any
@@ -235,43 +235,63 @@ checkpoints reached in a graph.
 \end{itemize}
 
 \section{Global Status}
-The global status represents the current state of the hole watchdog
+The global status represents the current state of the whole watchdog
 manager. There are five different statuses.
 \begin{itemize}
-\item WDGM\_GLOBALSTATUS\_DEACTIVATED \\
-  The watchdog manager is deactivated
-\item WDGM\_GLOBALSTATUS\_OK \\
-  The watchdog manager is in a correct state \\
-\item WDGM\_GLOBALSTATUS\_FAILED \\
-  ...
-\item WDGM\_GLOBALSTATUS\_EXPIRED \\
-  ...
-\item WDGM\_GLOBALSTATUS\_STOPPED \\
-  ...
+\item WDGM\_GLOBAL\_STATUS\_DEACTIVATED \\
+  The watchdog manager is in a resting state, deactivated, and will not execute
+  any supervision functions.
+\item WDGM\_GLOBAL\_STATUS\_OK \\
+  The watchdog manager is in a correct state.\\
+\item WDGM\_GLOBAL\_STATUS\_FAILED \\
+  A failure has happened to an alive supervision and the watchdog is configured
+  to have a tolerance against this kind of fault.
+\item WDGM\_GLOBAL\_STATUS\_EXPIRED \\
+  A fault has happened and the watchdog is configured to postpone the error
+  reaction (the final transition to the stopped state).
+\item WDGM\_GLOBAL\_STATUS\_STOPPED \\
+  This is the final state of the watchdog state machine. Recovery mechanisms
+  will be started and usually a watchdog reset will occur.
 \end{itemize}
-The different statuses are related to each other according to figure \ref{APP:FIG:GLOBALSTATUS}.
-The only function that can change the global status is the main function. This
-is done by locking at the local statuses of supervised entities and the
-current global status.
+The different statuses are related to each other according to figure~\ref{APP:FIG:GLOBALSTATUS}.
+There is only a small number of functions that is allowed to change the global
+status; those are the main function, the initialization function and the
+de-initialization function. The main function decide the next global status by
+checking the local statuses of the supervised entities and the current global
+status. The initialization function should only be able to change the global
+status from deactivated to ok, and the de-initialization function from ok to deactivated.
 
 \begin{figure}
-\includegraphics{pictures/globalstatuses.jpg}
-\label{APP:FIG:GLOBALSTATUS}
-\caption{The possible global statuses represented as a graph}
+  \includegraphics{pictures/globalstatuses.jpg}
+  \label{APP:FIG:GLOBALSTATUS}
+  \caption{The possible global statuses represented as a graph}
 \end{figure}
 
 \section{Local Status}
-A local status is a status of a supervised entity and is set
-according to the current local status and the results of the supervision
-algorithms. There are four different local statuses.
+A local status is a status of one supervised entity and could be set according
+to the current local status and the results of the supervision functions. There
+are four different local statuses. Init setmode mainfunction
 
 \begin{itemize}
-\item trams
+  \item WDGM\_LOCAL\_STATUS\_DEACTIVATED\\
+    If a supervised entity is set to deactivated, it will not be checked by the
+    supervision functions.
+  \item WDGM\_LOCAL\_STATUS\_OK\\
+    The supervised entity is in a correct state.
+  \item WDGM\_LOCAL\_STATUS\_FAILED\\
+    Alive supervision for the supervised function has failed.
+  \item WDGM\_LOCAL\_STATUS\_EXPIRED\\
+    A fault has been observed within the supervised function. The main function
+    will save the identification of the first supervised entity which reach this
+    state.
 \end{itemize}
 
 \section{API functions}
 \subsection{WdgM\_Init}
-Initializes the watchdog manager.
+Initializes the watchdog manager by setting, among other things, the local
+status of all supervised entities to either WDGM\_LOCAL\_STATUS\_OK or
+WDGM\_LOCAL\_STATUS\_DEACTIVATED. It also changes the global status to
+WDGM\_GLOBAL\_STATUS\_OK.
 \subsection{WdgM\_DeInit}
 De initializes the watchdog manger.
 \subsection{WdgM\_GetVersionInfo}
@@ -292,7 +312,7 @@ Shall set the trigger condition for all configured watchdogs to zero and
 thereby causing the hardware watchdogs to cause an external hardware reset.
 \subsection{WdgM\_GetFirstExpiredSEID}
 Returns the supervised entity that first reached the state
-\emph{LOCAL\_STATUS\_EXPIRED}.\footnotemark[\thefootnote]
+\emph{WDGM\_LOCAL\_STATUS\_EXPIRED}.\footnotemark[\thefootnote]
 \subsection{WdgM\_MainFunction}
 The main function is periodically called, it first updates the local statuses by
 running alive supervision for the supervised entities and then sets the global
@@ -300,3 +320,13 @@ status depending on the current state of the watchdog manager; this includes the
 new values of the local statuses.
 
 \chapter{Bugs in C-code}
+%% \section{-Some summary-}
+%%   A longer summary with AUTOSAR requirements which is violated
+%% \subsection{Severity:}\\
+%%   Why?
+%% \subsection{Steps to reproduce:}
+%%   \begin{lstlistings}
+%%     WdgM_Init
+%%   \end{lstlistings}
+
+\chapter{Ambiguities in AUTOSAR}
