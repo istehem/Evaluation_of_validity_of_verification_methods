@@ -59,13 +59,26 @@ system design specification. This is part of the integration between software
 and hardware. The second phase is the ``software architectural design''. It
 represent the interaction between all software components. The third phase and
 the last development phase, in the model is the ``software unit design and
-implementation''. %%%% FORTSÄTT HÄR!!
+implementation''. This phase contains the implementation of each module. If the
+implementation does not meet the wished safety, maybe the software
+architectural design or the specification of the software safety requirements
+need to be redesigned.
 
 \begin{figure}
   \includegraphics[keepaspectratio, width=\linewidth]{V}
   \caption{Phases of software development in the standard ISO~26262}
   \label{FIG:ISO:phases}
 \end{figure}
+
+Each of these phases is tested thoroughly with the phases ``software unit
+testing'', ``software integration and testing'' and ``verification of software
+safety requirements''. The unit testing phase tests that the implementation of
+the module fulfills the design specifications. If there is failures, one need to
+go back to the implementation phase, or if successful go to the phase
+integration and testing. This phase objective is to integrate the software units
+and demonstrate that the architectural design is correct. A demonstration that
+the software safety requirements is fulfilled, is done in the phase
+``verification of software safety requirements''.
 
 % ISO~26262 is built on IEC~61508 which is titled Functional Safety of
 % Electrical/Electronic/Programmable Electronic Safety-related Systems. IEC~61508
