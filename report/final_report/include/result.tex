@@ -79,7 +79,7 @@ called lesser and lesser times. This function is only needed when the global
 state is deactivated. It has more likelihood to be generated among the first
 commands in the command sequence, or right after a \lstinline!WdgM_DeInit!.
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
   \begin{center}
     \subfigure[Shows percentage of each possible command executed]{
       \label{FIG:COMMANDS_BSI}
@@ -95,8 +95,8 @@ commands in the command sequence, or right after a \lstinline!WdgM_DeInit!.
   \label{FIG:BSI}
 \end{figure}
 
-\begin{table}[h!]
-  \caption{bsi configuration}
+\begin{table}[!ht]
+  \caption{BSI configuration}
   \label{TABLE:STATUSES_BSI}
   \input{generated_tables/history_statuses_bsi.tex}
 \end{table}
@@ -109,7 +109,7 @@ that is used in actual lab environments. The state machine for the global
 status is totally covered by running QuickCheck, see
 table~\ref{TABLE:STATUSES_FREESCALE} and figure~\ref{FIG:GLOBALSTATUSES}.
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
   \begin{center}
     \subfigure[Shows percentage of each possible command executed]{
       \includegraphics{generated_pictures/history_commands_freescale.pdf}
@@ -124,7 +124,7 @@ table~\ref{TABLE:STATUSES_FREESCALE} and figure~\ref{FIG:GLOBALSTATUSES}.
   \label{FIG:FREESCALE}
 \end{figure}
 
-\begin{table}[!h]
+\begin{table}[!ht]
   \caption{Freescale configuration}
   \label{TABLE:STATUSES_FREESCALE}
   \input{generated_tables/history_statuses_freescale.tex}
@@ -136,7 +136,7 @@ configuration. This is because it supports all functionality of an
 configuration. Because of the complexity, some transition is harder or even
 impossible to reach.
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
   \begin{center}
     \subfigure[Shows percentage of each possible command executed]{
       \label{FIG:COMMANDS_EXAMPLE}
@@ -152,14 +152,15 @@ impossible to reach.
   \label{FIG:EXAMPLE}
 \end{figure}
 
-\begin{table}[!h]
-  \caption{example configuration}
+\begin{table}[!ht]
+  \caption{Example configuration}
   \label{TABLE:STATUSES_EXAMPLE}
   \input{generated_tables/history_statuses_example.tex}
 \end{table}
 
 \section{Handle bugs in the C code}
 \label{sec:handlebugs}
+
 
 \section{Functional safety analysis}
 \subsection{Definition of time}
