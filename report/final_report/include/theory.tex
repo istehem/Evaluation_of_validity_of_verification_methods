@@ -59,13 +59,26 @@ system design specification. This is part of the integration between software
 and hardware. The second phase is the ``software architectural design''. It
 represent the interaction between all software components. The third phase and
 the last development phase, in the model is the ``software unit design and
-implementation''. %%%% FORTSÄTT HÄR!!
+implementation''. This phase contains the implementation of each module. If the
+implementation does not meet the wished safety, maybe the software
+architectural design or the specification of the software safety requirements
+need to be redesigned.
 
 \begin{figure}
-  \includegraphics[keepaspectratio, width=\linewidth]{V}
+  \includegraphics[keepaspectratio, width=\linewidth]{pictures/V}
   \caption{Phases of software development in the standard ISO~26262}
   \label{FIG:ISO:phases}
 \end{figure}
+
+Each of these phases is tested thoroughly with the phases ``software unit
+testing'', ``software integration and testing'' and ``verification of software
+safety requirements''. The unit testing phase tests that the implementation of
+the module fulfills the design specifications. If there is failures, one need to
+go back to the implementation phase, or if successful go to the phase
+integration and testing. This phase objective is to integrate the software units
+and demonstrate that the architectural design is correct. A demonstration that
+the software safety requirements is fulfilled, is done in the phase
+``verification of software safety requirements''.
 
 % ISO~26262 is built on IEC~61508 which is titled Functional Safety of
 % Electrical/Electronic/Programmable Electronic Safety-related Systems. IEC~61508
@@ -82,7 +95,6 @@ implementation''. %%%% FORTSÄTT HÄR!!
 % translate to SIL 3.
 
 \subsection{AUTOSAR (AUTomotive Open System ARchitecture)}
-%Beskriv vad fan det är
 %Källa http://www.autosar.org/
 The AUTOSAR platform has a layered software architecture. This means that the
 architecture is divided to a number of different layers, such as the application
@@ -146,7 +158,10 @@ specify if the watchdog manager should report errors to the diagnostic event
 manager (DEM), or which type of supervision that should be done and what to
 supervise.
 
-%% SKRIV OM introduktionen av functional safety i version 4 av AUTOSAR
+The current version of AUTOSAR, version 4, has been design with functional
+safety in mind. Essential concepts of ISO~26262 have been developed alongside
+AUTOSAR.
+%% SKRIV MER OM functional safety i version 4 av AUTOSAR
 
 
 % Some of the specifications in AUTOSAR is left quite open for interpretation.
