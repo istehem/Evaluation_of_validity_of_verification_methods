@@ -466,7 +466,7 @@ entities.
 Logical supervision verifies if graphs are executed in the correct order. \\ Let
 $G = (V,E)$ be a internal graph for a supervised entity $S$ such that $\forall c_k
 \in V \rightarrow c_i \in S$. For the graph $G$ there exist a start checkpoint
-$c_s \in V$ and a final checkpoint $c_f \in V$. Then the logical supervision
+$c_s \in V$ and a final checkpoint $c_f \in V$. The logical supervision
 checks that the first checkpoint $c_1$ that is reached has the property $c_1 =
 c_s$ and for every reached checkpoint $c_j$ there exists an edge
 $(c_{j-1},c_{j}) \in E, j \neq 1$.           
@@ -541,6 +541,7 @@ status of a supervised entity.
 \end{figure}
 
 \section{API functions}
+\label{APP:API_CALLS}
 \subsection{WdgM\_Init}
 Initializes the watchdog manager by setting, among other things, the local
 status of all supervised entities to either WDGM\_LOCAL\_STATUS\_OK or
