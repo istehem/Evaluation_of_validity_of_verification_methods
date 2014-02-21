@@ -138,7 +138,7 @@ running QuickCheck, see table \ref{TABLE:STATUSES_FREESCALE} and figure
 The distribution of API-calls seems, according to figure
 \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and 
 \ref{FIG:COMMANDS_EXAMPLE}, to be the same for all configuration. The arguments
-to the API calls is however different, even though it is not seen in this plots.
+to the API calls is however different, even though it is not seen in those plots.
 The most interesting API calls is the ones thats modifies the internal state of
 the wathdog mangager, see appendix \ref{APP:API_CALLS}, namely \emph{init},
 \emph{deinit}, \emph{setmode}, \emph{mainfunction},
@@ -147,19 +147,20 @@ they will influence the results of future coming API calls.
 
 The init and deinit functions can just put the global
 status between two states, and should only change the internal state of the
-watchdog if they are called in one and only one correct state according to
+watchdog, when the watchdog is in either \emph{WDGM\_GLOBAL\_STATUS\_OK}
+or \emph{WDGM\_GLOBAL\_STATUS\_DEACTIVATED}, according to
 figure \ref{FIG:GLOBALSTATUSES}. If this happens they will change the internal
 state of the watchdog but will do so in the same manner independent previous
 called commands. The behaviour of this commands will hence not vary much. 
 This two functions has also the property that after they are called they will
-always put the watchdog manager in the same sate or a state that has already
+always put the watchdog manager in the same state, or a state that has already
 been reached, except for the first time the init function is called.   
 
 The performreset function is boring why?
 
 The set mode function changes the mode, why interesting? 
 
-The two remaining API-calls that are really worth discuss in detailed are the
+The two remaining API-calls that are really worth discussing in detailed are the
 main function and the checkpoint reached function. As can be seen in   
 \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and \ref{FIG:COMMANDS_EXAMPLE},
 \ref{FIG:COMMANDS_EXAMPLE} they are also the two commands that are most most
