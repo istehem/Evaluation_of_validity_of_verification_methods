@@ -228,12 +228,12 @@ entities.
 \begin{itemize}
 \item Logical Supervision: \\
 Logical supervision verifies if graphs are executed in the correct order. \\ Let
-$G(V,E)$ be a internal graph for a supervised entity $S$ such that $\forall c_k
-\in V \rightarrow c_k \in S$. For the graph $G$ there exist a start checkpoint
-$c_s \in V$ and a final checkpoint $c_f \in V$.  Then the logical supervision
-checks that the first checkpoint $c_i$ that is reached has the property $c_i =
-c_s$ and for every next coming checkpoint $c_j$ there exists an edge
-$(c_j,c_{j+1}) \in E, c_j \neq c_f$.           
+$G = (V,E)$ be a internal graph for a supervised entity $S$ such that $\forall c_k
+\in V \rightarrow c_i \in S$. For the graph $G$ there exist a start checkpoint
+$c_s \in V$ and a final checkpoint $c_f \in V$. Then the logical supervision
+checks that the first checkpoint $c_1$ that is reached has the property $c_1 =
+c_s$ and for every reached checkpoint $c_j$ there exists an edge
+$(c_{j-1},c_{j}) \in E, j \neq 1$.           
 \item Alive Supervision: \\
   Alive supervision periodically verifies the timing of transitions and
 checkpoints reached in a graph.
