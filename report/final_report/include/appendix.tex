@@ -218,10 +218,9 @@ transitions between checkpoints are defined as graphs. Checkpoints and
 transitions between checkpoints within a given supervised entity are marked as
 internal graphs. There may however be transitions between checkpoints of
 different supervised entities, such graphs are marked as external graphs.
-Available graphs are supplied be the configuration. There may be different graphs
-for different modes of the watchdog manager.
+Available graphs are supplied by the configuration. There may be different
+graphs for different modes of the watchdog manager.
 %Lite matematiska utryck kanske?
-
 
 There are three supervision algorithms to verify the correctness of supervised
 entities.
@@ -233,7 +232,7 @@ $G = (V,E)$ be a internal graph for a supervised entity $S$ such that $\forall c
 $c_s \in V$ and a final checkpoint $c_f \in V$. Then the logical supervision
 checks that the first checkpoint $c_1$ that is reached has the property $c_1 =
 c_s$ and for every reached checkpoint $c_j$ there exists an edge
-$(c_{j-1},c_{j}) \in E, j \neq 1$.           
+$(c_{j-1},c_{j}) \in E, j \neq 1$.
 \chapter{Introductions to QuickCheck}
 \label{APP:QUICKCHECK}
 \lstset{style=erlang}
@@ -469,7 +468,7 @@ $G = (V,E)$ be a internal graph for a supervised entity $S$ such that $\forall c
 $c_s \in V$ and a final checkpoint $c_f \in V$. Then the logical supervision
 checks that the first checkpoint $c_1$ that is reached has the property $c_1 =
 c_s$ and for every reached checkpoint $c_j$ there exists an edge
-$(c_{j-1},c_{j}) \in E, j \neq 1$.           
+$(c_{j-1},c_{j}) \in E, j \neq 1$.
 \item Alive Supervision: \\
   Alive supervision periodically verifies the timing of transitions and
 checkpoints reached in a graph.
@@ -631,7 +630,7 @@ manager. There are five different statuses.
   reaction. In contradiction to
   \emph{WDGM\_GLOBAL\_STATUS\_FAILED} there is no recovery mechanism for this
   state and the watchdog manager will eventually reach the state
-  \emph{WDGM\_GLOBAL\_STATUS\_STOPPED}. 
+  \emph{WDGM\_GLOBAL\_STATUS\_STOPPED}.
 \item WDGM\_GLOBAL\_STATUS\_STOPPED \\
   This is an absorbing state of the watchdog state machine. Recovery mechanisms
   will be started and usually a watchdog reset will occur.
@@ -669,7 +668,7 @@ are four different local statuses. Init setmode mainfunction
     state.
 \end{itemize}
 Figure \ref{APP:FIG:LOCALSTATUSES} describes the state machine for the local
-status of a supervised entity. 
+status of a supervised entity.
 
 \begin{figure}
 \includegraphics{pictures/localstatuses.jpg}

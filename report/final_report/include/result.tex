@@ -20,8 +20,9 @@ and right timing.
 Besides the transition between the deactivated and the OK states, the only
 function that can give rise to state transitions for the global status, is the
 main function. In an working ECU, the main function should continuously be
-called, in a given time interval, by the run time environment (RTE). Note that
-the timing is not used when using QuickCheck, see section \ref{SEC:CALLING_COMMANDS}.
+called, in a configured time interval, by the run time environment (RTE). Note
+that the timing is not used when using QuickCheck, see section
+\ref{SEC:CALLING_COMMANDS}.
 
 \begin{figure}[h!]
   \begin{center}
@@ -32,25 +33,52 @@ the timing is not used when using QuickCheck, see section \ref{SEC:CALLING_COMMA
 \end{figure}
 
 \section{Configurations}
-The WdgM was tested using three different configurations.
-% Which are they and why were they chosen
+The WdgM was tested using three different configurations. The configurations
+were of different complexity. One was a minimal configuration, one a example
+configuration and one was a live configuration, used in actual implementations.
+
+Because there is only a small number of commands that influences the state
+transitions, those commands were tweaked and therefore was generated more
+often. On the other hand, all get-functions were tweaked to not be generated as often.
 
 \subsection{BSI}
-A highly simplified configuration \emph{BSI} gives in some sense good results.
+A highly simplified configuration, \emph{BSI}, gives in some sense good results.
 Using this configuration the WdgM was never hitting the absorbing state
 according to figure \ref{FIG:GLOBALSTATUSES}.  However looking at the state
 transitions, comparing figure \ref{FIG:GLOBALSTATUSES} and table
 \ref{TABLE:STATUSES_BSI}, only two states are hit. This happens
-because the configuration is to simply, it is actually impossible to hit
+because the configuration is to simple, it is actually impossible to hit
 any other states then \emph{'GLOBAL\_STATUS\_OK'} or
 \emph{'GLOBAL\_STATUS\_DEACTIVATED'}. There are no checkpoints or supervision
-algorithms configured for the \emph{BSI} configuration.
-Hence it is easy to run tests using this configuration but it does, by it self,
-not fully test the code because some specification requirements will never be
-tested. The untested requirements are mainly requirements for supervision algorithms
-that are, according to the configuration, never supposed to be run. Those
-untested requirements leaves also other requirements untested because
-the watchdog manager never reaches a state when those other requirements must hold.
+functions configured for the \emph{BSI} configuration.
+It is easy to run tests using this configuration but it does not, by it self,
+fully test the code because some specification requirements will never be
+tested. The untested requirements are mainly requirements for supervision
+functions that are, according to the configuration, never supposed to be
+run. Those untested requirements leaves also other requirements untested because
+the watchdog manager never reaches a state when those other requirements must
+hold.
+
+Figure~\ref{FIG:COMMANDS_BSI} shows how many times a certain command was
+generated versus the length of the command sequence that was generated. E.g. the
+function \lstinline!WdgM_CheckpointReached! had in average a little more than
+40\% of all calls. This is because, in any other configuration, the supervision
+functions demand that a certain number of checkpoints is reached before the next
+main function is called \footnote{This is however not completely true, but it
+  gives the general idea.}. There is also a dependency the other way around. The
+main function has to be called a certain number of times before
+\lstinline!WdgM_CheckpointReached! is called on a certain supervised
+entity. This is why that function also has quite high proportions. Other
+functions that stands out is \lstinline!WdgM_SetMode! and \lstinline!WdgM_Init!.
+\lstinline!WdgM_Setmode! is called because different modes can have different
+supervision functions and supervised entities. That is why we need to call this
+function often. It should retain the states of supervised entities that is
+activated in the new mode and should reset the local state if the entity is
+deactivated in the new mode. The function \lstinline!WdgM_Init! is in contrast
+called lesser and lesser times. This function is only needed when the global
+state is deactivated. It has more likelihood to be generated among the first
+commands in the command sequence, or right after a \lstinline!WdgM_DeInit!.
+
 \begin{figure}[h!]
   \begin{center}
     \subfigure[Shows percentage of each possible command executed]{
