@@ -24,9 +24,19 @@ safety of modules.
 %% - coverage på modell och c-kod genom cover (erlang) och bullseye (c-kod)
 %% - statistik på quickcheck körningar.
 
-\section{Future work}
-Some interesting thing we wanted to do from the beginning was to implementing another module, preferably one that has some kind of dependency with the watchdog manager. This is because then, it would be possible to testing towards the phase ``system integration and testing'' in ISO~26262 and get even better results.
+Striped of comments and blank lines, the implemented Erlang model is almost 1500
+lines of code. This is to be compared with the c-code which is over 12500 lines
+of code.
 
-Another good idea is to do more negative testing, and testing of null pointers. This should be done to raise the coverage for the C-code to even better levels.
+\section{Future work}
+Some interesting thing we wanted to do from the beginning was to implementing
+another module, preferably one that has some kind of dependency with the
+watchdog manager. This is because then, it would be possible to testing towards
+the phase ``system integration and testing'' in ISO~26262 and get even better
+results.
+
+Another good idea is to do more negative testing, and testing of null
+pointers. This should be done to raise the coverage for the C-code to even
+better levels.
 
 We could also try new configurations. More configurations = better testing.
