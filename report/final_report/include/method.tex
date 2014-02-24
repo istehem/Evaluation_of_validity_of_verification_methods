@@ -26,6 +26,73 @@ combination, for example by corrupting some software elements?
 %% SKRIV OM vilka delar i ISO~26262 vi kan testa mha Quickcheck (6-9, 6-10,
 %% 6-11)
 
+\subsection{Existing tools}
+Besides Quickcheck, there are a number of existing software tools whose aim are
+to simplify the implementation of verification and testing.
+%% ..och helt plötsligt presenteras en lista av något..
+\begin{itemize}
+\item SPIN
+\item McErlang
+\item $\mu$CRL toolset
+\item CADP
+\item Parasoft C/C++test
+%\item Erlang and QuickCheck
+%\item Symlink
+%\item CORE
+%\item Isabelle
+\end{itemize}
+
+% \subsection{CORE}
+% A specification package developed by British Aerospace and System Designers.
+
+%\subsection{Promela}
+
+\subsection{SPIN}
+SPIN is used to trace logical design errors in distributed
+software\cite{SPIN:manual}. It supports a high level language, Promela, to
+specify system descriptions. Promela is an acronym for PROcess MEta LAnguage, and
+is a verification model language. The system properties that should be checked
+are written in logical temporal language (LTL), and SPIN reports errors such as
+deadlocks, race conditions and incompleteness between these properties and the
+system model. It also supports embedded C code as part of the model
+specifications. It supports random, interactive and guided simulation, with both
+partial and exhaustive proof techniques.
+
+\subsection{McErlang}
+McErlang is a model checker written in Erlang used for verifying distributed
+Erlang programs\cite{MCERLANG:model-checker}. Its purpose is to check a program
+against a correctness property, but can also among other things check safety
+or liveness properties.
+
+McErlang offers two depth-first state traversal model checking algorithms; one
+checks safety properties and the other is used for checking the liveness
+properties. McErlang also implements weak process fairness, by omitting non-fair
+loops from the accepting runs in its liveness algorithm.
+
+%% jag tror mcerlang ingår i QuickCheck suiten. den blir installerad tillsammans
+%% med QuickCheck iaf.
+
+\subsection{$\mu$CRL toolset} $\mu$CRL is a process algebraic language which is
+suited for the analysis of distributed systems. The toolkit is built on this
+language and contains a theorem prover based on binary decision
+diagrams\cite{MCRL:manual}.
+
+\subsection{CADP} Construction and Analysis of Distributed Processes (CADP),
+formerly CAESAR/ALDEBARAN Development Package, is a toolset for the design of
+distributed systems\cite{CADP:manual}. It includes, among others, tools for
+equivalence checking, state-space manipulation and model checking, and it also
+includes several verification algorithms. It provides functionality as
+step-by-step simulation to parallel model checking.
+
+\subsection{Parasoft C++test}
+Parasoft C++ is a commercial software with a huge range of functionality,
+developed by the Parasoft company, with the purpose of testing software written
+in C or C++. Parasoft claims that it should be possible to satisfy ASIL
+requirements using their software(?).
+%\subsection{Isabelle}
+% Isabelle theorem prover is an interactive theorem prover, successor of the
+% Higher Order Logic (HOL) theorem prover
+
 \subsection{Why QuickCheck and Erlang?}
 
 \section{Specification}
