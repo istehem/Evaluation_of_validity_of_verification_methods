@@ -183,23 +183,25 @@ we know that \lstinline!WdgM_MainFunction! is called periodically.
 \label{sec:handlebugs}
 There is a number of possible ways to handle bugs when QuickCheck encounters
 them. The problem is that QuickCheck generates arbitrary command sequences, it
-cannot ``save'' an error and proceed to find the next error. Either the c-code
+cannot ``save'' an error and proceed to find the next error. Either the C-code
 or the model needs to be ``corrected''.
 The best way, with the model in mind, would often be to let a third
 party correct the discovered bugs. However this is time consuming because the
 support line has often already much to do, and the releases doesn't come that
 often.
-Another way is to mock the erroneous function, but then you will only find one
-bug per function, strictly limiting the probability to find bugs.
+Another way is to mock, in other words simulate the output of the C-code, the
+erroneous function, but then you will only find one
+bug per function, strictly limiting the probability to find bugs. There are a
+QuickCheck Erlang module for the purpose of mocking C-code, see \ref{APP:SEC:OTHERMODULES}
 Then there is two equally good methods. Either the Erlang model needs to have
-the fault implemented, or the c-code needs to be fixed. There are pros and cons
+the fault implemented, or the C-code needs to be fixed. There are pros and cons
 with both methods. If the Erlang model introduce bugs, there may be secondary
 failures which are not discovered. This could also happened when correcting the
-c-code, but then more knowledge of the module is needed, and some of the
+C-code, but then more knowledge of the module is needed, and some of the
 secondary failures can easier be avoided. It also takes more time to get the
-extra knowledge of the c-code.
+extra knowledge of the C-code.
 
-We choose to correct the c-code, because then we had direct feedback and could
+We choose to correct the C-code, because then we had direct feedback and could
 discover where in the code the bugs were introduced.
 
 \section{Functional safety analysis}
