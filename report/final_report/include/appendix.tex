@@ -353,26 +353,28 @@ new values of the local statuses.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Ambiguities in AUTOSAR}
-\paragraph{Bad transition}
-The transition \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED! to
+\subsection*{Bad transition}
+The transition \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED! to\\
 \lstinline!WDGM_GLOBAL_STATUS_STOPPED! is possible due to [WDGM139]
 
-\paragraph{Incorrect reference}
-[WDGM329] could be the same as [WDGM]
-Initial/Final?
+\subsection*{Incorrect reference}
+[WDGM329] could be the same as [WDGM273]
+The only difference is a parenthesis referencing to Initial/Final?
 
-\paragraph{Optional or mandatory}
+\subsection*{Optional or mandatory}
 [WDGM344] and [WDGM258] is the same, with one difference: one is optional, the
 other mandatory.
 
-\paragraph{Logical supervision results}
+\subsection*{Logical supervision results}
 AUTOSAR does not specify if it is possible to overwrite logical supervision
 results from the same supervised entity.
 I.e.
 \begin{lstlisting}
-WdgM_CheckpointReached() -> incorrect result for SEx
-WdgM_CheckpointReached() -> Correct result for SEx
+WdgM_CheckpointReached(SEx, Bad_CP)  -> incorrect result for SEx
+WdgM_CheckpointReached(SEx, Good_CP) -> Correct result for SEx
 \end{lstlisting}
 
-\paragraph{Wrong spelling}
-[WDGM344\_CONF] WdgMInternallCheckpointFinalRef
+\subsection*{Wrong spelling}
+[WDGM344\_CONF] WdgMInternallCheckpointFinalRef has incorrect spelling.
+
+\subsection*{Definition of time in deadline supervision}

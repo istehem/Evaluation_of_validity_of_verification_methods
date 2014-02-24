@@ -136,7 +136,26 @@ configuration. This is because it supports all functionality of an
 configuration. Because of the complexity, some transition is harder or even
 impossible to reach. Noticeable is that the transition from the failed to
 the okay state, according to figure \ref{FIG:GLOBALSTATUSES} is never made, see
-table \ref{TABLE:STATUSES_EXAMPLE}. The reason for that is ...
+table \ref{TABLE:STATUSES_EXAMPLE}. The reason for that is that the alive
+functions must fail once and then continue without failures. Because
+\lstinline!WdgM_MainFunction! handles the alive supervision calculations, and
+the function \lstinline!WdgM_CheckpointReached! handles the incrementation of
+the alive counters. A certain number of calls to
+\lstinline!WdgM_CheckpointReached! must be done between each
+\lstinline!WdgM_MainFunction!. It does not stop there. Each checkpoint may have
+some logical supervision, so the order of the called checkpoints is important as
+well. It is also possible to set deadline supervision for a supervised
+entity. Both deadline supervision and logical supervision is handled by
+\lstinline!WdgM_CheckpointReached!, but with deadline supervision some time,
+specified in the configuration, must have elapsed since the start
+checkpoint. Because ``time'' isn't specified in AUTOSAR, see
+section~\ref{SEC:FUNCTIONAL_SAFETY_TIME}, the model implemented time as the
+c-code, with the use of \lstinline!WdgM_MainFunction!. This is possible because
+we know that \lstinline!WdgM_MainFunction! is called periodically.
+% We tried hard to find a suitable example when the global status transited from
+% \lstinline!WDGM_GLOBAL_STATUS_FAILED! to \lstinline!WDGM_GLOBAL_STATUS_OK!, in
+% the example configuration, but the number of commands needed for this
+% transition expanded to much and somewhere some other supervision failed.
 
 \begin{figure}[!ht]
   \begin{center}
@@ -162,7 +181,26 @@ table \ref{TABLE:STATUSES_EXAMPLE}. The reason for that is ...
 
 \section{Handle bugs in the C code}
 \label{sec:handlebugs}
+There is a number of possible ways to handle bugs when QuickCheck encounters
+them. The problem is that QuickCheck generates arbitrary command sequences, it
+cannot ``save'' an error and proceed to find the next error. Either the c-code
+or the model needs to be ``corrected''.
+The best way, with the model in mind, would often be to let a third
+party correct the discovered bugs. However this is time consuming because the
+support line has often already much to do, and the releases doesn't come that
+often.
+Another way is to mock the erroneous function, but then you will only find one
+bug per function, strictly limiting the probability to find bugs.
+Then there is two equally good methods. Either the Erlang model needs to have
+the fault implemented, or the c-code needs to be fixed. There are pros and cons
+with both methods. If the Erlang model introduce bugs, there may be secondary
+failures which are not discovered. This could also happened when correcting the
+c-code, but then more knowledge of the module is needed, and some of the
+secondary failures can easier be avoided. It also takes more time to get the
+extra knowledge of the c-code.
 
+We choose to correct the c-code, because then we had direct feedback and could
+discover where in the code the bugs were introduced.
 
 \section{Functional safety analysis}
 \subsection{Definition of time}
