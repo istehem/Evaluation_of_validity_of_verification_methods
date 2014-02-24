@@ -168,13 +168,14 @@ using the same techniques, for other modules.
 %Limitations. What should be left out and why?
 \section{Scope}
 We will use AUTOSAR 4.0 revision 3 for our thesis work.
-Since this version of AUTOSAR consists of around 80 specifications and other
+Since this version of AUTOSAR consists of more than 100 specifications and other
 auxiliary materials\cite{AUTOSAR:URL}, we will limit our scope to one
-specification. The module of this thesis is the WatchdogManager. This
+specification. The module of this thesis is the Watchdog Manager. This
 module provides monitoring services used to maintain correctness. This
 module is chosen because it got dependencies, and is used to report
 development and production errors, but mainly because it executes
-safety-critical work.
+safety-critical work. That it got dependencies is important when doing
+integration testing.
 
 Also the aim of the work is to verify software components. In other words no
 work considered hardware or a combination of hardware and software will be
