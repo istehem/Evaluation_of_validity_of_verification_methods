@@ -60,11 +60,7 @@ Functional safety was introduced to the automotive industry with ISO 26262 in
 late 2011 \cite{ISO26262}. ISO 26262 named ``Road vehicles -- Functional safety''
 is a general standard on how the implementation of functional safety in vehicle
 development should be carried out from beginning to end \cite{ISO26262}.
-\begin{comment}
-==============================================================================
- Nyskriven text under, hitta referencer och kontrollera!
-==============================================================================
-\end{comment}
+
 This standard is built on top of another industrial standard IEC 61508
 \cite{ISO26262}, named ``Functional safety of electrical/electronic/programmable
 electronic safety-related systems'' \cite{IEC61508}, which purpose is to ensure
@@ -93,11 +89,6 @@ need to be tested, and documented the most \cite{IEC61508}.\\
 The automotive has adopted a similar system of SIL, namely ASIL, automotive
 safety integrity levels. As IEC 61508 there are four integrity levels, named
 A-D, but there are no direct correlation between the two \cite{TI:safety_critical}.
-\begin{comment}
-==============================================================================
-SLUT NYSKRIVEN TEXT!
-==============================================================================
-\end{comment}
 
 \subsection{Testing}
 Functional safety demands testing \cite{ISO26262}, and testing accounts for
@@ -111,91 +102,15 @@ possible failure states is so large that it is considered
 infinite \cite{COURSEBOOK:safety-critical}. This makes it impossible exhaustively
 test the system, and therefore, also make the detection of failures unreliable.
 
-% %Background to the assignment. Why is it relevant?
-% \section{Background-old}
-% The last decade of the 20th century resulted in a dramatic growth of technology
-% \cite{AUTOSAR:gilberg}. The rate is still increasing with up to 90\% of all
-% innovations being realized through electronics in the beginning of the 21st
-% century \cite{Frost_Sullivan:flyer}, and over 80 \% of all innovations in the
-% automotive industry are in the electronics and software area
-% \cite{SAFE:interoperability}.
-% %% eventuellt dela upp paragrafen här då det är två olika ideer; en om att
-% %% teknologin utvecklas snabbt och mycket, och en som handlar om att just bilar
-% %% blir mer komplexa.
-% The software-based systems in motor vehicles have become more complex, and are
-% moving toward handling more critical functions \cite{SAFE:interoperability}.
-% Vehicles have already begun to communicate with each other \cite{VOLVO:convoys},
-% and it is soon expected that roadside traffic management systems will also
-% interact with the systems in vehicles \cite{SURVEY:car_communications}.
-
-% While the systems become more complex the software must be fault-tolerant and
-% safe. Testing, validation and verification is a need and should follow all
-% product development phases, from start to finish. The problem is that testing
-% is %% introducerar "product development phases" utan förklaring. behövs den?
-% both time consuming and labour intensive, accounting for up to 50 \% of the
-% development cost \cite{QUICKCHECK:lightweight}. Unit tests adds additional
-% complexity to the code. It is very important to test and verify all steps of the
-% development.
-
-% The complexity issue is that in systems such as microprocessors the number of
-% possible failure states is so large that it is considered
-% infinite \cite{COURSEBOOK:safety-critical}. This makes it impossible exhaustively
-% test the system, and therefore, also make the detection of failures unreliable.
-
-% Quviq QuickCheck has the ability to automate this process, and allow the
-% developer to write properties instead of tests. These properties makes it
-% possible for QuickCheck to create arbitrary input vectors that can be feed to
-% the code. Figure~\ref{IMG:phase_model} shows the different steps of the software
-% development process and the test and verification phases it has.
-
-% \begin{figure}[!ht]
-%   \includegraphics[keepaspectratio, width=\linewidth]{pictures/V}
-%   \label{IMG:phase_model}
-%   \caption{Phase model for software development}
-% \end{figure}
-
-% The first step is the system design. At this point the system specification is
-% written, and then the software specifications. When all specifications exists,
-% the next phase is to design the software architecture. The last part of the
-% design is software unit design and implementation. All phases must be a
-% verification of the former phase.
-
-% When the implementation is done, it is time for the test phases. These begins
-% with software unit testing which tests the software unit design phase. If the
-% tests verifies that the software unit design and implementation is correct, the
-% test phase moves on to the architectural design and then to verification of
-% software safety requirements.
-% The last test phase verifies that the system is
-% designed according to the specification. %It is important that the test phases
-% %test the specifications and not the
-% %implementation.
-
-% Because all manufacturers strive for the lowest production cost, car
-% manufacturers together with suppliers and other related companies, from the
-% automotive industry, have come to agree over a standard for the software
-% architecture in automotive vehicles. This standard is named AUTOSAR (AUTomotive
-% Open System ARchitecture) and makes it possible to select different suppliers
-% for different modules of the system.
-
-% AUTOSAR is very complex and since it is quite new, it still suffers from child
-% deceases, with requirements that are confusing and contradictorily. The first
-% versions of AUTOSAR is made without functional safety in mind.
-
 %Aim for the work. What should be accomplished?
 \section{Purpose}
-The purpose is to automate the testing process in an effective and good way.
-To make it possible to raise the Automotive Safety Integration Level (ASIL), in
-the software unit design and implementation phase and in the software %% nämner
- %% ASIL utan att ha pratat om det tidigare.
-architectural design phase, a check must be done to see if it exist a tool that
-can be used in order to perform a semi formal verification of a module, and
-then make this process generalized for modules in coexistence.\\ %% väldigt lång
- %% mening
+The purpose is to automate the testing process of automotive software in an
+effective and good way. To make it possible to raise the Automotive Safety
+Integration Level (ASIL), where applicable.
 
-The purpose is also to be able to decrease the number of needed unit tests in
-the software unit design and implementation phase. Even further is the goal to
-introduce semi formal verification of the software architectural design phase.
-The functional safety concept will be most important in this phase.
+A quick evaluation of tools that can be used in order to perform at least semi
+formal verification of automotive software modules. The main purpose is to
+evaluate if Quviq QuickCheck can be used for this.
 
 %question formulation?
 %The problem at hand, the assignment
