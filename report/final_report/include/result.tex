@@ -202,11 +202,21 @@ often called.
 
 \section{Coverage}
 \subsection{Erlang module}
+Here are some statistics. 
 \subsection{C-code}
-Bullseye Coverage was to analyse the coverage of the C-code. The results show
-that the decision coverage is over ?? and all functions except for one is
-executed, see figure \ref{FIG:BULLSEYE}. The reason for that there are a missing
-function call is that it is deprecated. 
+Bullseye Coverage was used to analyse the coverage of the C-code. The results
+show that the decision coverage is over ?? and all functions except for one is
+covered, see figure \ref{FIG:BULLSEYE}. The reason, for that there is a function
+that is not covered, is that it is deprecated and hence not implemented in Erlang
+code. Missing decision coverage in the C-code are checks for null pointers,
+which never evaluated to false. Many such checks seems to be redundant and
+impossible to evaluate to true, if one
+excludes the possibility of hardware failures or other processes which may
+corrupt the memory of the watchdog manager.      
+
+The coverage statistics shown in \ref{FIG:BULLSEYE} is constructed
+using three configuration. Using several configuration gave better results since
+some code is impossible reach if not certain configuration parameters is set. 
 
 \begin{figure}
 \label{FIG:BULLSEYE}
