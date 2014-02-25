@@ -60,7 +60,7 @@ seemed preferable to choose a less complicated module. It was also desirable to
 have the actual C code and not just library files.
 
 \section{Implementation}
-The C-code that was to be tested, using Quickcheck, was already unit tested and
+The C-code that was to be tested, using QuickCheck, was already unit tested and
 run sharp in lab environments at Mecel.
 
 The WdgM model was completely implemented in Erlang, independent of the design
@@ -68,13 +68,15 @@ choices of the C-code. The idea was to ensure an independent model; if the model
 was inspired by the C-code, it could have transmitted errors.
 
 The implementation of the module was done to be able to test API calls,
-also described in appendix~\ref{APP:QUICKCHECK}, against the C-code and check that postconditions
-held, according to figure \ref{FIG:api_calls}. The postconditions were written
-to test that AUTOSAR requirements held. In other words that the API calls were
-called correctly. A problem when writing the postconditions, because AUTOSAR
-specification are written in natural language, was to translate words into code.
-It was easy to see that there were room for different interpretations, which most
-likely would result in errors later.
+also described in appendix~\ref{APP:QUICKCHECK}, against the C-code. The tests
+then checked that the postconditions held, according to figure
+\ref{FIG:api_calls}. The postconditions were written to test that AUTOSAR
+requirements held. In other words that the API calls were called correctly. A
+problem when writing the postconditions, was to translate the AUTOSAR
+requirements into code, because AUTOSAR specification are written in natural
+language. It was easy to see that there were room for different interpretations,
+which most likely would
+result in errors later.
 
 The implementation of the AUTOSAR module in Erlang was done
 in an iterative way. Every piece of code were not required to be implemented before
