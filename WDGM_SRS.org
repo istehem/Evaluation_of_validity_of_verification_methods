@@ -3,8 +3,8 @@
 ** Need extra information/modules
 ** Impossible SRSs
 
-* Behavioural SRSs [114/114]
-** Possible [114/114]
+* Behavioural SRSs
+** Possible [114/124]
 *** DONE [WDGM200]
 *** DONE [WDGM238]
 *** DONE [WDGM268]
@@ -179,7 +179,7 @@
 **** TODO [WDGM313] (configuration) WDGM shall reject bad configurations
 **** TODO [WDGM314] (configuration) WDGM shall reject bad configurations
 
-** Others [0/39]
+** Others/UNSORTED [0/39]
 *** TODO [WDGM133] call Mcu_PerformReset
 *** TODO [WDGM002] multiple watchdogs
 *** TODO [WDGM259] Error values are of type uint8
