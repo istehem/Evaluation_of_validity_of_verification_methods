@@ -16,6 +16,7 @@
 #
 
 ERLFLAGS= -pa $(CURDIR)/.eunit -pa $(CURDIR)/ebin -pa $(CURDIR)/deps/*/ebin
+CONFIG=wdgm.config
 
 DEPS_PLT=$(CURDIR)/.deps_plt
 DEPS=erts kernel stdlib eqc
@@ -29,12 +30,20 @@ ifeq ($(ERL),)
 $(error "Erlang not available on this system")
 endif
 
+REBAR_CMD="$(shell which rebar)"
 
-REBAR="$(shell which rebar).cmd" -C "$(shell pwd)/rebar.config"
-
-ifeq ($(REBAR),)
+ifeq ($(REBAR_CMD),"")
 $(error "Rebar not available on this system")
 endif
+
+ifeq ($(wildcard $(CONFIG)),)
+$(error "Config file $(CONFIG) not found in $(shell pwd)")
+endif
+
+REBAR_ARGS=-C "$(shell pwd)/$(CONFIG)"
+
+REBAR=$(REBAR_CMD) $(REBAR_ARGS)
+
 
 .PHONY: all compile doc clean test dialyzer typer shell distclean pdf \
   update-deps clean-common-test-data rebuild rmbeam
