@@ -30,7 +30,7 @@ $(error "Erlang not available on this system")
 endif
 
 
-REBAR="$(shell which rebar).cmd" -C "$(shell pwd)/rebar.config"
+REBAR="$(shell which rebar)" -C "$(shell pwd)/rebar.config"
 
 ifeq ($(REBAR),)
 $(error "Rebar not available on this system")

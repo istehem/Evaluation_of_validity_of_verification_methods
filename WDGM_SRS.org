@@ -4,7 +4,7 @@
 ** Impossible SRSs
 
 * Behavioural SRSs
-** Possible [114/124]
+** Possible [115/124]
 *** DONE [WDGM200]
 *** DONE [WDGM238]
 *** DONE [WDGM268]
@@ -128,7 +128,7 @@
 *** TODO [WDGM018] possible to check - WdgM_Init
 *** TODO [WDGM010] possible to check - WdgM_Init
 *** TODO [WDGM030] possible to check - WdgM_Init
-*** TODO [WDGM350] possible to check - WdgM_Init
+*** DONE [WDGM350] possible to check - WdgM_Init
 
 ** Non-Behavioural SRSs [/]
 ** File/Code structure [0/5]

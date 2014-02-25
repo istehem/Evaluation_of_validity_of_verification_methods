@@ -168,3 +168,19 @@ new_SE_record(ModeId, SEid, Activated) ->
                     failed_alive_supervision_cycle_tol=FailedAliveTol,
                     failed_reference_supervision_cycles=0,
                     supervision_cycles=0}.
+
+%% could possible search for invalid variables.
+%% This is Mecels variable names.
+%% Maybe need to check that ModeId is valid.
+check_deadlinetimestamps(ModeId) -> %% [WDGM298]
+  Len = length(wdgm_config_params:get_deadline_supervision(ModeId)),
+  lists:all(fun(DRec) -> DRec#'WdgM_DeadLineSupervisionMonitor_Tag'.timestamp_var == 0 end, (eqc_c:read_array((eqc_c:value_of('WdgM_MonitorTableRef'))#'WdgM_MonitorTableRefType_Tag'.'DeadLineSupervisionMonitorTablePtr', Len))).
+
+
+%% could possible search for invalid variables.
+%% This is Mecels variable names.
+%% Maybe need to check that ModeId is valid.
+check_logicalactivityflag(ModeId) -> %% [WDGM296]
+  ILen = length(wdgm_config_params:get_internal_graphs()),
+  ELen = length(wdgm_config_params:get_external_graphs(ModeId)),
+  lists:all(fun(DRec) -> DRec#'WdgM_LogicalSupervisionMonitor_Tag'.activity_flag == 0 end, (eqc_c:read_array((eqc_c:value_of('WdgM_MonitorTableRef'))#'WdgM_MonitorTableRefType_Tag'.'LogicalSupervisionMonitorTablePtr', ILen+ELen))).

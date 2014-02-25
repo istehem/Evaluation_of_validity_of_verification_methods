@@ -23,11 +23,11 @@ init_post(S, Args=[{_, Is_Null}], Ret) ->
     eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' %% [WDGM285]
     andalso
 
-  %%    check_deadlinetimestamps() andalso %% [WDGM298]
-  %%    check_logicalactivityflag() andalso %% [WDGM296]
+    wdgm_helper:check_deadlinetimestamps(InitialMode) andalso %% [WDGM298]
+    wdgm_helper:check_logicalactivityflag(InitialMode) andalso %% [WDGM296]
   %%    check_all_global_and_statics() andalso %% [WDGM018]
-  %%    eqc_c:value_of('SeIdLocalStatusExpiredFirst') == 0 %% [WDGM350]
-  %%    andalso
+     eqc_c:value_of('SeIdLocalStatusExpiredFirst') == 0 %% [WDGM350]
+     andalso
 
       eqc_c:value_of('WdgM_CurrentMode') == InitialMode) %% [WDGM135]
        orelse
