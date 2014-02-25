@@ -30,14 +30,14 @@ $(error "Erlang not available on this system")
 endif
 
 
-REBAR="$(shell which rebar)" -C "$(shell pwd)/rebar.config"
+REBAR="$(shell which rebar).cmd" -C "$(shell pwd)/rebar.config"
 
 ifeq ($(REBAR),)
 $(error "Rebar not available on this system")
 endif
 
 .PHONY: all compile doc clean test dialyzer typer shell distclean pdf \
-  update-deps clean-common-test-data rebuild
+  update-deps clean-common-test-data rebuild rmbeam
 
 all: deps compile test
 
@@ -92,6 +92,10 @@ clean:
 	- rm -rf $(CURDIR)/test/*.beam
 	- rm -rf $(CURDIR)/logs
 	- rm -rf $(CURDIR)/ebin
+	$(REBAR) skip_deps=true clean
+
+rmbeam:
+	- rm -rf $(CURDIR)/ebin/*.beam
 	$(REBAR) skip_deps=true clean
 
 distclean: clean
