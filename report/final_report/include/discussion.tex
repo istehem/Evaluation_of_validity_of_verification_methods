@@ -1,16 +1,42 @@
 
-%% implementerat modellen iterativt
-%% och mha negativ testning
-%% ibland fått rätta modellen, ibland c-koden
+The model has been implemented in an iterative way. Function for function,
+requirement for requirement. This process is very easy with the use of
+QuickCheck.
+In the beginning there were alot of negative testing, because we didn't care
+about tweaking the generators.
+Sometimes the model needs to be corrected because of ambiguities in AUTOSAR or
+errors in the model. Quite often it was the C-code that had the errors and
+needed to be corrected.
+Easier when you do white box testing, because then you can really check the code
+and compare with the requirements.
+
+We achieved fair coverage of the c-code, around 90\%, and the Erlang code,
+around \%. The problem was the requirements where we achieved around 50\%. It
+would help if an QuickCheck model was implemented for the whole system as
+well. Many of the requirements had dependencies in other modules, and some
+requirements for the file structure, the configuration or even the generation of
+files.
+
+QuickCheck is good for overall testing, and can help with raising the functional
+safety of modules.
 
 %% analys av resultat
 %% - coverage på modell och c-kod genom cover (erlang) och bullseye (c-kod)
 %% - statistik på quickcheck körningar.
 
-Future work
+Striped of comments and blank lines, the implemented Erlang model is almost 1500
+lines of code. This is to be compared with the c-code which is over 12500 lines
+of code.
 
-* implement another module and connect the two
+\section{Future work}
+Some interesting thing we wanted to do from the beginning was to implementing
+another module, preferably one that has some kind of dependency with the
+watchdog manager. This is because then, it would be possible to testing towards
+the phase ``system integration and testing'' in ISO~26262 and get even better
+results.
 
-* shrinking better
+Another good idea is to do more negative testing, and testing of null
+pointers. This should be done to raise the coverage for the C-code to even
+better levels.
 
-* choose some other configurations
+We could also try new configurations. More configurations = better testing.

@@ -3,3 +3,4 @@ ebin/
 .deps_plt/
 *.jpg
 *.dot
+rebar.config

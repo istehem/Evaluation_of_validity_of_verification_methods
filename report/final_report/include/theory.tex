@@ -17,10 +17,12 @@ number of combinations to a computational maximum. %% SKRIV OM!!!!!!!!!!!
 
 \subsection{Semi formal verification}
 %Skriv något än mer luddigt
+Semi formal verification covers a smaller state space than formal
+verification.
 
 \section{Industrial Standards} It is useful to distinguish between
 systems with different levels of dependability, and determine where the hazards
-exists\cite{COURSEBOOK:safety-critical}. When this risk analysis is completed
+exists\cite{COURSEBOOK:safety-critical}. When this risk analysis is completed,
 %% överväg kommatecken mellan dessa satser
 and appropriate reliability and availability requirements is assigned to the
 system, the system can be identified by a certain safety integrity level (SIL).
@@ -28,7 +30,7 @@ If this number is high, the system will experience a more rigorous design and
 testing than could be justified for a lesser demanding system. These levels is
 more defined in standards IEC~61508 and ISO~26262.
 
-%\setion{Functional Safety}
+%\section{Functional Safety}
 % Kanske något vi vill skriva om? Näms i metoden
 
 \subsection {IEC~61508 and ISO~26262}
@@ -43,9 +45,41 @@ strongly recommends that semi formal verification of each module should be
 executed \cite[Part 6]{ISO26262}. It also recommends a formal verification, but
 because of the state-space complexity this is hard to achieve.
 
-%% SKRIV OM V-modellen i ISO~26262
-%% Och integrationstester mot unittester etc, (6-9, 6-10, 6-11 i ISO)
+%% Skriv om integrationstester mot unittester etc, (6-9, 6-10, 6-11 i ISO)
 
+ISO~26262 describes the full development process from concept to production,
+with functional safety in mind. For software development, the standard has a
+reference model with different phases of the process, see
+figure~\ref{FIG:ISO:phases}. Each phase in the reference model is dependent on
+the earlier phases. The reference model has the shape of a V, where the left
+side contains all development phases, and the right side contains the test
+phases. The work flow from this view starts with the phase ``specification of
+software safety requirements''. This phase specifies the software requirements
+needed to ensure the stability of the system. They are derived from the
+system design specification. This is part of the integration between software
+and hardware. The second phase is the ``software architectural design''. It
+represent the interaction between all software components. The third phase and
+the last development phase, in the model is the ``software unit design and
+implementation''. This phase contains the implementation of each module. If the
+implementation does not meet the wished safety, maybe the software
+architectural design or the specification of the software safety requirements
+need to be redesigned.
+
+\begin{figure}
+  \includegraphics[keepaspectratio, width=\linewidth]{pictures/V}
+  \caption{Phases of software development in the standard ISO~26262}
+  \label{FIG:ISO:phases}
+\end{figure}
+
+Each of these phases is tested thoroughly with the phases ``software unit
+testing'', ``software integration and testing'' and ``verification of software
+safety requirements''. The unit testing phase tests that the implementation of
+the module fulfills the design specifications. If there is failures, one need to
+go back to the implementation phase, or if successful go to the phase
+integration and testing. This phase objective is to integrate the software units
+and demonstrate that the architectural design is correct. A demonstration that
+the software safety requirements is fulfilled, is done in the phase
+``verification of software safety requirements''.
 
 % ISO~26262 is built on IEC~61508 which is titled Functional Safety of
 % Electrical/Electronic/Programmable Electronic Safety-related Systems. IEC~61508
@@ -53,16 +87,10 @@ because of the state-space complexity this is hard to achieve.
 % automotive industry. IEC~61508 have four safety integrity levels (SIL) ranked
 % 1-4. SIL 4 is the highest and should be applied where a failure can
 % do devastating damage to a large area. %% är det inte också så att om det är
-% %% ganska farligt men riskerar att hända ofta så ska den också klassas som SIL 4.
-% The automotive industry is improbable to have this risk. That is why ISO~26262
-% %% "that is why" - syftar på att detta är huvudanledningen. det är nog många
-% %% olika anledningar att ISO26262 har utvecklats.
-% exists which also defines four levels of SIL called automotive safety integrity
-% level (ASIL). The ASIL range from A-D, where D is the highest and roughly
-% translate to SIL 3.
+%% ganska farligt men riskerar att hända ofta så ska den också klassas som SIL
+%% 4.
 
 \subsection{AUTOSAR (AUTomotive Open System ARchitecture)}
-%Beskriv vad fan det är
 %Källa http://www.autosar.org/
 The AUTOSAR platform has a layered software architecture. This means that the
 architecture is divided to a number of different layers, such as the application
@@ -126,7 +154,10 @@ specify if the watchdog manager should report errors to the diagnostic event
 manager (DEM), or which type of supervision that should be done and what to
 supervise.
 
-%% SKRIV OM introduktionen av functional safety i version 4 av AUTOSAR
+The current version of AUTOSAR, version 4, has been design with functional
+safety in mind. Essential concepts of ISO~26262 have been developed alongside
+AUTOSAR.
+%% SKRIV MER OM functional safety i version 4 av AUTOSAR
 
 
 % Some of the specifications in AUTOSAR is left quite open for interpretation.
@@ -136,28 +167,11 @@ supervise.
 % for a configuration. Some parts of those configuration specifications is
 % generated into code, while other is manually written or added as a configurable.
 
-\section{Existing Software}
-There are a number of existing software tools whose aim are to simplify the
-implementation of verification and testing.
-%% ..och helt plötsligt presenteras en lista av något..
-\begin{itemize}
-\item QuickCheck
-\item SPIN
-\item McErlang
-\item $\mu$CRL toolset
-\item CADP
-\item Parasoft C/C++test
-%\item Erlang and QuickCheck
-%\item Symlink
-%\item CORE
-%\item Isabelle
-\end{itemize}
-
 \subsection{QuickCheck}
 QuickCheck was invented be Koen Claessen and John Hughes, as a testing module
 for Haskell, in 2000.
 In 2006 John Hughes founded the Company Quviq together with
-Thomas Arts. Quviq offers a commercial version of QuickCheck for Erlang.
+Thomas Arts\cite{QUVIQ:about}. Quviq offers a commercial version of QuickCheck for Erlang.
 The main difference, except from the programming paradigms, is that
 the commercial version of QuickCheck has a C-testing interface. Hence it
 possible to test C-code in Erlang with help of QuickCheck. All code for tests
@@ -169,67 +183,6 @@ QuickCheck tests a program with specification implemented as properties that
 the program must hold \cite{QUICKCHECK:manual}. QuickCheck has guided random
 test generation, this means that the samples can be weighted to cover certain
 parts of the state-space with more likelihood.
-
-%% Erlang är inget verktyg per se. vi borde skriva om det, men passar det in
-%% här?
-\subsection{Erlang}
-Erlang can easily communicate with other programming language by
-using byte streams. There have been some work done including Erlang,
-AUTOSAR and QuickCheck, mostly by the QuviQ company\cite{QUVIQ:flyer}.
-%% "mostly"? skriva något om Volvo och SP också?
-Imperative coding requires state based testing(?). QuviQ have developed a library in
-Erlang for this purpose(?).
-
-% \subsection{CORE}
-% A specification package developed by British Aerospace and System Designers.
-
-%\subsection{Promela}
-
-\subsection{SPIN}
-SPIN is used to trace logical design errors in distributed
-software\cite{SPIN:manual}. It supports a high level language, Promela, to
-specify system descriptions. Promela is an acronym for PROcess MEta LAnguage, and
-is a verification model language. The system properties that should be checked
-are written in logical temporal language (LTL), and SPIN reports errors such as
-deadlocks, race conditions and incompleteness between these properties and the
-system model. It also supports embedded C code as part of the model
-specifications. It supports random, interactive and guided simulation, with both
-partial and exhaustive proof techniques.
-
-\subsection{McErlang}
-McErlang is a model checker written in Erlang used for verifying distributed
-Erlang programs\cite{MCERLANG:model-checker}. Its purpose is to check a program
-against a correctness property, but can also among other things check safety
-or liveness properties.
-
-McErlang offers two depth-first state traversal model checking algorithms; one
-checks safety properties and the other is used for checking the liveness
-properties. McErlang also implements weak process fairness, by omitting non-fair
-loops from the accepting runs in its liveness algorithm.
-
-%% jag tror mcerlang ingår i QuickCheck suiten. den blir installerad tillsammans
-%% med QuickCheck iaf.
-
-\subsection{$\mu$CRL toolset} $\mu$CRL is a process algebraic language which is
-suited for the analysis of distributed systems. The toolkit is built on this
-language and contains a theorem prover based on binary decision
-diagrams\cite{MCRL:manual}.
-
-\subsection{CADP} Construction and Analysis of Distributed Processes (CADP),
-formerly CAESAR/ALDEBARAN Development Package, is a toolset for the design of
-distributed systems\cite{CADP:manual}. It includes, among others, tools for
-equivalence checking, state-space manipulation and model checking, and it also
-includes several verification algorithms. It provides functionality as
-step-by-step simulation to parallel model checking.
-
-\subsection{Parasoft C++test}
-Parasoft C++ is a commercial software with a huge range of functionality,
-developed by the Parasoft company, with the purpose of testing software written
-in C or C++. Parasoft claims that it should be possible to satisfy ASIL
-requirements using their software(?).
-%\subsection{Isabelle}
-% Isabelle theorem prover is an interactive theorem prover, successor of the
-% Higher Order Logic (HOL) theorem prover
 
 \section{Verification Methods}
 The standard IEC~61508 propose two methods to say that a program is formal
