@@ -42,7 +42,7 @@ endif
 
 REBAR_ARGS=-C "$(shell pwd)/$(CONFIG)"
 
-REBAR=$(REBAR_CMD) $(REBAR_ARGS)
+REBAR=$(REBAR_CMD).cmd $(REBAR_ARGS)
 
 
 .PHONY: all compile doc clean test dialyzer typer shell distclean pdf \
@@ -64,6 +64,9 @@ update-deps:
 
 compile:
 	$(REBAR) skip_deps=true compile
+
+#Changes of defines in config file may need recompile
+recompile: rmbeam compile
 
 doc:
 	$(REBAR) skip_deps=true doc

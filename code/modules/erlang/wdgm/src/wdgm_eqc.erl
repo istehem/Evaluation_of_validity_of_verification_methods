@@ -44,7 +44,7 @@ reload(M) ->
 reloadAll() ->
   Modules = [M || {M, P} <- code:all_loaded(),
                   is_list(P) andalso
-                    string:str(P, element(2, file:get_cwd())) > 0],
+                    string:str(string:to_lower(P), string:to_lower(element(2, file:get_cwd()))) > 0],
   [reload(M) || M <- Modules].
 
 %start() ->
