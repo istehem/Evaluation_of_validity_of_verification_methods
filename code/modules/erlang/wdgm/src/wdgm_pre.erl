@@ -19,29 +19,27 @@ init_pre(S) ->
 %%% -WdgM_GetMode---------------------------------------------------------------
 
 getmode_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+  S#state.initialized %% [WDGM253]
     orelse
-    S#state.initialized. %% [WDGM253]
-
+    S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect.
 
 %%% -WdgM_SetMode---------------------------------------------------------------
 setmode_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+  S#state.initialized
    orelse
-    S#state.initialized.
+    S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect.
 
 %%% -WdgM_DeInit----------------------------------------------------------------
 deinit_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+  S#state.initialized
     orelse
-    S#state.initialized.
-
+      S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect.
 
 %%% -WdgM_CheckpointReached-----------------------------------------------------
 checkpointreached_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+  S#state.initialized
     orelse
-    S#state.initialized.
+    S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect.
 
 checkpointreached_pre(_S, [false]) ->
   false.
@@ -51,22 +49,22 @@ checkpointreached_pre(_S, [false]) ->
 
 %%% -WdgM_GetLocalStatus--------------------------------------------------------
 getlocalstatus_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+  S#state.initialized
     orelse
-    S#state.initialized.
+    S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect.
 
 %%% -WdgM_GetGlobalStatus-------------------------------------------------------
 getglobalstatus_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+  S#state.initialized
     orelse
-    S#state.initialized.
+    S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect.
 
 %%% -WdgM_PerformReset----------------------------------------------------------
 
 performreset_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect
+  S#state.initialized
     orelse
-    S#state.initialized.
+    S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect.
 
 %%% -WdgM_GetFirstExpiredSEID---------------------------------------------------
 
@@ -76,8 +74,9 @@ getfirstexpiredseid_pre(_S) ->
 %%% -WdgM_MainFunction----------------------------------------------------------
 
 mainfunction_pre(S) ->
-  S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior orelse
-    S#state.initialized. %% [WDGM039]
+  S#state.initialized %% [WDGM039]
+    orelse
+    S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.defensive_behavior.
 
 %%% -WdgM_GetVersionInfo----------------------------------------------------------
 
