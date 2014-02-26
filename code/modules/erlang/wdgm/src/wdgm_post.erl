@@ -34,7 +34,7 @@ init_post(S, Args=[{_, Is_Null}], Ret) ->
          (DevErrorDetect
           andalso
             (Is_Null orelse %% [WDGM255]
-             not wdgm_helper:is_allowed_config() %% [WDGM010]
+             not wdgm_config_params:is_allowed_config() %% [WDGM010]
              %% orelse (not OffModeEnabled andalso is_disabled_watchdogs()) %% [WDGM030]
             )))
   andalso eqc_c:value_of('WdgM_GlobalStatus') == (wdgm_next:init_next(S,Ret,Args))#state.globalstatus .
