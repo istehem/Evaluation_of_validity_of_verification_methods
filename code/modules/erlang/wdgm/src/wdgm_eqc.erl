@@ -35,6 +35,18 @@ start() ->
 						     lib_dir() ++ "WdgIf.o",
 						     lib_dir() ++ "WdgM.o"]}]).
 
+reload(M) ->
+  code:purge(M),
+  code:soft_purge(M),
+  {module, M} = code:load_file(M),
+  {ok, M}.
+
+reloadAll() ->
+  Modules = [M || {M, P} <- code:all_loaded(),
+                  is_list(P) andalso
+                    string:str(P, element(2, file:get_cwd())) > 0],
+  [reload(M) || M <- Modules].
+
 %start() ->
 %  eqc_c:start(?C_CODE,
 %	      [{c_src, "wdgm_wrapper.c"},

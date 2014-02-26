@@ -25,20 +25,17 @@ init_post(S, Args=[{_, Is_Null}], Ret) ->
 
     wdgm_helper:check_deadlinetimestamps(InitialMode) andalso %% [WDGM298]
     wdgm_helper:check_logicalactivityflag(InitialMode) andalso %% [WDGM296]
-  %%    check_all_global_and_statics() andalso %% [WDGM018]
-     eqc_c:value_of('SeIdLocalStatusExpiredFirst') == 0 %% [WDGM350]
+    wdgm_helper:check_all_global_and_statics() andalso %% [WDGM018]
+    eqc_c:value_of('SeIdLocalStatusExpiredFirst') == 0 %% [WDGM350]
      andalso
 
       eqc_c:value_of('WdgM_CurrentMode') == InitialMode) %% [WDGM135]
        orelse
          (DevErrorDetect
           andalso
-            (Is_Null %% [WDGM255]
-
-
-             %%          orelse
-             %%          not is_allowed_config() orelse %% [WDGM010]
-             %%          (not OffModeEnabled andalso is_disabled_watchdogs()) %% [WDGM030]
+            (Is_Null orelse %% [WDGM255]
+             not wdgm_helper:is_allowed_config() %% [WDGM010]
+             %% orelse (not OffModeEnabled andalso is_disabled_watchdogs()) %% [WDGM030]
             )))
   andalso eqc_c:value_of('WdgM_GlobalStatus') == (wdgm_next:init_next(S,Ret,Args))#state.globalstatus .
 

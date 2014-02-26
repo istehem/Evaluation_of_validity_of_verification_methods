@@ -198,3 +198,8 @@ get_SE_of_CP(CPid) ->
   hd([SEid || {SEid, _} <- get_supervised_entities(),
               SECP      <- get_CPs_of_SE(SEid),
               SECP == CPid]).
+
+%%%% used by init_post
+is_allowed_config() ->
+  _PB = ['WdgMInitialMode', 'WDGM_E_IMPROPER_CALLER', 'WDGM_E_MONITORING', 'WDGM_E_SET_MODE', {'WdgMExpiredSupervisionCycleTol', 'WDGM_EXPIRED_SUPERVISION_CYCLE_TOLERANCE'}, 'WdgMModeId', {'WdgMSupervisionCycle', 'WDGM_SUPERVISION_CYCLE'}, {'WdgMExpectedAliveIndications', 'WDGM_EXPECTED_ALIVE_INDICATIONS'}, {'WdgMMaxMargin', 'WDGM_MAX_MARGIN'}],
+  true.

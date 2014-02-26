@@ -184,3 +184,17 @@ check_logicalactivityflag(ModeId) -> %% [WDGM296]
   ILen = length(wdgm_config_params:get_internal_graphs()),
   ELen = length(wdgm_config_params:get_external_graphs(ModeId)),
   lists:all(fun(DRec) -> DRec#'WdgM_LogicalSupervisionMonitor_Tag'.activity_flag == 0 end, (eqc_c:read_array((eqc_c:value_of('WdgM_MonitorTableRef'))#'WdgM_MonitorTableRefType_Tag'.'LogicalSupervisionMonitorTablePtr', ILen+ELen))).
+
+
+%% could possible search for invalid variables.
+%% This is Mecels variable names.
+check_all_global_and_statics() ->
+  WDGM_TOTAL_NUMBER_OF_SUPERVISED_ENTITIES = 0,
+  WDGM_NUMBER_OF_ALIVE_SUPERVISION = 0,
+  WDGM_NUMBER_OF_DEADLINE_SUPERVISION = 0,
+  WDGM_NUMBER_OF_LOGICAL_SUPERVISION = 0,
+  WDGM_NUMBER_OF_WATCHDOG_INSTANCES = 0,
+  WdgM_c = ['WdgM_ExpiredSupervisionCycles', 'WdgM_CurrentMode', 'SeIdLocalStatusExpiredFirstFlag', 'SeIdLocalStatusExpiredFirst', 'WdgM_CurrentConfigPtr', 'WdgM_GlobalStatus', 'WdgM_InitDone'],
+  WdgM_Lcfg_h = ['WdgM_DemEventId', 'WdgM_MonitorTableRef', 'WdgM_SupervisedEntityMonitorTable', 'WdgM_AliveSupervisionMonitorTable', 'WdgM_DeadlineSupervisionMonitorTable', 'WdgM_LogicalsupervisionMonitorTable', 'WdgM_WatchdogMonitorTable'],
+  WdgM_Pbcfg_h = [],%%['Tst_Cfg1'], %% could be whatever depending on configuration.
+  lists:all(fun (X) -> X /= 'NULL' end, WdgM_c ++ WdgM_Lcfg_h ++ WdgM_Pbcfg_h).
