@@ -200,6 +200,56 @@ get_SE_of_CP(CPid) ->
               SECP == CPid]).
 
 %%%% used by init_post
+%% Checks that post build parameters is in the correct range
 is_allowed_config() ->
-  _PB = ['WdgMInitialMode', 'WDGM_E_IMPROPER_CALLER', 'WDGM_E_MONITORING', 'WDGM_E_SET_MODE', {'WdgMExpiredSupervisionCycleTol', 'WDGM_EXPIRED_SUPERVISION_CYCLE_TOLERANCE'}, 'WdgMModeId', {'WdgMSupervisionCycle', 'WDGM_SUPERVISION_CYCLE'}, {'WdgMExpectedAliveIndications', 'WDGM_EXPECTED_ALIVE_INDICATIONS'}, {'WdgMMaxMargin', 'WDGM_MAX_MARGIN'}],
+  %% each element is a tuple of {parameter, multiplicity}
+  %% parameter = name | {name, alternative}
+  %% multiplicity = {lower, higher}
+  %% each parameter has a reference to the configuration.
+  _Referenses =
+    [{'WdgMInitialMode',        {1, 1}}, %% reference to WdgMMode
+     {'WDGM_E_IMPROPER_CALLER', {0, 1}}, %% reference to DemEventParameter
+     {'WDGM_E_MONITORING',      {0, 1}}, %% reference to DemEventParameter
+     {'WDGM_E_SET_MODE',        {0, 1}}, %% reference to DemEventParameter
+     {'WdgMAliveSupervisionCheckpointRef',  {1, 1}},   %% reference to CP
+     {'WdgMDeadlineStartRef',               {1, 1}},   %% reference to cp
+     {'WdgMDeadlineStopRef',                {1, 1}},   %% reference to cp
+     {'WdgMExternalCheckpointFinalRef',   {1, 65535}}, %% reference to CP
+     {'WdgMExternalCheckpointInitialRef', {1, 65535}}, %% reference to CP
+     {'WdgMExternalTransitionDestRef',      {1, 1}},   %% reference to CP
+     {'WdgMExternalTransitionSourceRef',    {1, 1}},   %% reference to CP
+     {'WdgMTriggerWatchdogRef',             {1, 1}},%% reference to WdgMWatchdog
+     {'WdgMLocalStatusSupervisedEntityRef', {1, 1}}],  %% reference to SE
+
+  %% each element is a tuple of {parameter, multiplicity, range}
+  %% range = {lower, higher} | {[value]}
+  %% lower = higher = 0..inf
+  _Ranges =
+    [{{'WdgMExpiredSupervisionCycleTol',
+       'WDGM_EXPIRED_SUPERVISION_CYCLE_TOLERANCE'}, "WdgMMode", {1,1}, {0, 65535}},
+     {'WdgMModeId', "WdgMMode",                     {1,1}, {0, 255}},
+     {{'WdgMSupervisionCycle', "WdgMMode",
+       'WDGM_SUPERVISION_CYCLE'},                   {1,1}, {0, inf}},
+     {{'WdgMExpectedAliveIndications',
+       'WDGM_EXPECTED_ALIVE_INDICATIONS'}, "WdgMAliveSupervision", {1,1}, {0, 65535}},
+     {{'WdgMMaxMargin', 'WDGM_MAX_MARGIN'}, "WdgMAliveSupervision", {1,1}, {0, 255}},
+     {{'WdgMMinMargin', 'WDGM_MIN_MARGIN'}, "WdgMAliveSupervision", {1,1}, {0, 255}},
+     {{'WdgMSupervisionReferenceCycle',
+       'WDGM_SUPERVISION_REFERENCE_CYCLE'}, "WdgMAliveSupervision", {1,1}, {1, 65535}},
+     {'WdgMDeadlineMax', "WdgMDeadlineSupervision", {1,1}, {0, inf}},
+     {'WdgMDeadlineMin', "WdgMDeadlineSupervision", {1,1}, {0, inf}},
+     {'WdgMTriggerConditionValue', "WdgMTrigger",   {1,1}, {1, 65535}},
+     {'WdgMWatchdogMode', "WdgMTrigger",   {1,1}, {['WDGMIF_FAST_MODE',
+                                                    'WDGMIF_OFF_MODE',
+                                                    'WDGMIF_SLOW_MODE']}},
+     {{'WdgMFailedAliveSupervisionRefCycleTol',
+       'WDGM_FAILED_SUPERVISION_REFERENCE_CYCLE_TOLERANCE'}, "WdgMLocalStatusParams", {1,1}, {0, 255}}],
+
   true.
+
+check_is_within_range({Names, Container, {LowerM, HigherM}, Range}) ->
+  C = car_xml:get_containers_by_def(Container, ?CFG),
+  case Names of
+    {Name, Alternative} -> car_xml:get_values(Name, C);
+    Name                -> car_xml:get_values(Name, C)
+  end.
