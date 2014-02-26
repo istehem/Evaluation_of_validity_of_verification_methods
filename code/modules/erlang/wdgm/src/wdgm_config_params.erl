@@ -205,51 +205,77 @@ is_allowed_config() ->
   %% each element is a tuple of {parameter, multiplicity}
   %% parameter = name | {name, alternative}
   %% multiplicity = {lower, higher}
+  %% lower = higher = 0..inf
   %% each parameter has a reference to the configuration.
-  _Referenses =
-    [{'WdgMInitialMode',        {1, 1}}, %% reference to WdgMMode
-     {'WDGM_E_IMPROPER_CALLER', {0, 1}}, %% reference to DemEventParameter
-     {'WDGM_E_MONITORING',      {0, 1}}, %% reference to DemEventParameter
-     {'WDGM_E_SET_MODE',        {0, 1}}, %% reference to DemEventParameter
-     {'WdgMAliveSupervisionCheckpointRef',  {1, 1}},   %% reference to CP
-     {'WdgMDeadlineStartRef',               {1, 1}},   %% reference to cp
-     {'WdgMDeadlineStopRef',                {1, 1}},   %% reference to cp
-     {'WdgMExternalCheckpointFinalRef',   {1, 65535}}, %% reference to CP
-     {'WdgMExternalCheckpointInitialRef', {1, 65535}}, %% reference to CP
-     {'WdgMExternalTransitionDestRef',      {1, 1}},   %% reference to CP
-     {'WdgMExternalTransitionSourceRef',    {1, 1}},   %% reference to CP
-     {'WdgMTriggerWatchdogRef',             {1, 1}},%% reference to WdgMWatchdog
-     {'WdgMLocalStatusSupervisedEntityRef', {1, 1}}],  %% reference to SE
+  References =
+    [{"WdgMInitialMode", "WdgMConfigSet", {1, 1}}, %% WdgMMode
+     {"WDGM_E_IMPROPER_CALLER", "WdgMDemEventParameterRefs", {0, 1}}, %% DemEventParameter
+     {"WDGM_E_MONITORING", "WdgMDemEventParameterRefs", {0, 1}},      %% DemEventParameter
+     {"WDGM_E_SET_MODE", "WdgMDemEventParameterRefs", {0, 1}},        %% DemEventParameter
+     {"WdgMAliveSupervisionCheckpointRef", "WdgMAliveSupervision", {1, 1}}, %% CP
+     {"WdgMDeadlineStartRef", "WdgMDeadlineSupervision", {1, 1}}, %% CP
+     {"WdgMDeadlineStopRef", "WdgMDeadlineSupervision",  {1, 1}}, %% CP
+     {"WdgMExternalCheckpointFinalRef", "WdgMExternalLogicalSupervision", {1, 65535}}, %% CP
+     {"WdgMExternalCheckpointInitialRef", "WdgMExternalLogicalSupervision", {1, 65535}}, %% CP
+     {"WdgMExternalTransitionDestRef", "WdgMExternalTransition",   {1, 1}}, %% CP
+     {"WdgMExternalTransitionSourceRef", "WdgMExternalTransition", {1, 1}}, %% CP
+     {"WdgMTriggerWatchdogRef", "WdgMTrigger",   {1, 1}}, %% WdgMWatchdog
+     {"WdgMLocalStatusSupervisedEntityRef", "WdgMLocalStatusParams", {1, 1}}], %% SE
 
   %% each element is a tuple of {parameter, multiplicity, range}
   %% range = {lower, higher} | {[value]}
-  %% lower = higher = 0..inf
-  _Ranges =
-    [{{'WdgMExpiredSupervisionCycleTol',
-       'WDGM_EXPIRED_SUPERVISION_CYCLE_TOLERANCE'}, "WdgMMode", {1,1}, {0, 65535}},
-     {'WdgMModeId', "WdgMMode",                     {1,1}, {0, 255}},
-     {{'WdgMSupervisionCycle', "WdgMMode",
-       'WDGM_SUPERVISION_CYCLE'},                   {1,1}, {0, inf}},
-     {{'WdgMExpectedAliveIndications',
-       'WDGM_EXPECTED_ALIVE_INDICATIONS'}, "WdgMAliveSupervision", {1,1}, {0, 65535}},
-     {{'WdgMMaxMargin', 'WDGM_MAX_MARGIN'}, "WdgMAliveSupervision", {1,1}, {0, 255}},
-     {{'WdgMMinMargin', 'WDGM_MIN_MARGIN'}, "WdgMAliveSupervision", {1,1}, {0, 255}},
-     {{'WdgMSupervisionReferenceCycle',
-       'WDGM_SUPERVISION_REFERENCE_CYCLE'}, "WdgMAliveSupervision", {1,1}, {1, 65535}},
-     {'WdgMDeadlineMax', "WdgMDeadlineSupervision", {1,1}, {0, inf}},
-     {'WdgMDeadlineMin', "WdgMDeadlineSupervision", {1,1}, {0, inf}},
-     {'WdgMTriggerConditionValue', "WdgMTrigger",   {1,1}, {1, 65535}},
-     {'WdgMWatchdogMode', "WdgMTrigger",   {1,1}, {['WDGMIF_FAST_MODE',
-                                                    'WDGMIF_OFF_MODE',
-                                                    'WDGMIF_SLOW_MODE']}},
-     {{'WdgMFailedAliveSupervisionRefCycleTol',
-       'WDGM_FAILED_SUPERVISION_REFERENCE_CYCLE_TOLERANCE'}, "WdgMLocalStatusParams", {1,1}, {0, 255}}],
-
-  true.
+  Ranges =
+    [{{"WdgMExpiredSupervisionCycleTol",
+       "WDGM_EXPIRED_SUPERVISION_CYCLE_TOLERANCE"}, "WdgMMode", {1,1}, {0, 65535}},
+     {"WdgMModeId", "WdgMMode",                     {1,1}, {0, 255}},
+     %% BugFIX [WDGM330_Config]
+     %% {{"WdgMSupervisionCycle",
+     %%   "WDGM_SUPERVISION_CYCLE"}, "WdgMMode",       {1,1}, {0, inf}},
+     {{"WdgMExpectedAliveIndications",
+       "WDGM_EXPECTED_ALIVE_INDICATIONS"}, "WdgMAliveSupervision", {1,1}, {0, 65535}},
+     {{"WdgMMaxMargin", "WDGM_MAX_MARGIN"}, "WdgMAliveSupervision", {1,1}, {0, 255}},
+     {{"WdgMMinMargin", "WDGM_MIN_MARGIN"}, "WdgMAliveSupervision", {1,1}, {0, 255}},
+     {{"WdgMSupervisionReferenceCycle",
+       "WDGM_SUPERVISION_REFERENCE_CYCLE"}, "WdgMAliveSupervision", {1,1}, {1, 65535}},
+     {"WdgMDeadlineMax", "WdgMDeadlineSupervision", {1,1}, {0, inf}},
+     {"WdgMDeadlineMin", "WdgMDeadlineSupervision", {1,1}, {0, inf}},
+     {"WdgMTriggerConditionValue", "WdgMTrigger",   {1,1}, {1, 65535}},
+     {"WdgMWatchdogMode", "WdgMTrigger",   {1,1},  ['WDGIF_FAST_MODE',
+                                                    'WDGIF_OFF_MODE',
+                                                    'WDGIF_SLOW_MODE']},
+     {{"WdgMFailedAliveSupervisionRefCycleTol",
+       "WDGM_FAILED_SUPERVISION_REFERENCE_CYCLE_TOLERANCE"}, "WdgMLocalStatusParams", {1,1}, {0, 255}}],
+  lists:all(fun (X) -> check_is_within_range(X) == true end, Ranges) andalso
+    lists:all(fun (X) -> check_has_a_reference(X) == true end, References).
 
 check_is_within_range({Names, Container, {LowerM, HigherM}, Range}) ->
   C = car_xml:get_containers_by_def(Container, ?CFG),
-  case Names of
-    {Name, Alternative} -> car_xml:get_values(Name, C);
-    Name                -> car_xml:get_values(Name, C)
-  end.
+  Multiple = length(C),
+  Values =
+    case Names of
+      {Name, Alternative} -> car_xml:get_values(Name, C) ++
+                               car_xml:get_values(Alternative, C);
+      Name                -> car_xml:get_values(Name, C)
+    end,
+  GoodRange =
+    case Range of
+      {L, H} -> lists:map(fun (V) ->
+                              V >= L andalso (H == inf orelse V =< H)
+                          end, Values);
+      Xs     -> lists:map(fun (V) -> lists:member(V, Xs) end, Values)
+    end,
+  length(Values) >= Multiple*LowerM andalso %% Simple check
+    (HigherM == inf orelse
+     length(Values) =< Multiple*HigherM) andalso %% simple check
+    lists:all(fun (X) -> X == true end, GoodRange).
+
+check_has_a_reference({Name, Container, {LowerM, HigherM}}) ->
+  Containers = car_xml:get_containers_by_def(Container, ?CFG),
+  Multiple = length(Containers),
+  GetRef = car_xml:get_values(Name, Containers),
+  %% we dont know with certain that each container has the specifed
+  %% lower/higher multiplicity, but the overall references/containers is correct
+  length(GetRef) >= Multiple*LowerM andalso
+    (HigherM == inf orelse
+     length(GetRef) =< Multiple*HigherM) andalso
+    lists:all(fun (Ref) -> is_tuple(car_xml:get_named_container(Ref, ?CFG)) end, GetRef).

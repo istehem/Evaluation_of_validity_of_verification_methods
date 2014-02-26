@@ -189,11 +189,11 @@ check_logicalactivityflag(ModeId) -> %% [WDGM296]
 %% could possible search for invalid variables.
 %% This is Mecels variable names.
 check_all_global_and_statics() ->
-  WDGM_TOTAL_NUMBER_OF_SUPERVISED_ENTITIES = 0,
-  WDGM_NUMBER_OF_ALIVE_SUPERVISION = 0,
-  WDGM_NUMBER_OF_DEADLINE_SUPERVISION = 0,
-  WDGM_NUMBER_OF_LOGICAL_SUPERVISION = 0,
-  WDGM_NUMBER_OF_WATCHDOG_INSTANCES = 0,
+  %% WDGM_TOTAL_NUMBER_OF_SUPERVISED_ENTITIES = 0,
+  %% WDGM_NUMBER_OF_ALIVE_SUPERVISION = 0,
+  %% WDGM_NUMBER_OF_DEADLINE_SUPERVISION = 0,
+  %% WDGM_NUMBER_OF_LOGICAL_SUPERVISION = 0,
+  %% WDGM_NUMBER_OF_WATCHDOG_INSTANCES = 0,
   WdgM_c = ['WdgM_ExpiredSupervisionCycles', 'WdgM_CurrentMode', 'SeIdLocalStatusExpiredFirstFlag', 'SeIdLocalStatusExpiredFirst', 'WdgM_CurrentConfigPtr', 'WdgM_GlobalStatus', 'WdgM_InitDone'],
   WdgM_Lcfg_h = ['WdgM_DemEventId', 'WdgM_MonitorTableRef', 'WdgM_SupervisedEntityMonitorTable', 'WdgM_AliveSupervisionMonitorTable', 'WdgM_DeadlineSupervisionMonitorTable', 'WdgM_LogicalsupervisionMonitorTable', 'WdgM_WatchdogMonitorTable'],
   WdgM_Pbcfg_h = [],%%['Tst_Cfg1'], %% could be whatever depending on configuration.
