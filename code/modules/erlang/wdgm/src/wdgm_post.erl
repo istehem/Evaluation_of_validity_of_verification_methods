@@ -18,7 +18,7 @@
 init_post(S, Args=[{_, Is_Null}], Ret) ->
   InitialMode = S#state.originalCfg#wdgm.tst_cfg1#tst_cfg1.initial_mode_id,
   DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
-  _OffModeEnabled = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.off_mode_enabled,
+  OffModeEnabled = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.off_mode_enabled,
   ((wdgm_helper:check_supervisionstatus(eqc_c:value_of('WdgM_SupervisedEntityMonitorTable')) andalso %% [WDGM268], [WDGM269:446
     eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_OK' %% [WDGM285]
     andalso
@@ -34,8 +34,9 @@ init_post(S, Args=[{_, Is_Null}], Ret) ->
          (DevErrorDetect
           andalso
             (Is_Null orelse %% [WDGM255]
-             not wdgm_config_params:is_allowed_config() %% [WDGM010]
-             %% orelse (not OffModeEnabled andalso is_disabled_watchdogs()) %% [WDGM030]
+             not wdgm_config_params:is_allowed_config() orelse %% [WDGM010]
+             (not OffModeEnabled andalso
+              wdgm_config_params:will_disable_watchdog(InitialMode)) %% [WDGM030]
             )))
   andalso eqc_c:value_of('WdgM_GlobalStatus') == (wdgm_next:init_next(S,Ret,Args))#state.globalstatus .
 
