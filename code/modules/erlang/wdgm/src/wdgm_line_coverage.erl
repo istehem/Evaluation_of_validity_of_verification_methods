@@ -19,9 +19,24 @@ modules() ->
     %wdgm_command, %% Seems not to be running, probable cause "only seen in generation step"
   ].
 
-analyse([],_) ->
-  cover:stop();
-analyse([X|Xs],Opts) ->
+
+analyse(Xs,Opts) ->
+ Ys = analyse(Xs,Opts,[]),
+ {_,L,R} = lists:foldl(
+             fun({M0,L0,R0},{_,L1,R1}) ->
+                begin
+                  io:fwrite("Coverage for module " ++ atom_to_list(M0) ++ " = " ++ io_lib:format("~.2f",[(R0/L0)*100]) ++ "%\n"),
+                  {M0,L0+L1,R0+R1}
+                end
+             end,
+             {none,0,0},Ys),
+ io:fwrite("Total Coverage" ++ " = " ++ io_lib:format("~.2f",[(R/L)*100]) ++ "%\n").
+
+
+analyse([],_,Xr) ->
+  cover:stop(),
+  Xr;
+analyse([X|Xs],Opts,Xr) ->
   File = atom_to_list(X) ++ ".coverdata",
   case file:read_file_info(File) of
     {ok,_} -> case lists:member(X,cover:imported_modules()) of
@@ -32,18 +47,17 @@ analyse([X|Xs],Opts) ->
   end,
   case Opts of
     false -> {_,Ans} = cover:analyse(X,coverage,line),
-             io:fwrite("line_coverage=~p\n",[return_cover_stats(Ans,0,length(Ans),X)]),
+             io:fwrite("line_coverage=~s\n",[]),
              cover:analyse_to_file(X);
     _     -> {_,Ans} = cover:analyse(X,coverage,line),
-             io:fwrite("line_coverage=~p\n",[return_cover_stats(Ans,0,length(Ans),X)]),
              cover:analyse_to_file(X,Opts)
   end,
   cover:export(File,X),
   cover:reset(X),
-  analyse(Xs,Opts).
+  analyse(Xs,Opts,[return_cover_stats(Ans,0,length(Ans),X)|Xr]).
 
 return_cover_stats([],N,L,M) ->
-  "Coverage for module " ++ atom_to_list(M) ++ "=" ++ float_to_list((N/L)*100) ++ "%";
+  {M,L,N};
 return_cover_stats([A|Ans],N,L,M) ->
   case A of
     {{M,_},{1,_}} -> return_cover_stats(Ans,N + 1,L,M);
