@@ -62,7 +62,7 @@ setmode_post(S, [ModeId, Cid], Ret) ->
     orelse
       ((S#state.globalstatus == eqc_c:value_of('WdgM_GlobalStatus') orelse  %% [WDGM317]
         S#state.globalstatus == undefined) andalso %% if not initialized everything under will failed
-       %%    S#state.expiredsupervisioncycles == eqc_c:value_of(expiredsupervisioncycles) andalso %% [WDGM317]
+       S#state.expiredsupervisioncycles == eqc_c:value_of('WdgM_ExpiredSupervisionCycles') andalso %% [WDGM317]
 
        case Ret of
          0 ->
@@ -165,10 +165,6 @@ getfirstexpiredseid_post(S, [Is_Null], Ret) ->
 %%% -WdgM_MainFunction----------------------------------------------------------
 
 mainfunction_post(S, _Args, _Ret) ->
-  %% [WDGM325] set localstatus based on [WDGM201], [WDGM202], [WDGM203], [WDGM204], [WDGM300], [WDGM205], [WDGM206], [WDGM208]
-  %% [WDGM214] globalstatus == mainfunction_next.globalstatus
-  %% [WDGM326] set globalstatus based on [WDGM078], [WDGM076], [WDGM215], [WDGM216], [WDGM217], [WDGM218], [WDGM077], [WDGM117], [WDGM219], [WDGM220], [WDGM221]
-  %% [WDGM324] perform alive supervision based on [WDGM098], [WDGM074], [WDGM115], [WDGM083]
   %% WDGIF [WDGM223], [WDGM328]
   %% OS [WDGM275]
   %% manage corresponding error handling [WDGM327]
