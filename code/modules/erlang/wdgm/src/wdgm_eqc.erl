@@ -47,6 +47,10 @@ reloadAll() ->
                     string:str(string:to_lower(P), string:to_lower(element(2, file:get_cwd()))) > 0],
   [reload(M) || M <- Modules].
 
+loadAll() ->
+  {ok, Files} = file:list_dir("."),
+  [code:ensure_loaded(list_to_atom(lists:sublist(M, length(M)-5))) || M <- Files, string:rstr(M, ".beam") > 0].
+
 %start() ->
 %  eqc_c:start(?C_CODE,
 %	      [{c_src, "wdgm_wrapper.c"},

@@ -130,19 +130,19 @@
 *** DONE [WDGM030] WdgM_Init
 *** DONE [WDGM350] WdgM_Init
 
-** Non-Behavioural SRSs [/]
-** File/Code structure [0/5]
-*** TODO [WDGM127] check file structure
-*** TODO [WDGM126] check file structure
-*** TODO [WDGMFCK] check file structure
-*** TODO [WDGM014] check file structure
-*** TODO [WDGM013] version check
-*** TODO [WDGM235] all type definitions shall be accessable for WdgM.h
-*** TODO [WDGM025] Code structure - WdgM_Cfg.h
-*** TODO [WDGM029] Code structure - WdgM.h
-*** TODO [WDGM104] Code structure - WdgM_Cfg.h
-** More information/modules needed [/]
-*** WdgIf [0/10]
+** Non-Behavioural SRSs [0/74]
+   File/Code structure [0/9]
+**** TODO [WDGM127] check file structure
+**** TODO [WDGM126] check file structure
+**** TODO [WDGMFCK] check file structure
+**** TODO [WDGM014] check file structure
+**** TODO [WDGM013] version check
+**** TODO [WDGM235] all type definitions shall be accessable for WdgM.h
+**** TODO [WDGM025] Code structure - WdgM_Cfg.h
+**** TODO [WDGM029] Code structure - WdgM.h
+**** TODO [WDGM104] Code structure - WdgM_Cfg.h
+     More information/modules needed [/]
+     WdgIf [0/11]
 **** TODO [WDGM292] if DEACTIVATED dont call WdgIf_SetTriggerConditions
 **** TODO [WDGM119] if OK call all watchdogs not in WDGIF_OFF_MODE
 **** TODO [WDGM120] if FAILED call all watchdogs not in WDGIF_OFF_MODE
@@ -154,16 +154,16 @@
 **** TODO [WDGM328] set trigger conditions (WdgIf needed)
 **** TODO [WDGM186] WdgIf_SetMode
 **** TODO [WDGM223] set trigger conditions
-*** OS/Rte/Bsw [0/3]
+     OS/Rte/Bsw [0/4]
 **** TODO [WDGM225] OS application configured
 **** TODO [WDGM275] separation of OS tasks
 **** TODO [WDGM114] notification to RTE
 **** TODO [WDGM267] Code structure - BSW header file
-*** Error reporting, Det/Dem [0/3]
+     Error reporting, Det/Dem [0/3]
 **** TODO [WDGM129] Report to DEM
 **** TODO [WDGM048] report errors to DET
 **** TODO [WDGM006] report errors to DEM
-*** Configuration [0/14]
+     Configuration [0/14]
 **** TODO [WDGM047] (configuration) WdgMDevErrorDetect
 **** TODO [WDGM304] (configuration) each SE should have a unique identifier
 **** TODO [WDGM306] (configuration) each BSW-module shall use its id as SEid
@@ -179,38 +179,38 @@
 **** TODO [WDGM313] (configuration) WDGM shall reject bad configurations
 **** TODO [WDGM314] (configuration) WDGM shall reject bad configurations
 
-** Others/UNSORTED [0/39]
-*** TODO [WDGM133] call Mcu_PerformReset
-*** TODO [WDGM002] multiple watchdogs
-*** TODO [WDGM259] Error values are of type uint8
-*** TODO [WDGM004] WdgM should be able to detect errors
-*** TODO [WDGM015] production code errors cannot be turned off
-*** TODO [WDGM236] possible to calc size of variables with size_of
-*** TODO [WDGM237] accessible variable shall be described
-*** TODO [WDGM333] naming of functions
-*** TODO [WDGM146] ?? service ports??
-*** TODO [WDGM147] naming of alive supervision
-*** TODO [WDGM195] mode ports (statuses?)
-*** TODO [WDGM196] mode ports - integration to RTE
-*** TODO [WDGM197] mode ports
-*** TODO [WDGM198] mode ports
-*** TODO [WDGM199] mode ports
-*** TODO [WDGM334] mode declaration group (statuses?)
-*** TODO [WDGM335] individual mode ports
-*** TODO [WDGM336] global mode port
-*** TODO [WDGM148] mode port
-*** TODO [WDGM149] naming of mode ports
-*** TODO [WDGM150] global mode port
-*** TODO [WDGM338] definition of wdgm as a service
-*** TODO [WDGM011] only use [some] imported types
-*** TODO [WDGM038] only use [some] data types
-*** TODO [WDGM042] WdgM_ConfigType
-*** TODO [WDGM262] if available at compile time - define as macro
-*** TODO [WDGM142] if not a defined development error
-*** TODO [WDGM060] processing of cyclic jobs
-*** TODO [WDGM327] manage corresponding error handling
-*** TODO [WDGM161] mandatory interfaces
-*** TODO [WDGM162] optional interfaces
-*** TODO [WDGM265] Variants - precompile time
-*** TODO [WDGM266] Variants - postcompile time
-*** [WDGM..._Conf] shitload with configuration requirements
+     Others/UNSORTED [0/33]
+**** TODO [WDGM133] call Mcu_PerformReset
+**** TODO [WDGM002] multiple watchdogs
+**** TODO [WDGM259] Error values are of type uint8
+**** TODO [WDGM004] WdgM should be able to detect errors
+**** TODO [WDGM015] production code errors cannot be turned off
+**** TODO [WDGM236] possible to calc size of variables with size_of
+**** TODO [WDGM237] accessible variable shall be described
+**** TODO [WDGM333] naming of functions
+**** TODO [WDGM146] ?? service ports??
+**** TODO [WDGM147] naming of alive supervision
+**** TODO [WDGM195] mode ports (statuses?)
+**** TODO [WDGM196] mode ports - integration to RTE
+**** TODO [WDGM197] mode ports
+**** TODO [WDGM198] mode ports
+**** TODO [WDGM199] mode ports
+**** TODO [WDGM334] mode declaration group (statuses?)
+**** TODO [WDGM335] individual mode ports
+**** TODO [WDGM336] global mode port
+**** TODO [WDGM148] mode port
+**** TODO [WDGM149] naming of mode ports
+**** TODO [WDGM150] global mode port
+**** TODO [WDGM338] definition of wdgm as a service
+**** TODO [WDGM011] only use [some] imported types
+**** TODO [WDGM038] only use [some] data types
+**** TODO [WDGM042] WdgM_ConfigType
+**** TODO [WDGM262] if available at compile time - define as macro
+**** TODO [WDGM142] if not a defined development error
+**** TODO [WDGM060] processing of cyclic jobs
+**** TODO [WDGM327] manage corresponding error handling
+**** TODO [WDGM161] mandatory interfaces
+**** TODO [WDGM162] optional interfaces
+**** TODO [WDGM265] Variants - precompile time
+**** TODO [WDGM266] Variants - postcompile time
+**** [WDGM..._Conf] shitload with configuration requirements
