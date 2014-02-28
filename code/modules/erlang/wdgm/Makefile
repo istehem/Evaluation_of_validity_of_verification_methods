@@ -42,7 +42,7 @@ endif
 
 REBAR_ARGS=-C "$(shell pwd)/$(CONFIG)"
 
-REBAR=$(REBAR_CMD).cmd $(REBAR_ARGS)
+REBAR=$(REBAR_CMD) $(REBAR_ARGS)
 
 
 .PHONY: all compile doc clean test dialyzer typer shell distclean pdf \
