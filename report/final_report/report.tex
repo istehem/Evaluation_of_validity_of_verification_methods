@@ -19,6 +19,8 @@
 \usepackage{subfigure}
 \usepackage{comment}
 \usepackage{slashbox}
+\usepackage{glossaries}
+
 
 \newcommand{\backgroundpic}[3]{
   \put(#1,#2){
@@ -98,6 +100,8 @@
   }
 }
 
+\makeglossaries
+\input{include/glossaries}
 
 \begin{document}
 \pagenumbering{Alph}
@@ -106,7 +110,12 @@
 \input{include/abstract}
 \setcounter{page}{2}
 \tableofcontents
+
+\glsaddall
+\printglossary
+
 \clearpage
+
 \pagenumbering{arabic}
 \chapter{Introduction}
 \input{include/introduction}
