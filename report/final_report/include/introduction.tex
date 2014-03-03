@@ -7,7 +7,7 @@
 
 %Background to the assignment. Why is it relevant?
 \section{Background}
-\subsection{The Development within Automotive Industry}
+\subsection{The Development within automotive industry}
 In the recent decades there has been a dramatic growth of information and
 communication innovations within the automotive industry
 \cite{CRC:embedded_handbook}. Analog vehicles have been transformed into complex
@@ -23,7 +23,7 @@ become more complex \cite{Springer:advanced_microsystems}.%  This could be done
 % with the use of multicore ECUs, which can provide more computational power in a
 % more energy effective way \cite{Springer:advanced_microsystems}.
 
-\subsection{Extent of software in modern Vehicles}
+\subsection{Extent of software in modern vehicles}
 Developing a new car model costs up to one billion \euro
 \cite{Clemens:tech_acceptance}, where electronics has reached a mean share of
 one third of the value, divided 20\% sensor value, 40\% hardware value and 40\%
@@ -33,7 +33,7 @@ doubled the last 10 years \cite{Wiley:internetworking}.
 More and more functions will be implemented; Intelligent traffic systems which
 make the automotive vehicles communicate \cite{VOLVO:convoys} with the roadside management systems
 \cite{Cambridge:controlsystems}, infotainment systems will bring, among other,
-weather information through internet and emergency call support
+weather information through the Internet and emergency call support
 \cite{Wiley:internetworking}\cite{Springer:advanced_microsystems}, traffic sign
 recognition \cite{Springer:advanced_microsystems}, night vision
 \cite{Wiley:internetworking}\cite{Springer:advanced_microsystems} and automated
@@ -41,10 +41,10 @@ parking \cite{Springer:advanced_microsystems}.
 
 The number of lines of code running in a vehicle is another example of how
 complex the automotive software is. The software running on a F-22 Raptor
-and the F-35 Strike Fighter, US air force attack planes, has about 1.7 million
-lines of code and 5.7 million lines of code respectively
+and the F-35 Strike Fighter, two of the attack planes in the US air force, has
+about 1.7 million lines of code and 5.7 million lines of code respectively
 \cite{IEEESpectrum:car_code}. The passenger plane Boeing 787 Dreamliner runs on
-6.5 million lines of code where the average premium-class car has close to 100
+6.5 million lines of code, where the average premium-class car has close to 100
 million lines of code \cite{IEEESpectrum:car_code}.
 
 \subsection{Introduction of standards}
@@ -65,30 +65,17 @@ This standard is built on top of another industrial standard IEC 61508
 \cite{ISO26262}, named ``Functional safety of electrical/electronic/programmable
 electronic safety-related systems'' \cite{IEC61508}, which purpose is to ensure
 functional safety in computer based system's overall life cycles
-\cite{IEC61508}. IEC 61508 adopts a four level system for categorizing the
-severity of hazards, and a six level system for classifying the frequency of a
-hazard \cite{COURSEBOOK:safety-critical}. There is also four risk classes which
-are given the values 1-4 where 1 corresponds to the most serious accidents and
-four to the least serious \cite{COURSEBOOK:safety-critical}. Based on this, IEC
-61508 has a four level classification of safety integrity levels called SIL,
-ranged from 1, being the least critical, to 4, being the most critical
-\cite{COURSEBOOK:safety-critical}\cite{IEC61508}\cite{Advances:IEC61508}. Each
-of the safety integrity levels has a criteria of maximum frequency of failures
-which a system built on that SIL must satisfy
-\cite{COURSEBOOK:safety-critical}. In other words, a SIL is a level of measure
-of the reliability of a safety function \cite{Advances:SIL4}.
-% The targeted SIL of the safety function that is going to be implemented has a
-% determined number of measurements needed to be taken to achieve the
-% classification \cite{Advances:IEC61508}.
-Due to the fact that the failure of a safety function can lead to a hazardous
-event, the safety integrity of a specific safety function must be of such a
-level to ensure that the failure frequency is sufficiently low or that the
-consequences of the hazardous event are modified to meet a tolerable risk
-\cite{Advances:IEC61508}\cite{Advances:SIL4}. To ensure safety, functions with SIL 4
-need to be tested, and documented the most \cite{IEC61508}.\\
-The automotive has adopted a similar system of SIL, namely ASIL, automotive
-safety integrity levels. As IEC 61508 there are four integrity levels, named
-A-D, but there are no direct correlation between the two \cite{TI:safety_critical}.
+\cite{IEC61508}.
+
+It is useful to distinguish between systems with different levels of
+dependability, and determine where the hazards exists\cite{COURSEBOOK:safety-critical}. When this risk analysis is completed,
+and appropriate reliability and availability requirements is assigned to the
+system, the system can be identified by a certain safety integrity level (SIL).
+If this number is high, the system will experience a more rigorous design and
+testing than could be justified for a lesser demanding system. These levels is
+more defined in standards IEC~61508 and ISO~26262.
+
+
 
 \subsection{Testing}
 Functional safety demands testing \cite{ISO26262}, and testing accounts for
