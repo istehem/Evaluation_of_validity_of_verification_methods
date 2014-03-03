@@ -47,7 +47,6 @@ analyse([X|Xs],Opts,Xr) ->
   end,
   case Opts of
     false -> {_,Ans} = cover:analyse(X,coverage,line),
-             io:fwrite("line_coverage=~s\n",[]),
              cover:analyse_to_file(X);
     _     -> {_,Ans} = cover:analyse(X,coverage,line),
              cover:analyse_to_file(X,Opts)
