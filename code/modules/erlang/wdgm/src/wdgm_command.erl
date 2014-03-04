@@ -64,8 +64,12 @@ checkpoint_gen(S) ->
            return(case SEid of
              999 -> [999, 999]; %% if the phony, also choose a phony CPid
              _   ->
-               LCPs = lists:flatten(wdgm_checkpointreached:get_args_given_LS(S#state.logicalTable, SEid)),
-               wdgm_checkpointreached:choose_SE_and_CP(S, LCPs)
+               ?LET(LCPs, frequency( %% mostly prioritize checkpointreached, but also make room for negative testing
+                        [
+                         {1,return(lists:map(fun(X) -> {found,SEid,X} end,wdgm_config_params:get_CPs_of_SE(SEid)))},
+                         {20,return(lists:flatten(wdgm_checkpointreached:get_args_given_LS(S#state.logicalTable, SEid)))}
+                        ]),
+               wdgm_checkpointreached:choose_SE_and_CP(S, LCPs))
            end))
   end.
 
