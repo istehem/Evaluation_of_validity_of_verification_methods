@@ -355,8 +355,21 @@ new values of the local statuses.
 
 \chapter{Ambiguities in AUTOSAR}
 \subsection*{Bad transition}
-The transition \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED! to\\
-\lstinline!WDGM_GLOBAL_STATUS_STOPPED! is possible due to [WDGM139]
+[WDGM285] claims that ``if WdgM_Init was successfully called, change
+global supervision status to \lstinline!WDGM_GLOBAL_STATUS_OK!''.
+
+[WDGM139] claims that ``if a call to \lstinline!WdgIf_SetMode! fails,
+the function shall assume a global supervision failure and set the
+global supervision status to \lstinline!WDGM_GLOBAL_STATUS_STOPPED!'',
+with a reference to the transition between
+\lstinline!WDGM_GLOBAL_STATUS_OK! and stopped.
+
+What if it were not successfully called?
+
+If \lstinline!WdgIf_SetMode! is not successfully called, how can
+\lstinline!WdgM_Init! be successfully, and get the global status
+\lstinline!WDGM_GLOBAL_STATUS_OK!?
+
 
 \subsection*{Incorrect reference}
 [WDGM329] could be the same as [WDGM273]
