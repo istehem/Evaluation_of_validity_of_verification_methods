@@ -4,23 +4,29 @@ definition may differ in comparison of academic or industrial use. Even in
 different phases of the safety life cycle verification is conducted in various
 forms \cite[8:9.2]{ISO26262}.
 
-\subsection{Formal verification}
-%Skriv något luddigt
-Formal verification is very hard to achieve for software, due to the state space
-explosion problem. To achieve formal verification, one must visit every state
-that exists, and prove for each of those states, that the code is correct. State
-space explosion occur when a small increase of elements rapidly raises the
-number of combinations to a computational maximum. %% SKRIV OM!!!!!!!!!!!
-                                %% framför allt sista meningen men också binda
-                                %% ihop med ISO~26262 och "state-space
-                                %% complexity"
+% \subsection{Formal verification}
+% %Skriv något luddigt
+% Formal verification is very hard to achieve for software, due to the state space
+% explosion problem. To achieve formal verification, one must visit every state
+% that exists, and prove for each of those states, that the code is correct. State
+% space explosion occur when a small increase of elements rapidly raises the
+% number of combinations to a computational maximum. %% SKRIV OM!!!!!!!!!!!
+%                                 %% framför allt sista meningen men också binda
+%                                 %% ihop med ISO~26262 och "state-space
+%                                 %% complexity"
 
-\subsection{Semi formal verification}
-%Skriv något än mer luddigt
-Semi formal verification covers a smaller state space than formal
-verification.
+% \subsection{Semi formal verification}
+% %Skriv något än mer luddigt
+% Semi formal verification covers a smaller state space than formal
+% verification.
 
 \section{Industrial Standards}
+
+%\section{Functional Safety}
+% Kanske något vi vill skriva om? Näms i metoden
+
+\subsection {IEC~61508 and ISO~26262}
+
 IEC 61508 adopts a four level system for categorizing the
 severity of hazards, and a six level system for classifying the frequency of a
 hazard \cite{COURSEBOOK:safety-critical}. There is also four risk classes which
@@ -40,26 +46,21 @@ Due to the fact that the failure of a safety function can lead to a hazardous
 event, the safety integrity of a specific safety function must be of such a
 level to ensure that the failure frequency is sufficiently low or that the
 consequences of the hazardous event are modified to meet a tolerable risk
-\cite{Advances:IEC61508}\cite{Advances:SIL4}. To ensure safety, functions with SIL 4
-need to be tested, and documented the most \cite{IEC61508}.\\
-The automotive has adopted a similar system of SIL, namely ASIL, automotive
-safety integrity levels. As IEC 61508 there are four integrity levels, named
-A-D, but there are no direct correlation between the two \cite{TI:safety_critical}.
+\cite{Advances:IEC61508}\cite{Advances:SIL4}. To ensure safety, functions with
+SIL 4 need to be tested, and documented the most \cite{IEC61508}.
 
-%\section{Functional Safety}
-% Kanske något vi vill skriva om? Näms i metoden
-
-\subsection {IEC~61508 and ISO~26262}
-
-%% SKRIV OM IEC~61508
+The automotive functional safety standard, ISO~26262, has adopted a similar
+system of SIL, namely ASIL, automotive safety integrity levels. As IEC~61508
+there are four integrity levels, named A-D, but there are no direct correlation
+between the two \cite{TI:safety_critical}.
 
 %Gör skillnad på verifikation och verifikation. Dvs vilken fas handlar det om?
-Automotive software for safety related systems is required to be designed,
-implemented and verified by the standard ISO~26262, which handles functional
-safety for automotive equipment. For a higher level of integrity ISO~26262
-strongly recommends that semi formal verification of each module should be
-executed \cite[Part 6]{ISO26262}. It also recommends a formal verification, but
-because of the state-space complexity this is hard to achieve.
+% Automotive software for safety related systems is required to be designed,
+% implemented and verified by the standard ISO~26262, which handles functional
+% safety for automotive equipment. For a higher level of integrity ISO~26262
+% strongly recommends that semi formal verification of each module should be
+% executed \cite[Part 6]{ISO26262}. It also recommends a formal verification, but
+% because of the state-space complexity this is hard to achieve.
 
 %% Skriv om integrationstester mot unittester etc, (6-9, 6-10, 6-11 i ISO)
 
@@ -160,7 +161,7 @@ tracer. Two services used for error management. %% bra eller anus att skriva av
                                 %% skriver i nästa avsnitt att det går att ta
                                 %% bort DEM rapporteringen?
 
-AUTOSARs concept is to make it possible for vehicle manufacturers to buy modules
+AUTOSAR's concept is to make it possible for vehicle manufacturers to buy modules
 from different software developers, which will still work together in
 unison. For vehicle manufacturers to have different work done by the same
 software developer's
@@ -182,23 +183,6 @@ AUTOSAR.
 % This makes it possible for vehicle developers to have different specifications
 % for a configuration. Some parts of those configuration specifications is
 % generated into code, while other is manually written or added as a configurable.
-
-\subsection{QuickCheck}
-QuickCheck was invented be Koen Claessen and John Hughes, as a testing module
-for Haskell, in 2000.
-In 2006 John Hughes founded the Company Quviq together with
-Thomas Arts\cite{QUVIQ:about}. Quviq offers a commercial version of QuickCheck for Erlang.
-The main difference, except from the programming paradigms, is that
-the commercial version of QuickCheck has a C-testing interface. Hence it
-possible to test C-code in Erlang with help of QuickCheck. All code for tests
-is written in Erlang and checked against API calls to the C-code. It is actually
-not necessary to have actual source code; it is enough to only have compiled library
-files.
-
-QuickCheck tests a program with specification implemented as properties that
-the program must hold \cite{QUICKCHECK:manual}. QuickCheck has guided random
-test generation, this means that the samples can be weighted to cover certain
-parts of the state-space with more likelihood.
 
 \section{Verification Methods}
 The standard IEC~61508 propose two methods to say that a program is formal
@@ -241,3 +225,21 @@ The description of semi formal verification in IEC~61508 states: \\
 some stage in its development, i.e. specification, design or coding. The
 description can in some cases be analysed by machine or animated to display
 various aspects of the system behaviour.''
+
+
+\subsection{QuickCheck}
+QuickCheck was invented be Koen Claessen and John Hughes, as a testing module
+for Haskell, in 2000.
+In 2006 John Hughes founded the Company Quviq together with
+Thomas Arts\cite{QUVIQ:about}. Quviq offers a commercial version of QuickCheck for Erlang.
+The main difference, except from the programming paradigms, is that
+the commercial version of QuickCheck has a C-testing interface. Hence it
+possible to test C-code in Erlang with help of QuickCheck. All code for tests
+is written in Erlang and checked against API calls to the C-code. It is actually
+not necessary to have actual source code; it is enough to only have compiled library
+files.
+
+QuickCheck tests a program with specification implemented as properties that
+the program must hold \cite{QUICKCHECK:manual}. QuickCheck has guided random
+test generation, this means that the samples can be weighted to cover certain
+parts of the state-space with more likelihood.

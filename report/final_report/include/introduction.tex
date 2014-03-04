@@ -15,12 +15,12 @@ electromechanical systems \cite{Cambridge:controlsystems}. New features are
 implemented (for example due to user demands, traffic safety or environmental
 regulations \cite{Springer:advanced_microsystems}\cite{ISO26262}) requiring more
 computational power and less energy consumption
-\cite{Springer:advanced_microsystems}. The average car has already 80 ECUs
+\cite{Springer:advanced_microsystems}. The average car has already 80 ECU's
 (electronic computation units)
 \cite{Springer:advanced_microsystems}\cite{QUVIQ:COURSE} and to deal with
 the extra functionality, each ECU will need to
 become more complex \cite{Springer:advanced_microsystems}.%  This could be done
-% with the use of multicore ECUs, which can provide more computational power in a
+% with the use of multicore ECU's, which can provide more computational power in a
 % more energy effective way \cite{Springer:advanced_microsystems}.
 
 \subsection{Extent of software in modern vehicles}
@@ -64,16 +64,17 @@ development should be carried out from beginning to end \cite{ISO26262}.
 This standard is built on top of another industrial standard IEC 61508
 \cite{ISO26262}, named ``Functional safety of electrical/electronic/programmable
 electronic safety-related systems'' \cite{IEC61508}, which purpose is to ensure
-functional safety in computer based system's overall life cycles
+functional safety in computer based systems' overall life cycles
 \cite{IEC61508}.
 
 It is useful to distinguish between systems with different levels of
-dependability, and determine where the hazards exists\cite{COURSEBOOK:safety-critical}. When this risk analysis is completed,
+dependability, and determine where the hazards
+exists\cite{COURSEBOOK:safety-critical}. When this risk analysis is completed,
 and appropriate reliability and availability requirements is assigned to the
 system, the system can be identified by a certain safety integrity level (SIL).
 If this number is high, the system will experience a more rigorous design and
-testing than could be justified for a lesser demanding system. These levels is
-more defined in standards IEC~61508 and ISO~26262.
+testing than could be justified for a lesser demanding system. These levels are
+more defined in the standards IEC~61508 and ISO~26262.
 
 
 
@@ -84,10 +85,15 @@ around half of all software development costs
 motivated and can be done by automating the test generation process
 \cite{QUICKCHECK:software}\cite{Testing:black_box}.
 
-The complexity issue is that in systems such as microprocessors the number of
-possible failure states is so large that it is considered
-infinite \cite{COURSEBOOK:safety-critical}. This makes it impossible exhaustively
-test the system, and therefore, also make the detection of failures unreliable.
+For simple devices it is possible to exhaustively test the functional safety of
+the system \cite{COURSEBOOK:safety-critical}. For example consider system
+consisting of a small number of switches, where each switch has only two states;
+open and closed. Then the number of possible failures can be determined by the
+combination of all possible failure states of each individual switch. The
+complexity issue is that in systems such as microprocessors or ECU's, the
+number of possible failure states is so large that it is considered
+infinite. This makes it impossible exhaustively test the system, and therefore,
+make the detection of failures unreliable.
 
 %Aim for the work. What should be accomplished?
 \section{Purpose}
@@ -148,9 +154,9 @@ It should not matter which configuration that is active and even further
 how the module is implemented, because the specification should hold for all
 configurations and implementations. This gives rise to that every company that
 implements the module should be able to run the final code to achieve ``semi
-formal verification''. Since modules in AUTOSAR are dependent the work presented here
-should be generalized so it can be hooked on when implementing test suits,
-using the same techniques, for other modules.
+formal verification''. Since modules in AUTOSAR are dependent, the work
+presented here should be generalized so it can be hooked on when implementing
+test suits, using the same techniques, for other modules.
 
 %Limitations. What should be left out and why?
 \section{Scope}
@@ -158,13 +164,13 @@ We will use AUTOSAR 4.0 revision 3 for our thesis work.
 Since this version of AUTOSAR consists of more than 100 specifications and other
 auxiliary materials\cite{AUTOSAR:URL}, we will limit our scope to one
 specification. The module of this thesis is the Watchdog Manager. This
-module provides monitoring services used to maintain correctness. This
+module provides monitoring services used to maintain correctness. The
 module is chosen because it got dependencies, and is used to report
 development and production errors, but mainly because it executes
-safety-critical work. That it got dependencies is important when doing
+safety-critical work. The fact that it got dependencies is important when doing
 integration testing.
 
-Also the aim of the work is to verify software components. In other words no
+The aim of the work is also to verify software components. In other words no
 work considered hardware or a combination of hardware and software will be
 prioritized. All implemented code for the verification will run on a standard
 PC-machine.
@@ -174,3 +180,5 @@ PC-machine.
 
 We will not implement deprecated API-functions in our model, nor will we test
 configurations which will give raise to segmentation faults.
+
+%% skriva något om varför vi inte vill testa segmentation fault configs?
