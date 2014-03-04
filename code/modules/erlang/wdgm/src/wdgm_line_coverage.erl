@@ -14,7 +14,8 @@ modules() ->
     wdgm_post,
     wdgm_pre,
     wdgm_main,
-    wdgm_checkpointreached
+    wdgm_checkpointreached,
+    wdgm_helper
     %wdgm_statem_eqc
     %wdgm_command, %% Seems not to be running, probable cause "only seen in generation step"
   ].
@@ -25,12 +26,13 @@ analyse(Xs,Opts) ->
  {_,L,R} = lists:foldl(
              fun({M0,L0,R0},{_,L1,R1}) ->
                 begin
-                  io:fwrite("Coverage for module " ++ atom_to_list(M0) ++ " = " ++ io_lib:format("~.2f",[(R0/L0)*100]) ++ "%\n"),
+                  io:fwrite("Coverage for module " ++ atom_to_list(M0) ++ ": ~p/~p*100 = " ++
+                            io_lib:format("~.2f",[(R0/L0)*100]) ++ "%\n",[R0,L0]),
                   {M0,L0+L1,R0+R1}
                 end
              end,
              {none,0,0},Ys),
- io:fwrite("Total Coverage" ++ " = " ++ io_lib:format("~.2f",[(R/L)*100]) ++ "%\n").
+ io:fwrite("Total Coverage:" ++ " ~p/~p*100 = " ++ io_lib:format("~.2f",[(R/L)*100]) ++ "%\n", [R,L]).
 
 
 analyse([],_,Xr) ->
