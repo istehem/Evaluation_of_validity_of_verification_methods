@@ -6,12 +6,75 @@
                  car_xml:file(wdgm_xml:config_file())))))).
 
 -define(CFG, car_xml:file(wdgm_xml:config_file())).
+-define(WDGMSTATEM, wdgm_statem_eqc).
+-define(C_CODE, wdgm_wrapper).
 
+%% Bullseye C coverage
+-ifdef(bullseye).
+-define(COPY_FILE,copy_bullseye_cov_file()).
+-define(COVER_OPTS,[{d,bullseye}]).
+-else.
+-define(COVER_OPTS,[]).
+-define(COPY_FILE,ok).
+-endif.
+
+%% Cover Erlang coverage
+-ifdef(linecover).
+-define(SETUP_COVERAGE,setup_coverage()).
+-define(RUN_COVERAGE,run_coverage()).
+-else.
+-define(SETUP_COVERAGE,ok).
+-define(RUN_COVERAGE,ok).
+-endif.
+
+%% Write history to file
+-ifdef(history).
+-define(WRITE_HISTORY(T,H),write_history_to_file(T,H)).
+-else.
+-define(WRITE_HISTORY(T,H),ok).
+-endif.
+
+%% Prioritize logical supervision?
 -ifdef(NOLSPRIO).
 -define(LSPRIO, dont_prioritize_ls).
 -else.
 -define(LSPRIO, prioritize_ls).
 -endif.
+
+%% CONFIG DEFINES
+-define(EXAMPLE_CONFIG, "examples/WdgM_VID41_ExampleConfiguration_001_cfg1.arxml").
+-define(FREESCALE_CONFIG, "freescale/wdgm_freescale_pip.arxml").
+-define(BSI_CONFIG, "bsi/wdgm_bsi.arxml").
+-define(EXAMPLE_ONLY_AS_CONFIG, "examples/WdgM_VID41_ExampleConfiguration_ONLY_AS.arxml").
+
+-ifdef(EXAMPLE).
+-ifndef(CONFIG).
+-define(CONFIG, ?EXAMPLE_CONFIG).
+-endif.
+-endif.
+
+-ifdef(FREESCALE).
+-ifndef(CONFIG).
+-define(CONFIG, ?FREESCALE_CONFIG).
+-endif.
+-endif.
+
+-ifdef(BSI).
+-ifndef(CONFIG).
+-define(CONFIG, ?BSI_CONFIG).
+-endif.
+-endif.
+
+-ifdef(EXAMPLE_ONLY_AS).
+-ifndef(CONFIG).
+-define(CONFIG, ?EXAMPLE_ONLY_AS_CONFIG).
+-endif.
+-endif.
+
+-ifndef(CONFIG).
+-define(CONFIG, ?EXAMPLE_CONFIG).
+-endif.
+
 
 -record(wdgmgeneral,
         {defensive_behavior,

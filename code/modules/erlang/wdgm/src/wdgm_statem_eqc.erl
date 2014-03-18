@@ -7,30 +7,7 @@
 
 -include("wdgm_types.hrl").
 -include("wdgm_config.hrl").
--define(C_CODE, wdgm_wrapper).
--include_lib("../ebin/wdgm_wrapper.hrl").
-
--ifdef(bullseye).
--define(COPY_FILE,copy_bullseye_cov_file()).
--define(COVER_OPTS,[{d,bullseye}]).
--else.
--define(COVER_OPTS,[]).
--define(COPY_FILE,ok).
--endif.
-
--ifdef(linecover).
--define(SETUP_COVERAGE,setup_coverage()).
--define(RUN_COVERAGE,run_coverage()).
--else.
--define(SETUP_COVERAGE,ok).
--define(RUN_COVERAGE,ok).
--endif.
-
--ifdef(history).
--define(WRITE_HISTORY(T,H),write_history_to_file(T,H)).
--else.
--define(WRITE_HISTORY(T,H),ok).
--endif.
+-include_lib("wdgm_wrapper.hrl").
 
 %%% QuickCheck specific functions ==============================================
 initial_state() ->

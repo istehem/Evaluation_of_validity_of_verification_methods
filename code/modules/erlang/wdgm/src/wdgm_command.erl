@@ -12,8 +12,6 @@
 
 -compile(export_all).
 
--define(WDGMSTATEM, wdgm_statem_eqc).
-
 
 %%% -WdgM_Init------------------------------------------------------------------
 
