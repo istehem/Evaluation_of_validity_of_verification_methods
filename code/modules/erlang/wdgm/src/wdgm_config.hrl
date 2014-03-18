@@ -5,6 +5,12 @@
                  "WdgMConfigSet",
                  car_xml:file(wdgm_xml:config_file())))))).
 
+-ifdef(NOLSPRIO).
+-define(LSPRIO, dont_prioritize_ls).
+-else.
+-define(LSPRIO, prioritize_ls).
+-endif.
+
 -record(wdgmgeneral,
         {defensive_behavior,
          dem_stopped_supervision_report,

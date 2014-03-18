@@ -59,15 +59,23 @@ checkpoint_gen(S) ->
                                           Xs -> Xs
                                        end)},   %% either choose one of the valid SEid
                                                 % (This demands there is at least one ActivatedSEid)
-                            {1, oneof(DeactivatedSEid++[999])}, % (This demands there is at least one DeactivatedSEid)
+                            {1, oneof(DeactivatedSEid++[999])},
                             {1, return(999)}]), %% or a phony
            return(case SEid of
              999 -> [999, 999]; %% if the phony, also choose a phony CPid
              _   ->
-               LCPs = lists:flatten(wdgm_checkpointreached:get_args_given_LS(S#state.logicalTable, SEid)),
+               LCPs = ?LSPRIO(S, SEid),
                wdgm_checkpointreached:choose_SE_and_CP(S, LCPs)
            end))
   end.
+
+%% prioritize logical supervision
+prioritize_ls(S, SEid) ->
+    lists:flatten(wdgm_checkpointreached:get_args_given_LS(S#state.logicalTable, SEid)).
+
+%% don't prioritize logical supervision
+dont_prioritize_ls(_S, SEid) ->
+    lists:map(fun (CP) -> {found, SEid, CP} end, wdgm_config_params:get_CPs_of_SE(SEid)).
 
 
 %%% -WdgM_UpdateAliveCounter----------------------------------------------------
