@@ -201,9 +201,10 @@ mainfunction_post(S, _Args, _Ret) ->
 %%% -WdgM_GetVersionInfo--------------------------------------------------------
 
 getversioninfo_post(S, [Is_Null], {_Ret, Value}) ->
+  Version = list_to_tuple(['Std_VersionInfoType'] ++ tuple_to_list(?VERSION)),
   case Is_Null of
     true  ->
       S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect; %% [WDGM256]
     false ->
-      Value == {'Std_VersionInfoType', 41, 13, 5, 1, 1} %% [WDGM110]
+      Value == Version %% [WDGM110]
   end.

@@ -82,6 +82,10 @@
 -define(CONFIG, ?EXAMPLE_CONFIG).
 -endif.
 
+%% Version of the module
+-ifndef(VERSION).
+-define(VERSION, {41, 13, 5, 1, 1}).
+-endif.
 
 -record(wdgmgeneral,
         {defensive_behavior,

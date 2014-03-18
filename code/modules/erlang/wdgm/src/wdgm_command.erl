@@ -29,12 +29,21 @@ getmode_command(_S) ->
 %%% -WdgM_SetMode---------------------------------------------------------------
 
 setmode_command(S) ->
+  CallerIds = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids,
+  CIds =
+    case
+      CallerIds == [] orelse
+      CallerIds == undefined
+    of
+      true  -> [65535];
+      false -> CallerIds
+    end,
   {call, ?WDGMSTATEM, setmode, [frequency(
                                   [{30, oneof([Id || {Id, _} <- wdgm_config_params:get_modes()])},
                                    {1, return(255)}]),
                                 frequency(
-                                  [{30, oneof(S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)},
-                                   {1, return(999)}])]}.
+                                  [{30, oneof(CIds)},
+                                   {1, return(65535)}])]}.
 
 %%% -WdgM_DeInit----------------------------------------------------------------
 
@@ -59,14 +68,13 @@ checkpoint_gen(S) ->
                          || {SEid,_} <- SEs,
                             not lists:member(SEid, ActivatedSEid)],
       ?LET(SEid, frequency([{20, oneof(case ActivatedSEid of
-                                          [] -> [999];
+                                          [] -> [65535];
                                           Xs -> Xs
                                        end)},   %% either choose one of the valid SEid
                                                 % (This demands there is at least one ActivatedSEid)
-                            {1, oneof(DeactivatedSEid++[999])},
-                            {1, return(999)}]), %% or a phony
+                            {1, oneof(DeactivatedSEid++[65535])}]),
            return(case SEid of
-             999 -> [999, 999]; %% if the phony, also choose a phony CPid
+             65535 -> [65535, 65535]; %% if the phony, also choose a phony CPid
              _   ->
                LCPs = ?LSPRIO(S, SEid),
                wdgm_checkpointreached:choose_SE_and_CP(S, LCPs)
@@ -87,9 +95,18 @@ dont_prioritize_ls(_S, SEid) ->
 
 %%% -WdgM_GetLocalStatus--------------------------------------------------------
 
-getlocalstatus_command(_S) ->
-  {call, ?WDGMSTATEM, getlocalstatus, [frequency([{20, choose(0,4)},
-                                                  {1, return(999)}]),
+getlocalstatus_command(S) ->
+  SErecords =
+    case
+      S#state.supervisedentities == undefined orelse
+      S#state.supervisedentities == []
+    of
+      true  -> [#supervisedentity{seid=65535}];
+      false -> S#state.supervisedentities
+    end,
+  SEids = [SE#supervisedentity.seid || SE <- SErecords],
+  {call, ?WDGMSTATEM, getlocalstatus, [frequency([{20, oneof(SEids)},
+                                                  {1, return(65535)}]),
                                        frequency([{20, return(false)},
                                                   {1, return(true)}])]}.
 

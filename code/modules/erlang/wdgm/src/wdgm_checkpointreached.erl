@@ -245,12 +245,12 @@ choose_SE_and_CP(S, LCPs) ->
     [prioritize(S, ProposedSE, ProposedCP)
      || {found, ProposedSE, ProposedCP} <- lists:flatten(LCPs)],
   case PrioritizedCPs of
-    []                  -> [999,999]; %% waaat?
+    []                  -> [65535,65535]; %% waaat?
     _  ->
       case lists:keyfind(prio, 1, PrioritizedCPs) of
         false ->
           case lists:keyfind(maybe, 1, PrioritizedCPs) of
-            false       -> [999,999]; %% mainfunction really needed
+            false       -> [65535,65535]; %% mainfunction really needed
             {_, SE, CP} -> [SE, CP]
           end;
         {_, SE, CP}     -> [SE, CP]
