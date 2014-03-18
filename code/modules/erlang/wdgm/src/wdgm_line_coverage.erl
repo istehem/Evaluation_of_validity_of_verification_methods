@@ -14,7 +14,8 @@ modules() ->
     wdgm_post,
     wdgm_pre,
     wdgm_main,
-    wdgm_checkpointreached
+    wdgm_checkpointreached,
+    wdgm_helper
     %wdgm_statem_eqc
     %wdgm_command, %% Seems not to be running, probable cause "only seen in generation step"
   ].
