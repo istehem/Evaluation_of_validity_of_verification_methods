@@ -1,16 +1,9 @@
 -module(wdgm_eqc).
 
 -include_lib("eqc/include/eqc.hrl").
+-include("wdgm_config.hrl").
 
 -compile(export_all).
-
--define(C_CODE, wdgm_wrapper).
-
--ifdef(bullseye).
--define(COMPILER,"C:/Program\ Files\ \(x86\)/BullseyeCoverage/bin/gcc.exe").
--else.
--define(COMPILER,"gcc").
--endif.
 
 %% -Eqc start-------------------------------------------------------------------
 

@@ -9,6 +9,13 @@
 -define(WDGMSTATEM, wdgm_statem_eqc).
 -define(C_CODE, wdgm_wrapper).
 
+%% Which compiler to use
+-ifdef(bullseye).
+-define(COMPILER,"C:/Program\ Files\ \(x86\)/BullseyeCoverage/bin/gcc.exe").
+-else.
+-define(COMPILER,"gcc").
+-endif.
+
 %% Bullseye C coverage
 -ifdef(bullseye).
 -define(COPY_FILE,copy_bullseye_cov_file()).
