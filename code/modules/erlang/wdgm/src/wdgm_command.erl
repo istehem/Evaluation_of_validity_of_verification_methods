@@ -31,9 +31,9 @@ getmode_command(_S) ->
 setmode_command(S) ->
   {call, ?WDGMSTATEM, setmode, [frequency(
                                   [{30, oneof([Id || {Id, _} <- wdgm_config_params:get_modes()])},
-                                   {1, return(999)}]),
+                                   {1, return(255)}]),
                                 frequency(
-                                  [{30, oneof(S#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)},
+                                  [{30, oneof(S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)},
                                    {1, return(999)}])]}.
 
 %%% -WdgM_DeInit----------------------------------------------------------------
