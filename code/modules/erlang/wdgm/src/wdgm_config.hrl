@@ -5,6 +5,8 @@
                  "WdgMConfigSet",
                  car_xml:file(wdgm_xml:config_file())))))).
 
+-define(CFG, car_xml:file(wdgm_xml:config_file())).
+
 -ifdef(NOLSPRIO).
 -define(LSPRIO, dont_prioritize_ls).
 -else.

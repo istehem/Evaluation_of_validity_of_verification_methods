@@ -18,8 +18,9 @@
 %%% -WdgM_Init------------------------------------------------------------------
 
 init_command(_S) ->
-  {call, ?WDGMSTATEM, init, [frequency([{20, return({eqc_c:address_of(?CONFIG_FILE), false})},
-                                   {1, return({{ptr, "WdgM_ConfigType", 0}, true})}])]}.
+  {call, ?WDGMSTATEM, init, [frequency(
+                               [{20, return({eqc_c:address_of(?CONFIG_FILE), false})},
+                                {1, return({{ptr, "WdgM_ConfigType", 0}, true})}])]}.
 
 %%% -WdgM_GetMode---------------------------------------------------------------
 
@@ -29,8 +30,13 @@ getmode_command(_S) ->
 
 %%% -WdgM_SetMode---------------------------------------------------------------
 
-setmode_command(_S) ->
-  {call, ?WDGMSTATEM, setmode, [choose(0,3), choose(1,2)]}. %% borde avspegla de aktuella värdena
+setmode_command(S) ->
+  {call, ?WDGMSTATEM, setmode, [frequency(
+                                  [{30, oneof([Id || {Id, _} <- wdgm_config_params:get_modes()])},
+                                   {1, return(999)}]),
+                                frequency(
+                                  [{30, oneof(S#wdgm.wdgmgeneral#wdgmgeneral.caller_ids)},
+                                   {1, return(999)}])]}.
 
 %%% -WdgM_DeInit----------------------------------------------------------------
 

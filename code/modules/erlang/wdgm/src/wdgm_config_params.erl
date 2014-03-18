@@ -2,7 +2,7 @@
 
 -compile([export_all, debug_info]).
 
--define(CFG, car_xml:file(wdgm_xml:config_file())).
+-include("wdgm_config.hrl").
 
 %%% Get the existing modes
 %%% Return: [{ModeId, ModeName}]
