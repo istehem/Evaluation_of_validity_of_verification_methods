@@ -162,8 +162,8 @@ get_args_given_DS(DRs, SEid, CPid) ->
         lists:usort(
           [ case
               {CP == D#deadline.startCP,
-               (D#deadline.timer-D#deadline.timestamp) =< D#deadline.minmargin,
-               (D#deadline.timer-D#deadline.timestamp) == D#deadline.maxmargin}
+               (D#deadline.timer-D#deadline.timestamp) < -D#deadline.minmargin, %% Not sure if it should be negative min margin
+               (D#deadline.timer-D#deadline.timestamp) >= D#deadline.maxmargin}
             of
               {false, false, _} -> {mainfunction_needed, SEid, CP};
               {false, _, true}  -> {mustdo, SEid, CP};
@@ -201,8 +201,8 @@ get_args_given_AS(ARs, SEid, CPid) ->
       AliveRecordsForSE =
         lists:usort(
           [ case
-              {(A#alive.expected_alive_indications-A#alive.alive_counter) == A#alive.maxmargin,
-               (A#alive.expected_alive_indications-A#alive.alive_counter) < A#alive.minmargin}
+              {(A#alive.expected_alive_indications-A#alive.alive_counter) >= A#alive.maxmargin,
+               (A#alive.expected_alive_indications-A#alive.alive_counter) < -A#alive.minmargin}
             of
               {true, _} -> {mainfunction_needed, SEid, CP};
               {_, true} -> {mustdo, SEid, CP};

@@ -60,10 +60,8 @@ setmode_post(S, [ModeId, Cid], Ret) ->
    S#state.globalstatus /= 'WDGM_GLOBAL_STATUS_FAILED' andalso
    S#state.currentMode == eqc_c:value_of('WdgM_CurrentMode')) %% [WDGM316], [WDGM145]
     orelse
-      ((S#state.globalstatus == eqc_c:value_of('WdgM_GlobalStatus') orelse  %% [WDGM317]
-        S#state.globalstatus == undefined) andalso %% if not initialized everything under will failed
+      (S#state.globalstatus == eqc_c:value_of('WdgM_GlobalStatus') andalso %% [WDGM317]
        S#state.expiredsupervisioncycles == eqc_c:value_of('WdgM_ExpiredSupervisionCycles') andalso %% [WDGM317]
-
        case Ret of
          0 ->
            wdgm_helper:check_next_supervisionstatus(S, eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'), 0); %% [WDGM207], [WDGM291], [WDGM209], [WDGM182], [WDGM316]
@@ -84,11 +82,12 @@ setmode_post(S, [ModeId, Cid], Ret) ->
 %% [WDGM154] should check something with WdgM_SetMode
 deinit_post(S, _Args, _Ret) ->
   DevErrorDetect = S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect,
+  (DevErrorDetect orelse S#state.initialized) andalso %% [WDGM288]
   case S#state.globalstatus of
-    'WDGM_GLOBAL_STATUS_OK' -> eqc_c:value_of('WdgM_GlobalStatus') ==
-                                  'WDGM_GLOBAL_STATUS_DEACTIVATED'; %% [WDGM286]
-    undefined               -> (DevErrorDetect andalso not S#state.initialized); %% [WDGM288]
-    Status                  -> eqc_c:value_of('WdgM_GlobalStatus') == Status %% lack of wdgm286?
+    'WDGM_GLOBAL_STATUS_OK' ->
+      eqc_c:value_of('WdgM_GlobalStatus') == 'WDGM_GLOBAL_STATUS_DEACTIVATED'; %% [WDGM286]
+    Status                  ->
+      eqc_c:value_of('WdgM_GlobalStatus') == Status %% lack of wdgm286?
   end.
 
 %%% -WdgM_CheckpointReached-----------------------------------------------------
@@ -174,8 +173,7 @@ mainfunction_post(S, _Args, _Ret) ->
   NextS = wdgm_next:mainfunction_next(S, 0, 0),
   MonitorTable = eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'),
 
-  Behaviour =
-  NextS#state.globalstatus == GlobalStatus andalso %% [WDGM214], [WDGM326]
+  Behaviour = NextS#state.globalstatus == GlobalStatus andalso %% [WDGM214], [WDGM326]
   ((GlobalStatus == 'WDGM_GLOBAL_STATUS_EXPIRED' andalso
       eqc_c:value_of('SeIdLocalStatusExpiredFirst') /= 0 andalso
       NextS#state.expiredSEid /= undefined) %% [WDGM351]
@@ -189,8 +187,7 @@ mainfunction_post(S, _Args, _Ret) ->
       case S#state.initialized of
         true -> Behaviour;
         false ->
-          (S#state.globalstatus == GlobalStatus orelse (S#state.globalstatus == undefined
-            andalso GlobalStatus == 'WDGM_GLOBAL_STATUS_OK')) andalso
+          S#state.globalstatus == GlobalStatus andalso
             (S#state.supervisedentities == undefined orelse
              S#state.supervisedentities == [] orelse
             wdgm_helper:check_same_supervisionstatus(S, MonitorTable, 0))

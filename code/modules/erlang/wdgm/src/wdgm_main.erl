@@ -208,8 +208,7 @@ check_CP_within_SE(S, CPref) ->
       true ->
         I = algorithm_for_alive_supervision(CPstate#alive.alive_counter, EAI),
         case
-          I =< MaxMargin andalso
-          I >= -MinMargin
+          I =< MaxMargin andalso I >= -MinMargin
         of
           true -> {'WDGM_CORRECT', 0};
           _    -> {'WDGM_INCORRECT', 0}
