@@ -265,8 +265,17 @@ often called.
 \newcommand{\linecoverage}{100\%}
 The Erlang module \emph{cover} was used to calculate the line coverage for the
 Erlang module.
-To get an idea of how many tests that needed to be executed, blablablbla, was
+To get an idea of how many tests that needed to be executed, before the line
+coverage of the Erlang module converges against a certain value,
 the coverage measured after each executed test for every configuration.
+
+\begin{figure}[!ht]
+\begin{center}
+%\includegraphics{generated_pictures/coverage_per_tests_freescale.pdf}
+\end{center}
+\caption{Coverage per tests using the BSI configuration}
+\label{FIG:COV_PER_TESTS_BSI}
+\end{figure}
 
 \begin{figure}[!ht]
 \begin{center}
@@ -275,6 +284,24 @@ the coverage measured after each executed test for every configuration.
 \caption{Coverage per tests using the Freescale configuration}
 \label{FIG:COV_PER_TESTS_FREESCALE}
 \end{figure}
+
+
+\begin{figure}[!ht]
+\begin{center}
+%\includegraphics{generated_pictures/coverage_per_tests_freescale.pdf}
+\end{center}
+\caption{Coverage per tests using the Example configuration}
+\label{FIG:COV_PER_TESTS_EXAMPLE}
+\end{figure}
+
+As can be seen in the plots \ref{FIG:COV_PER_TESTS_BSI},
+\ref{FIG:COV_PER_TESTS_FREESCALE} and \ref{FIG:COV_PER_TESTS_EXAMPLE} the
+example configuration takes the longest time before it converges. It also
+becomes clear that the freescale configuration needs more tests than the BSI
+configuration before it convergence. The complexity of the configuration seems
+hence to play an important part. This is not surprising because a more complex
+configuration may drastically increase the state space, blablabla.
+
 The coverage results after running all configuration can be seen in table
 \ref{TABLE:COVERAGE}.  The module \emph{wdgm\_pre} checks preconditions of the
 model state, hence constraining the model states ability to change, this will

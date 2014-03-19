@@ -27,11 +27,16 @@ def get_data():
   data = []
   f = open(raw_input(''),'r')
   xs = f.readlines()
+  f.close()
   cov = 0
   tot = 0
+  tres = 200
   for i, elem in enumerate(xs):
     cov, tot = map(lambda x: float(x),elem.split('*')[0].split('/'))
     data = data + [(i,cov/tot*100)]
+    if (i+1) % tres == 0 and (data[i][1] == data[(i-tres+1)][1]):
+        sys.stderr.write(str(data[i]) + " " + str(data[i-tres+1]) + "\n")
+        break
   return (data,cov,tot)
 
 if __name__ == "__main__":
