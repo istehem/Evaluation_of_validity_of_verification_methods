@@ -42,6 +42,7 @@ system model. It also supports embedded C code as part of the model
 specifications. It supports random, interactive and guided simulation, with both
 partial and exhaustive proof techniques.
 
+%% Testar bara erlang kod
 % \subsection{McErlang}
 % McErlang is a model checker written in Erlang used for verifying distributed
 % Erlang programs\cite{MCERLANG:model-checker}. Its purpose is to check a program
@@ -53,26 +54,33 @@ partial and exhaustive proof techniques.
 % properties. McErlang also implements weak process fairness, by omitting non-fair
 % loops from the accepting runs in its liveness algorithm.
 
-% %% jag tror mcerlang ingår i QuickCheck suiten. den blir installerad tillsammans
-% %% med QuickCheck iaf.
+%% mCRL2 kod; process algebra
+% \subsection{$\mu$CRL toolset} $\mu$CRL is a process algebraic language which is
+% suited for the analysis of distributed systems. The toolkit is built on this
+% language and contains a theorem prover based on binary decision
+% diagrams\cite{MCRL:manual}.
 
-\subsection{$\mu$CRL toolset} $\mu$CRL is a process algebraic language which is
-suited for the analysis of distributed systems. The toolkit is built on this
-language and contains a theorem prover based on binary decision
-diagrams\cite{MCRL:manual}.
+%% LOTOS kod; specifikationer/protokoll kan testas
+% \subsection{CADP} Construction and Analysis of Distributed Processes (CADP),
+% formerly CAESAR/ALDEBARAN Development Package, is a toolset for the design of
+% distributed systems\cite{CADP:manual}. It includes, among others, tools for
+% equivalence checking, state-space manipulation and model checking, and it also
+% includes several verification algorithms. It provides functionality as
+% step-by-step simulation to parallel model checking.
 
-\subsection{CADP} Construction and Analysis of Distributed Processes (CADP),
-formerly CAESAR/ALDEBARAN Development Package, is a toolset for the design of
-distributed systems\cite{CADP:manual}. It includes, among others, tools for
-equivalence checking, state-space manipulation and model checking, and it also
-includes several verification algorithms. It provides functionality as
-step-by-step simulation to parallel model checking.
+\subsection{Parasoft C/C++test}
+Parasoft C/C++test is an integrated development testing solution for C
+and C++ \cite{PARASOFT:datasheet}. It has automated code analysis,
+which enforces code policies depending on given rules.
+It also detects certain runtime errors such as referencing null
+pointers, buffer overflows, division by zero and using uninitialized
+memory/variables.
 
-\subsection{Parasoft C++test}
-Parasoft C++ is a commercial software with a huge range of functionality,
+Parasoft C/C++test is a commercial tool with a huge range of functionality,
 developed by the Parasoft company, with the purpose of testing software written
 in C or C++. Parasoft claims that it should be possible to satisfy ASIL
-requirements using their software(?).
+requirements using their methods(?).
+
 %\subsection{Isabelle}
 % Isabelle theorem prover is an interactive theorem prover, successor of the
 % Higher Order Logic (HOL) theorem prover
