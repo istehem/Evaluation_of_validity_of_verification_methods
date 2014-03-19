@@ -42,8 +42,8 @@ check_next_supervisionstatus(S, [L|Ls], C) ->
    S#state.globalstatus == 'WDGM_GLOBAL_STATUS_FAILED') andalso
   case L#'WdgM_SupervisedEntityMonitor_Tag'.supervision_status of
     'WDGM_LOCAL_STATUS_OK' ->
-       SE#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_OK' orelse %% [WDGM182]
-        SE#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_DEACTIVATED' %% [WDGM209]
+       (SE#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_OK' orelse %% [WDGM182]
+        SE#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_DEACTIVATED') %% [WDGM209]
         andalso check_next_supervisionstatus(S, Ls, C+1);
     'WDGM_LOCAL_STATUS_DEACTIVATED' ->
       ((SE#supervisedentity.localstatus == 'WDGM_LOCAL_STATUS_OK' orelse %% [WDGM207]
@@ -81,13 +81,6 @@ check_supervision_results({_, _, 'WDGM_LOCAL_STATUS_OK', _, 'WDGM_CORRECT', 'WDG
   true;
 check_supervision_results(_) ->
   false.
-
-findKeyIndex(E, P, Ls) -> findKeyIndex(E, P, Ls, 1).
-findKeyIndex(_, _, [], _) -> not_found;
-findKeyIndex(Elem, P, [Tuple|Ls],N) -> case element(P, Tuple) of
-                                         Elem -> N;
-                                         _ -> findKeyIndex(Elem, P, Ls, N+1)
-                                       end.
 
 reset_alive_table(ModeId) ->
   lists:map(fun (CPref) ->
