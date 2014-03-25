@@ -156,7 +156,7 @@ integrated, is the watchdog, which consist of several parts as seen in figure~\r
 microcontroller abstraction layer has the drivers for the watchdog, the
 interaction with the microcontroller. Then there is the watchdog interface at
 the ECU abstraction layer. The watchdog interface is the onboard device
-abstraction. Last is the watchdog manager which runs as a system service in the
+abstraction. Last is the watchdog manager (abbreviated WdgM) which runs as a system service in the
 service layer.
 
 \begin{figure}[!ht]
@@ -175,15 +175,14 @@ tracer. Two services used for error management. %% bra eller anus att skriva av
                                 %% skriver i nästa avsnitt att det går att ta
                                 %% bort DEM rapporteringen?
 
-AUTOSAR's concept is to make it possible for vehicle manufacturers to buy modules
-from different software developers, which will still work together in
-unison. For vehicle manufacturers to have different work done by the same
-software developer's
-module, the standard introduce configurations. There exist a number of variables
-to configure. In the watchdog manager, there is for example variables that
-specify if the watchdog manager should report errors to the diagnostic event
-manager (DEM), or which type of supervision that should be done and what to
-supervise.
+AUTOSAR's concept is to make it possible for vehicle manufacturers to
+buy modules from different software developers, which will still work
+together in unison. For vehicle manufacturers to have different work
+done by the same software developer's module, the standard introduce
+configurations. There exist a number of variables to configure. In the
+watchdog manager, there is for example variables that specify if the
+watchdog manager should report errors to the diagnostic event manager
+(DEM), or which type of supervision that should be done and what to supervise.
 
 The current version of AUTOSAR, version 4, has been design with functional
 safety in mind. Essential concepts of ISO~26262 have been developed alongside
