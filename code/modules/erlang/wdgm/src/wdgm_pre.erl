@@ -41,9 +41,6 @@ checkpointreached_pre(S) ->
     orelse
     S#state.originalCfg#wdgm.wdgmgeneral#wdgmgeneral.dev_error_detect.
 
-checkpointreached_pre(_S, [false]) ->
-  false.
-
 %%% -WdgM_UpdateAliveCounter----------------------------------------------------
 %% Deprecated
 
