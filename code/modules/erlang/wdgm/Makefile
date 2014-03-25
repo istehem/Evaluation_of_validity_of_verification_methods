@@ -40,7 +40,7 @@ ifeq ($(wildcard $(CONFIG)),)
 $(error "Config file $(CONFIG) not found in $(shell pwd)")
 endif
 
-REBAR_ARGS=-C "$(shell pwd)/$(CONFIG)"
+REBAR_ARGS=-vvv -C"$(shell pwd)/$(CONFIG)"
 
 REBAR=$(REBAR_CMD) $(REBAR_ARGS)
 
