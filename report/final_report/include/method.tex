@@ -123,21 +123,33 @@ have the actual C code and not just library files.
 The C-code that was to be tested, using QuickCheck, was already unit tested and
 run sharp in lab environments.
 
-The WdgM model was completely implemented in Erlang, independent of the design
-choices of the C-code. The idea was to ensure an independent model; if the model
-was inspired by the C-code, it could have transmitted errors.
-
 The implementation of the module was done to be able to test API calls,
 also described in appendix~\ref{APP:QUICKCHECK}, against the C-code. The tests
 then checked that the postconditions held, according to figure
 \ref{FIG:api_calls}. The postconditions were written to test that AUTOSAR
-requirements held. In other words that the API calls were called correctly. A
-problem when writing the postconditions, was to translate the AUTOSAR
-requirements into code, because AUTOSAR specification are written in natural
-language. It was easy to see that there were room for different interpretations,
+requirements held. In other words that the API calls were called correctly.
+
+\subsection{Formal Notation}
+To be able to automatically generate test cases, using QuickCheck,
+AUTOSAR specifications, written in a natural language, needed to be transformed
+into Erlang code. Hence transforming informal notation into formal notation.
+
+A problem when translating the AUTOSAR specifications into code was that there
+were ambiguities. It was easy to see that there were room for different interpretations,
 which most likely would
 result in errors later.
 
+The translating process was done iteratively as described in section \ref{SEC:ITERATIVE}
+
+\subsection{Independence of the Erlang implementation}
+The implementation in Erlang was done independent of the design
+choices of the C-code. The idea was to ensure an independent model; if the model
+was inspired by the C-code, it could have transmitted errors.
+
+
+
+\subsection{Iterative strategy}
+\label{SEC:ITERATIVE}
 The implementation of the AUTOSAR module in Erlang was done
 in an iterative way. Every piece of code were not required to be implemented before
 tests could be run. This because of that a module in AUTOSAR consist of several API
@@ -154,6 +166,8 @@ reached before other unimplemented API calls.
 \caption{Shows Erlang modeled states with calls against the C-code}
 \label{FIG:api_calls}
 \end{figure}
+
+\subsection{Conflicts and Bugs}
 Early in the implementation phase Quickcheck found differences between the Erlang
 and C-implementation. This was expected because every programmer makes mistakes.
 The question was whether the fault was in the C-code or the Erlang code. Then
@@ -184,10 +198,15 @@ When thoroughly reading the AUTOSAR API not only ambiguous rules were found but
 also rules that contradicted each other were recognized. In those cases the
 implementation in the C-code was followed.
 
+\subsection{Advantage of having the Actual C-code}
 A great tool when a clear interpretation of the AUTOSAR specification was not
 possible was to look into the C-code. Even though Quickcheck can be used to
 test libraries when the actually source code is not available.
 
+\section{Evaluation of the Implementation}
+Just passing a number of tests did not say much more then some tests evaluated
+to true. The next thing to do was to evaluate what was actually tested.
+\subsection{Verifying the tests}
 When the full module was implemented in Erlang code there had to be some assurance
 for that every piece of code in the C implementation was actually tested.
 Code coverage for the Erlang implementation was measured using the Erlang module
@@ -211,6 +230,7 @@ state \emph{stopped} is reached.
   \end{center}
 \end{figure}
 
+\subsection{Finding better test cases}
 The next step was to tweak the generators, used by Quickcheck, to construct
 valid API-calls. There were several branches in the C-code
 that needed a specific sequence of API calls, with correct arguments, to be
