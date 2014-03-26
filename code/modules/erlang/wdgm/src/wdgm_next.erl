@@ -25,13 +25,14 @@ init_next(S, _Ret, [{_,Is_Null}]) ->
            originalCfg   = R,
            expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
            globalstatus  = 'WDGM_GLOBAL_STATUS_OK',
-           deadlineTable = wdgm_helper:reset_deadline_table(ModeId), %% [WDGM298]
+           deadlineTable = wdgm_helper:reset_deadline_table(ModeId, []), %% [WDGM298]
            logicalTable  = wdgm_helper:reset_logical_table(wdgm_config_params:get_internal_graphs(), %% [WDGM296]
-                                               true)
+                                               true, [])
                         ++ wdgm_helper:reset_logical_table(wdgm_config_params:get_external_graphs(ModeId), %% [WDGM296]
-                                               false),
-           aliveTable    = wdgm_helper:reset_alive_table(ModeId)},
-    NewS#state{supervisedentities = wdgm_helper:reset_supervised_entities(NewS, ModeId)};
+                                               false, []),
+           aliveTable    = wdgm_helper:reset_alive_table(ModeId, [])},
+      {NewSupervisedEntities, _} = wdgm_helper:reset_supervised_entities(NewS, ModeId),
+    NewS#state{supervisedentities = NewSupervisedEntities};
   _ -> S
   end.
 
@@ -51,17 +52,28 @@ setmode_next(S, _Ret, [ModeId, Cid]) ->
      not wdgm_config_params:will_disable_watchdog(ModeId))
   of
     true ->
-      S#state{currentMode = ModeId,
+      {NewSupervisedEntities, RetainedSEIds} = wdgm_helper:reset_supervised_entities(S, ModeId),
+      S#state{currentMode        = ModeId,
               expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
-              supervisedentities = wdgm_helper:reset_supervised_entities(S, ModeId),
-              deadlineTable      = wdgm_helper:reset_deadline_table(ModeId),
-              logicalTable       = lists:filter(fun (Logical) ->
-                                                    Logical#logical.is_internal
-                                                end,
-                                                S#state.logicalTable) %% dont reset SE internal graphs
-              ++ wdgm_helper:reset_logical_table(wdgm_config_params:get_external_graphs(ModeId),
-                                                 false),
-              aliveTable         = wdgm_helper:reset_alive_table(ModeId)};
+              supervisedentities = NewSupervisedEntities,
+              deadlineTable      =
+		lists:keymerge(2,
+			       lists:keysort(2, wdgm_helper:reset_deadline_table(ModeId, RetainedSEIds)),
+			       lists:keysort(2, S#state.deadlineTable)),
+              logicalTable       =
+		lists:keymerge(2,
+			       lists:keysort(2,
+					     wdgm_helper:reset_logical_table(
+					       wdgm_config_params:get_internal_graphs(),
+					       true, RetainedSEIds)
+					     ++ wdgm_helper:reset_logical_table(
+						  wdgm_config_params:get_external_graphs(ModeId),
+						  false, RetainedSEIds)),
+			       lists:keysort(2, S#state.logicalTable)),
+	      aliveTable         =
+		lists:keymerge(2,
+			       lists:keysort(2, wdgm_helper:reset_alive_table(ModeId, RetainedSEIds)),
+			       lists:keysort(2, S#state.aliveTable))};
     false -> %% [WDGM316], [WDGM145]
       S %% if WdgIf_SetMode failed set globalstatus='WDGM_GLOBAL_STATUS_STOPPED'? %% [WDGM139]
   end.
