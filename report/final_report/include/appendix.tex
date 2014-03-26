@@ -389,6 +389,41 @@ WdgM_CheckpointReached(SEx, Good_CP) -> Correct result for SEx
 \end{lstlisting}
 
 \subsection*{Wrong spelling}
-[WDGM344\_CONF] WdgMInternallCheckpointFinalRef has incorrect spelling.
+[WDGM344\_CONF] WdgMInternallCheckpointFinalRef has incorrect
+spelling.
+
+[WDGM315] ``set its Results of Active, Deadline and Logical Supervision'',
+what is ``Active supervision''? Should be alive supervision.
+
+\subsection*{Retain state}
+[WDGM182] if \lstinline!WdgM_SetMode! is called, and a supervised
+entity which was activated in the previous mode, also is active in the
+new mode, then retain the state for the supervised entity.
+
+The problem is that it is unclear what the supervised entity state
+should contain. We know that the status, the results of alive,
+deadline and logical supervision and some counters should be part of
+this state. Should the supervision functions be part of the state?
+
+This could be problematic because then there is a need to map out
+which supervision function should be retained (exists in the new mode
+as well as the old mode), which should be discarded (does not exist
+in the new mode) and which should be created (exists in the new mode
+but not the old).
+
+If it is not part of the state, then all supervisions functions should
+be discarded and the new supervision functions should be added.
+This could also be problematic because, what if there exist a
+supervision function which has the status \lstinline!WDGM_INCORRECT!
+and the only thing that keeps the supervised entity from setting the
+status \lstinline!WDGM_LOCAL_STATUS_EXPIRED! is a call to
+\lstinline!WdgM_MainFunction!. Then a call to \lstinline!WdgM_SetMode!
+with the same mode could reset all supervision functions and the
+expired state would not happen.
+
+Another question arises; should internal logical supervision functions
+count?
+They are mode independent, but if the supervised entity is
+deactivated, the internal logical supervision should not be able to do anything.
 
 %% \subsection*{Definition of time in deadline supervision}

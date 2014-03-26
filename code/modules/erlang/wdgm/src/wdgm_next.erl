@@ -25,14 +25,13 @@ init_next(S, _Ret, [{_,Is_Null}]) ->
            originalCfg   = R,
            expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
            globalstatus  = 'WDGM_GLOBAL_STATUS_OK',
-           deadlineTable = wdgm_helper:reset_deadline_table(ModeId, []), %% [WDGM298]
+           deadlineTable = wdgm_helper:reset_deadline_table(ModeId), %% [WDGM298]
            logicalTable  = wdgm_helper:reset_logical_table(wdgm_config_params:get_internal_graphs(), %% [WDGM296]
-                                               true, [])
+                                               true)
                         ++ wdgm_helper:reset_logical_table(wdgm_config_params:get_external_graphs(ModeId), %% [WDGM296]
-                                               false, []),
-           aliveTable    = wdgm_helper:reset_alive_table(ModeId, [])},
-      {NewSupervisedEntities, _} = wdgm_helper:reset_supervised_entities(NewS, ModeId),
-    NewS#state{supervisedentities = NewSupervisedEntities};
+                                               false),
+           aliveTable    = wdgm_helper:reset_alive_table(ModeId)},
+      NewS#state{supervisedentities = wdgm_helper:reset_supervised_entities(NewS, ModeId)};
   _ -> S
   end.
 
@@ -52,28 +51,21 @@ setmode_next(S, _Ret, [ModeId, Cid]) ->
      not wdgm_config_params:will_disable_watchdog(ModeId))
   of
     true ->
-      {NewSupervisedEntities, RetainedSEIds} = wdgm_helper:reset_supervised_entities(S, ModeId),
       S#state{currentMode        = ModeId,
               expired_supervision_cycles_tol = wdgm_config_params:get_expired_supervision_cycles(ModeId),
-              supervisedentities = NewSupervisedEntities,
+              supervisedentities = wdgm_helper:reset_supervised_entities(S, ModeId),
               deadlineTable      =
-		lists:keymerge(2,
-			       lists:keysort(2, wdgm_helper:reset_deadline_table(ModeId, RetainedSEIds)),
-			       lists:keysort(2, S#state.deadlineTable)),
+		wdgm_helper:reset_deadline_table(ModeId),
               logicalTable       =
-		lists:keymerge(2,
-			       lists:keysort(2,
-					     wdgm_helper:reset_logical_table(
-					       wdgm_config_params:get_internal_graphs(),
-					       true, RetainedSEIds)
-					     ++ wdgm_helper:reset_logical_table(
-						  wdgm_config_params:get_external_graphs(ModeId),
-						  false, RetainedSEIds)),
-			       lists:keysort(2, S#state.logicalTable)),
+		%% ambiguity in AUTOSAR, either we reset internal graphs,
+		%% or dont. See appendix for more information.
+		wdgm_helper:reset_logical_table(wdgm_config_params:get_internal_graphs(),
+						true)
+		%% [LS || LS <- S#state.logicalTable, LS#logical.is_internal]
+	      ++ wdgm_helper:reset_logical_table(wdgm_config_params:get_external_graphs(ModeId),
+						 false),
 	      aliveTable         =
-		lists:keymerge(2,
-			       lists:keysort(2, wdgm_helper:reset_alive_table(ModeId, RetainedSEIds)),
-			       lists:keysort(2, S#state.aliveTable))};
+		wdgm_helper:reset_alive_table(ModeId)};
     false -> %% [WDGM316], [WDGM145]
       S %% if WdgIf_SetMode failed set globalstatus='WDGM_GLOBAL_STATUS_STOPPED'? %% [WDGM139]
   end.

@@ -82,7 +82,7 @@ check_supervision_results({_, _, 'WDGM_LOCAL_STATUS_OK', _, 'WDGM_CORRECT', 'WDG
 check_supervision_results(_) ->
   false.
 
-reset_alive_table(ModeId, RetainedSEids) ->
+reset_alive_table(ModeId) ->
   AliveFun =
     fun (CPref) ->
 	CPid = wdgm_config_params:get_checkpoint_id(CPref),
@@ -92,13 +92,13 @@ reset_alive_table(ModeId, RetainedSEids) ->
 	       expected_alive_indications   = EAI,
 	       minmargin     = Min,
 	       maxmargin     = Max,
-	       alive_counter = 0}
+	       alive_counter = 0,
+	       status        = 'WDGM_CORRECT'}
     end,
   [AliveFun(CPref) ||
-    CPref <- wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS'),
-    lists:member(wdgm_config_params:get_SE_id(CPref), RetainedSEids)].
+    CPref <- wdgm_config_params:get_checkpoints_for_mode(ModeId, 'AS')].
 
-reset_deadline_table(ModeId, RetainedSEids) ->
+reset_deadline_table(ModeId) ->
   DeadlineFun =
     fun (DS) ->
 	{Start, Stop, Min, Max} = wdgm_config_params:get_deadline_params(DS),
@@ -110,10 +110,9 @@ reset_deadline_table(ModeId, RetainedSEids) ->
 		  timer      = 0}
     end,
   [DeadlineFun(DS)
-   || DS <- wdgm_config_params:get_deadline_supervision(ModeId),
-      lists:member(wdgm_config_params:get_SE_id(car_xml:get_value("WdgMDeadlineStartRef", DS)), RetainedSEids)].
+   || DS <- wdgm_config_params:get_deadline_supervision(ModeId)].
 
-reset_logical_table(Table, Is_Internal, RetainedSEids) ->
+reset_logical_table(Table, Is_Internal) ->
   LogicalFun =
     fun ({Init, Finals, Transitions}) ->
 	#logical{initCP       = Init,
@@ -128,17 +127,17 @@ reset_logical_table(Table, Is_Internal, RetainedSEids) ->
 		 is_internal  = Is_Internal}
     end,
   [ LogicalFun(Tuple)
-    || {Init, _, _} = Tuple <- Table, Is_Internal, lists:member(wdgm_config_params:get_SE_of_CP(Init), RetainedSEids)].
+    || {_Init, _, _} = Tuple <- Table].
 
 reset_supervised_entities(S, ModeId) ->
   case S#state.supervisedentities of
     undefined -> %% not initialized...
-      {[new_SE_record(ModeId,
+      [new_SE_record(ModeId,
                      SEid,
                      wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid))
-       || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId)], []};
+       || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId)];
     SEs ->
-      {[case
+      [case
          {wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid),
          (lists:keyfind(SEid, 2, SEs))#supervisedentity.localstatus /= 'WDGM_LOCAL_STATUS_DEACTIVATED'}
        of
@@ -151,10 +150,7 @@ reset_supervised_entities(S, ModeId) ->
          {true, false} -> new_SE_record(ModeId, SEid, true); %% [WDGM209];
          {false, _}    -> new_SE_record(ModeId, SEid, false) %% [WDGM207], [WDGM291]
        end
-       || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId)],
-      [SEid || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId),
-	       wdgm_config_params:is_activated_SE_in_mode(ModeId, SEid) == true,
-	       (lists:keyfind(SEid, 2, SEs))#supervisedentity.localstatus /= 'WDGM_LOCAL_STATUS_DEACTIVATED']}
+       || SEid <- wdgm_config_params:get_SEs_from_LS(ModeId)]
   end.
 
 new_SE_record(ModeId, SEid, Activated) ->
