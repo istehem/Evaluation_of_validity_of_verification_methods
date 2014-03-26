@@ -20,7 +20,7 @@ def draw_plot():
     ar.add_plot(line_plot.T(data = data,line_style=colors[0]))
     ar.draw()
     tb = text_box.T(loc=(20,110),
-        text="Coverage Per Tests\nnumber of lines: %i"%(int(tot)))
+        text="Final Coverage:\n %i//%i=%.2f%%"%(int(cov),int(tot),data[-1][1]))
     tb.draw()
 
 def get_data():
