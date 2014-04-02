@@ -7,6 +7,9 @@ endif
 
 all: pdf clean
 
+once:
+	"$(LATEX_CMD)" report
+
 pdf:
 	"$(LATEX_CMD)" report
 	-makeglossaries report
