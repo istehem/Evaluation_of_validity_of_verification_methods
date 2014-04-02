@@ -25,8 +25,12 @@ safety of modules.
 %% - statistik på quickcheck körningar.
 
 Stripped of comments and blank lines, the implemented Erlang model is
-almost 1500 lines of code. This is to be compared with the c-code
-which is over 12500 lines of code.
+almost 1300 lines of code. This is to be compared with the c-code
+which is over 14500 lines of code.
+%% cat src/* inc/* generated_cfg/*.[c,h] stub/* rte/* gcc/* | grep -vP
+%% ^[[:space:]]?'/\*' | grep -vP ^[[:space:]]?'\*' | grep -vP
+%% ^[[:space:]]?'\\\*' | grep -v ^[[:space:]]$ | wc -l
+
 
 \section{Future work}
 Some interesting thing we wanted to do from the beginning was to implementing

@@ -115,7 +115,7 @@ shows that QuickCheck is reliable for verification.
 There were several modules that were up for discussion when it came to the
 choice of a module to test. Since the goal was to get a proof of concept for
 that it was possible to
-get an ASIL-classification and achieve functional safety using Quickcheck, it
+get an ASIL-classification and achieve functional safety using QuickCheck, it
 seemed preferable to choose a less complicated module. It was also desirable to
 have the actual C code and not just library files.
 
@@ -171,7 +171,7 @@ reached before other unimplemented API calls.
 \end{figure}
 
 \subsection{Conflicts and Bugs}
-Early in the implementation phase Quickcheck found differences between the Erlang
+Early in the implementation phase QuickCheck found differences between the Erlang
 and C-implementation. This was expected because every programmer makes mistakes.
 The question was whether the fault was in the C-code or the Erlang code. Then
 the API was thoroughly read and a conclusion was made. Either a bug in the
@@ -184,7 +184,7 @@ sharp in lab environments; only a few specification requirements needed to be
 implemented in Erlang.
 
 If a bug in the C-code was discovered how should the work be continued? Since
-Quickcheck terminates as soon as it finds a counter example something was needed to
+QuickCheck terminates as soon as it finds a counter example something was needed to
 be able to run further tests. Some alternatives were discussed.
 
 \begin{enumerate}
@@ -203,7 +203,7 @@ implementation in the C-code was followed.
 
 \subsection{Advantage of having the Actual C-code}
 A great tool when a clear interpretation of the AUTOSAR specification was not
-possible was to look into the C-code. Even though Quickcheck can be used to
+possible was to look into the C-code. Even though QuickCheck can be used to
 test libraries when the actually source code is not available.
 
 \section{Evaluation of the Implementation}
@@ -234,13 +234,36 @@ state \emph{stopped} is reached.
 \end{figure}
 
 \subsection{Finding better test cases}
-The next step was to tweak the generators, used by Quickcheck, to construct
-valid API-calls. There were several branches in the C-code
-that needed a specific sequence of API calls, with correct arguments, to be
-reached. Also the tweaking of the generators could be implemented in a iterative
-way. Change the probability properties of the generators and check the results.
-The results were analyzed and the generators were tweaked even more to make the
-results even better.
+The next step was to tweak the generators, that were used by
+QuickCheck to construct valid API-calls. The tweaking of generators is
+done to find better test cases. I.e. there were several branches
+in the C-code that needed a specific sequence of API calls with
+correct arguments, to be reached. For example, it is unreasonable to
+test functions as often as half of the times when the initialization
+function \lstinline!WdgM_Init! has not yet been called.
+
+Because of QuickCheck's weight feature, one can simply change the
+ratio of the generated API calls, by matching on the state and the
+function you want to change probability to.
+
+For example we have the initialization function \lstinline!WdgM_Init!
+were we want to have a high priority if it has not been called yet,
+and a low priority if it has been called previously.
+\begin{listings}
+weight(S,  'WdgM_Init') ->
+  case S#state.initialized of
+    true                           -> 1;
+    _                              -> 200
+  end;
+\end{listings}
+It is a good idea not to lower some ratios to much, because then
+certain API sequences would not be generated, and bugs might be
+missed.
+
+The tweaking of the generators were implemented in a iterative way by
+changing the probability properties of the generators and analyze the
+results and the coverage. After the analysis, the generators were
+tweaked even more to make the result and coverage even better.
 
 %% Just checking code coverage was however not good enough for our goals...
 
@@ -254,7 +277,7 @@ figure \ref{fig:workflow}.
 \parbox{\linewidth}{
 \begin{enumerate}
 \item Construct a model for an AUTOSAR module in Erlang
-\item Run Quickcheck for this model and compare the results with the output from
+\item Run QuickCheck for this model and compare the results with the output from
 the c code. \label{compare}
 \item Tweak the generators for the test cases \label{generators}
     \item Evaluate the results
@@ -301,12 +324,16 @@ between \lstinline!WDGM_GLOBAL_STATUS_OK! and
 tested some null conditions, for example when there are no supervised
 entities.
 
-The last configuration, was one of the configurations that is used in
-lab equipment and released to
+The last configuration (named Freescale configuration), which was one
+of the configurations that were used actively in lab equipment, was
+similar to the example configuration but a bit more relaxed. The
+global status stayed in a good state more often; it was easier to do
+positive testing.
 
-The tweaking of generators, to achieve better test cases, seemed in some sense to be
-configuration dependent. Better test cases were generated if the generators were
-tweaked according to a specific configuration, see results.
+The tweaking of generators, where the aim is to generate better test
+cases, seemed in some sense to be configuration dependent. Better test
+cases were generated if the generators were tweaked according to a
+specific configuration, see results.
 
 \begin{figure}[!ht]
 \input{pictures/box.tex}
