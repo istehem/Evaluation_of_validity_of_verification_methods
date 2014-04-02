@@ -284,10 +284,25 @@ possible to get some kind of confidence on the correctness of the code?
 \section{Configurations}
 When the code coverage was calculated it was recognized that every piece of code
 wasn't executed. The reason seemed to be that the current configuration
-disallowed, even though the program behaved correctly, the execution of those
-lines of code. Because of that the implementation of the Erlang module was done
-independent of configuration it was easy to to run tests on several
-configuration which resulted in that everything was executed.
+disallowed the execution of some parts of the code, even though the
+program behaved correctly. Because the implementation of the
+Erlang module was independent of configurations it was easy to run
+tests on several configuration which resulted in almost full coverage.
+
+Three configurations with different complexity was used. The first
+one, an example configuration (this will further on be called the
+Example configuration), had many supervision functions configured in
+each mode, and followed a strict execution of the program.
+
+There were also a minimal configuration (BSI configuration) which, in
+lack of supervision functions, only could change the global status
+between \lstinline!WDGM_GLOBAL_STATUS_OK! and
+\lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!. This on the other hand,
+tested some null conditions, for example when there are no supervised
+entities.
+
+The last configuration, was one of the configurations that is used in
+lab equipment and released to
 
 The tweaking of generators, to achieve better test cases, seemed in some sense to be
 configuration dependent. Better test cases were generated if the generators were
