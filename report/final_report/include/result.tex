@@ -6,6 +6,20 @@
 
 \section{Achieving good test cases}
 %% how do we generate good test cases?
+The finding good test cases are not very trivial. It may not be enough to
+generate test cases which follows a correct behavior. One also have to take
+negative testing into account.
+
+The problem with negative testing is that the watchdog manager quickly will be
+put in an absorbing state and hence only a few relevant API-calls will be generated.
+Negative testing mostly only needs a short sequences of API-calls before a
+single property will be tested. As a conclusion negative testing needs more test
+cases, but those tests can be small. A problem using Quickcheck is that the test
+cases are generated before the actual execution of the program. Hence it is very
+likely that a lot of API-calls will be executed after a particular property has
+been tested and the watchdog manager will be put in an absorbing state, when
+using negative testing. As a consequence negative testing is time consuming.
+
 
 \subsection{Tweaking the generators}
 %% tweaking the generators to find interesting test cases, with functional
