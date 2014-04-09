@@ -144,8 +144,8 @@ The translating process was done iteratively as described in section \ref{SEC:IT
 \subsection{Independence of the Erlang implementation}
 The implementation in Erlang was done independent of the design
 choices of the C-code. The idea was to ensure an independent model; if the model
-was inspired by the C-code, it could have transmitted errors. Also implementing the 
-Erlang module independent of the C-implementation would result in that ambigousities in 
+was inspired by the C-code, it could have transmitted errors. Also implementing the
+Erlang module independent of the C-implementation would result in that ambigousities in
 the AUTOSAR specification would be easier to find. This since two different interpretation
 of the same specification would eventually be availible.
 
@@ -249,13 +249,13 @@ function you want to change probability to.
 For example we have the initialization function \lstinline!WdgM_Init!
 were we want to have a high priority if it has not been called yet,
 and a low priority if it has been called previously.
-\begin{listings}
+\begin{lstlisting}
 weight(S,  'WdgM_Init') ->
   case S#state.initialized of
     true                           -> 1;
     _                              -> 200
   end;
-\end{listings}
+\end{lstlisting}
 It is a good idea not to lower some ratios to much, because then
 certain API sequences would not be generated, and bugs might be
 missed.
