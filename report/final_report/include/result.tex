@@ -306,7 +306,8 @@ often called.
 
 \section{Coverage}
 \subsection{Erlang module}
-\newcommand{\linecoverage}{100\%}
+\newcommand{\linecoverage}{97.38\%}
+\newcommand{\bullseyecoverage}{81\%}
 The Erlang module \emph{cover} was used to calculate the line coverage for the
 Erlang module.
 To get an idea of how many tests that needed to be executed, before the line
@@ -369,11 +370,12 @@ model state and the actual state of the C-code.
 \hline
 module & total number of lines & lines covered & line coverage (\%)\\
 \hline
-wdgm\_checkpointreached & 106  & ?? & ?? \% \\
-wdgm\_main & 84   & ?? & ??\% \\
-wdgm\_pre  & 20   & ?? & ??\% \\
-wdgm\_post & 102  & ?? & ??\% \\
-wdgm\_next & 37   & 37 & 100\%
+wdgm\_helper            & 80  & 79 & 98.75\% \\
+wdgm\_checkpointreached & 104 & 98 & 94.23\% \\
+wdgm\_main              & 81  & 80 & 98.77\% \\
+wdgm\_pre               & 19  & 19 & 100\%   \\
+wdgm\_post              & 99  & 96 & 96.97\% \\
+wdgm\_next              & 37  & 37 & 100\%
 \end{tabular}
 \end{center}
 \end{table}
@@ -381,7 +383,7 @@ Say something about why everything are not covered ...
 The total line coverage results is \linecoverage.
 \subsection{C-code}
 Bullseye Coverage was used to analyse the coverage of the C-code. The results
-show that the decision coverage is over 80\% and all functions except for two is
+show that the decision coverage is over \bullseyecoverage and all functions except for two is
 covered, see figure \ref{FIG:BULLSEYE}. The reason for that there is function
 which is not covered, is that one function is deprecated and the other is a
 support function to that function. One of our limitations were to not
