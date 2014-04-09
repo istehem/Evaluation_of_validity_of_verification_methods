@@ -195,9 +195,9 @@ prop_wdgm_init() ->
           end,
           ?WHENFAIL(?RUN_COVERAGE,
             ?FORALL(
-                  Cmds, non_empty(commands(?MODULE)), %% Use eqc_gen:vector/2 in combination ?LET
+               Cmds, non_empty(commands(?MODULE)), %% Use eqc_gen:vector/2 in combination ?LET
                                                       %% for more commands
-                  %Cmds,call_seq(),
+               %% Cmds,call_seq(),
                   begin
                     ?COPY_FILE,
                     eqc_c:restart(),
@@ -334,18 +334,26 @@ collect_state_transitions(G1, G2, [{Ns, _}|Ss]) ->
 
 call_seq() -> return
               ([
-               {set,{var,1},{call,?MODULE,init,[{eqc_c:address_of(?CONFIG_FILE), false}]}},
-               {set,{var,2},{call,?MODULE,checkpointreached,[1,7]}},
-               {set,{var,3},{call,?MODULE,checkpointreached,[1,7]}},
-               {set,{var,4},{call,?MODULE,mainfunction,[]}},
-               {set,{var,5},{call,?MODULE,mainfunction,[]}},
-               {set,{var,6},{call,?MODULE,checkpointreached,[0,0]}},
-               {set,{var,7},{call,?MODULE,checkpointreached,[0,0]}},
-               {set,{var,8},{call,?MODULE,checkpointreached,[1,7]}},
-               {set,{var,9},{call,?MODULE,checkpointreached,[1,7]}},
-               {set,{var,10},{call,?MODULE,checkpointreached,[4,27]}},
-               {set,{var,11},{call,?MODULE,checkpointreached,[4,27]}},
-               {set,{var,12},{call,?MODULE,mainfunction,[]}},
-               {set,{var,13},{call,?MODULE,mainfunction,[]}},
-               {set,{var,14},{call,?MODULE,mainfunction,[]}}
+                {set,{var,1},{call,?MODULE,init,[{eqc_c:address_of(?CONFIG_FILE), false}]}},
+                {set,{var,2},{call,?MODULE,setmode, [0,1]}},
+                {set,{var,3},{call,?MODULE,mainfunction, []}},
+                {set,{var,4},{call,?MODULE,mainfunction, []}},
+                {set,{var,5},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,6},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,7},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,8},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,9},{call,?MODULE,mainfunction, []}},
+                {set,{var,10},{call,?MODULE,mainfunction, []}},
+                {set,{var,11},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,12},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,13},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,14},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,15},{call,?MODULE,mainfunction, []}},
+                {set,{var,16},{call,?MODULE,mainfunction, []}},
+                {set,{var,17},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,18},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,19},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,20},{call,?MODULE,checkpointreached,[0,4]}},
+                {set,{var,21},{call,?MODULE,mainfunction, []}},
+                {set,{var,22},{call,?MODULE,mainfunction, []}}
               ]).

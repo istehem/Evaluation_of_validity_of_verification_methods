@@ -172,7 +172,6 @@ mainfunction_post(S, _Args, _Ret) ->
   GlobalStatus = eqc_c:value_of('WdgM_GlobalStatus'),
   NextS = wdgm_next:mainfunction_next(S, 0, 0),
   MonitorTable = eqc_c:value_of('WdgM_SupervisedEntityMonitorTable'),
-
   Behaviour = NextS#state.globalstatus == GlobalStatus andalso %% [WDGM214], [WDGM326]
   ((GlobalStatus == 'WDGM_GLOBAL_STATUS_EXPIRED' andalso
       eqc_c:value_of('SeIdLocalStatusExpiredFirst') /= 0 andalso

@@ -57,9 +57,7 @@ check_global_status({'WDGM_GLOBAL_STATUS_EXPIRED', _, true}, EXPIRED_TOL, EXPIRE
 check_global_status({'WDGM_GLOBAL_STATUS_EXPIRED', _, true}, EXPIRED_TOL, EXPIRED_CYCLES) when EXPIRED_CYCLES > EXPIRED_TOL ->
   {'WDGM_GLOBAL_STATUS_STOPPED', EXPIRED_CYCLES}; %% [WDGM220]
 check_global_status({'WDGM_GLOBAL_STATUS_STOPPED', _, _}, _, EXPIRED_CYCLES) ->
-  {'WDGM_GLOBAL_STATUS_STOPPED', EXPIRED_CYCLES}; %% [WDGM221]
-check_global_status({_, _, _}, _, EXPIRED_CYCLES) ->
-  {'WDGM_GLOBAL_STATUS_STOPPED', EXPIRED_CYCLES}. %% should never get here
+  {'WDGM_GLOBAL_STATUS_STOPPED', EXPIRED_CYCLES}. %% [WDGM221]
 
 %%-LOCAL SE STATUS--------------------------------------------------------------
 
@@ -159,10 +157,8 @@ check_local_status({'WDGM_LOCAL_STATUS_DEACTIVATED',
 check_local_status({'WDGM_LOCAL_STATUS_EXPIRED',
                     _, _, _},
                    _, FAIL_CYCLES) ->
-  {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}; %% [WDGM]
-check_local_status({_, _, _, _},
-                   _, FAIL_CYCLES) ->
-  {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}. %% should never get here
+  {'WDGM_LOCAL_STATUS_EXPIRED', FAIL_CYCLES}. %% Ambigous meaning,
+%% we dont know what happens after we have optained the status EXPIRED
 
 %%-ALIVE SUPERVISION------------------------------------------------------------
 %% @doc should not do anything with the state, just need it for the checking.
