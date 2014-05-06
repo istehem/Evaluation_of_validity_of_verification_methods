@@ -58,16 +58,6 @@ the needs for achieving functional safety, see \ref{SEC:DEVERRORDETECT}.
 \subsection{Collapsing states}
 %% write something that QuickCheck automatically does this
 
-\section{Evaluation of the solution}
-\subsection{Functional safety}
-%% The question here that needs to be answered is:
-%% Does the solution ensure functional safety?
-
-\subsection{Measurements of the state space}
-%% How does one measure the size of the state space that is actually verified?
-
-\subsection{Confidence interval}
-%% how certain is the verification
 
 
 \section{State Machine}
@@ -408,7 +398,11 @@ some code is impossible to reach if not certain configuration parameters are set
 \end{figure}
 
 
-\section{Functional safety analysis}
+\section{Evaluation of the solution}
+%% The question here that needs to be answered is:
+%% Does the solution ensure functional safety?
+
+\subsection{Functional safety analysis}
 Since one important part of the functional safety concept is that it must be
 taken in consideration during the hole development process, one can not simply
 say that QuickCheck makes it possible to acquire functional safety. There must
@@ -422,7 +416,7 @@ one can even reason about how QuickCheck can benefit.
 This assumptions lies in that the model for the watchdog
 manager is correct, namely the AUTOSAR specification.
 
-\subsection{Development error detection}
+\subsubsection{Development error detection}
 \label{SEC:DEVERRORDETECT}
 We discovered that it existed a configuration parameter,
 \lstinline!WdgMDevErrorDetect!, which would turn off functional safety
@@ -431,7 +425,7 @@ something that weren't OK. This could be null pointers, or improper ids. AUTOSAR
 has not been specified enough for the parameter \lstinline!WdgMDevErrorDetect!
 to be switched off. With functional safety in mind, this parameter must be on!
 
-\subsection{Definition of time}
+\subsubsection{Definition of time}
 \label{SEC:FUNCTIONAL_SAFETY_TIME}
 In AUTOSAR time is specified as seconds and there are two functions that need to
 keep track of the time. First it is the main function that needs to be scheduled
@@ -445,6 +439,21 @@ be called periodically, it could be used for the measurements of time. For each
 call of \lstinline!WdgM_MainFunction! tick a ``time'' counter.
 
 
+\subsection{Measurements of the state space}
+%% How does one measure the size of the state space that is actually verified?
+One way when trying the measure the state space is to collect statistical data
+during the execution of the tests. It is hard to say much about the hole systems
+state space since it is very large, due to the state explosion problem. In the
+case of an AUTOSAR module the state space also varies on the configuration in
+use, since features an checkpoints can be configured for a certain configuration
+but not for an other configuration.
+However locking at certain parts, that are considered to be important, of the system
+much more can be said. For instance when locking at the internal graphs of the
+watchdog manager one can easily see that every node in those graphs are visited.
+
+
+\subsection{Confidence interval}
+%% how certain is the verification
 
 %% LoC
 %% right side of pipe:  without blank lines and comments
