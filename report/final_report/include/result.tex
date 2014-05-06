@@ -451,6 +451,23 @@ However locking at certain parts, that are considered to be important, of the sy
 much more can be said. For instance when locking at the internal graphs of the
 watchdog manager one can easily see that every node in those graphs are visited.
 
+Measuring the code coverage can in it self tell if important parts of the state
+space are not covered, since parts of the code that changes the state of the
+watchdog manager are not covered. However this parts can in worst case be dead
+code or redundancy if something unexpected happens to the hardware, which is
+beyond this thesis. Therefor total code coverage is hard, or may be even
+impossible to reach.  Even if all lines of code in for example an algorithmic
+part of the watchdog manager are covered this algorithm may not be totally
+verified. This since the state are dependent of actual values of
+variables.
+
+The supervision algorithms are important parts of the watchdog manager since
+they specify the transitions in the internal and external graphs. Therefore it
+was also chosen to prioritise different algorithms when running some tests on
+the module. When doing so there were more bugs found. This emphasizes the
+importance of finding tests that are critical for the system and not only lean
+on the line coverage.
+
 
 \subsection{Confidence interval}
 %% how certain is the verification
