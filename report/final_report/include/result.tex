@@ -39,6 +39,13 @@ the absorbing state \lstinline!'WDGM_GLOBAL_STATUS_EXPIRED'! is reached.
 \subsection{Prioritized Testing}
 %TODO Tramsa lite om hur vi inte prioriterade LOGICAL supervision och
 %vilka resultat det gave
+The supervision algorithms are important parts of the watchdog manager since
+they specify the transitions in the internal and external graphs. Therefore it
+was also chosen to prioritize different algorithms when running some of the
+tests on the module. When doing so there were more bugs found. This emphasizes
+the importance of finding tests that are critical for the system and not only
+lean on the line coverage.
+
 Since there are different supervisions of checkpoints that can be
 configured at the same time the failure reason ...
 
@@ -461,12 +468,6 @@ part of the watchdog manager are covered this algorithm may not be totally
 verified. This since the state are dependent of actual values of
 variables.
 
-The supervision algorithms are important parts of the watchdog manager since
-they specify the transitions in the internal and external graphs. Therefore it
-was also chosen to prioritise different algorithms when running some tests on
-the module. When doing so there were more bugs found. This emphasizes the
-importance of finding tests that are critical for the system and not only lean
-on the line coverage.
 
 
 \subsection{Confidence interval}
