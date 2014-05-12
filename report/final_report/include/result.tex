@@ -468,7 +468,42 @@ part of the watchdog manager are covered this algorithm may not be totally
 verified. This since the state are dependent of actual values of
 variables.
 
+\subsection{AUTOSAR}
+Due to the informal syntax of AUTOSAR it is directly not very god fitted for
+functional safety. This since the informal syntax makes it possible for
+different interpretation. To be able to reach the requirements for ASIL (C,D?)
+dependent AUTOSAR modules must be interpreted dependent of each other.
 
+One way of doing this is to interpret AUTOSAR in a model based language like
+SPIN and check that the model after transforming it into formal syntax actually
+is valid. Hence the model in itself should contain no bugs.
+
+This can also be done using Quickcheck but, in a functional safety point of
+view, it seems pointless to test the actual C code before there is assurance for
+that the model actually is correct.
+
+C in itself is also a formal language but C is not very good fitted to formally defining
+the actual requirements of AUTOSAR. This, for instance, because of its low level nature.
+
+What is done in this thesis is that given a formally defined AUTOSAR model in C
+define an other model in Erlang and check the two models against each other.
+A better work flow had been, define AUTOSAR in a model based language, check
+that this model holds, implement the actual C-code following the formal notation of
+the previous constructed model. Implementing the C-code would be much easier
+because there are no room for different interpretations. After the C code is written write model
+in Erlang, following the model written in the model based language, again there
+are no room for different interpretations. Check the Erlang module, using
+QuikCheck, against the C-code and look for bugs and that the translation into C of the
+original module was done correctly. This will assure that the C code are a
+correct translation of the original model that is known to be correct.
+
+
+
+\subsection{Achieving functional safety}
+The $V$ model used by $ISO-26262$ requires that the standard are taken in
+consideration during the hole development process. Hence it is hard to analyse
+code written without the standard in consideration and analyze if it's fulfills
+the standards requirements.
 
 \subsection{Confidence interval}
 %% how certain is the verification
