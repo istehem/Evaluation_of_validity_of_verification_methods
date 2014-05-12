@@ -1,210 +1,185 @@
-%% kolla att allt är i imperfekt
-%% verb i passiv form
-
 \section{Existing verification tools}
+%% TODO: Skriv om stycket.
 Software unit testing can be achieved by almost any tool.
-%% motivera.
-Consequently this phase is not the most interesting when it comes to the choice
-of a tool verification. Of course one can take the simplicity to achieve good
-%% "simplicity" - av vad?
-unit testing into account, but still it is not what makes a verification tool
-especially unique for the project goals.
+The choice of verification tool is therefore not the most
+interesting when it comes to this. One can of course take the
+simplicit to achieve good unit testing into account, but it is not
+what makes a verification tool unique for this projects goals.
+% Consequently this phase is not the most interesting when it comes to
+% the choice of a tool verification. Of course one can take the
+% simplicity to achieve good unit testing into account, but it is
+% not what makes a verification tool especially unique for this projects
+% goals.
 
-Since the purpose is about benchmarking software the phase ``verification of
-%% what now? Introduce ISO-phases!
-software safety requirements'' will not influence the choice. To be able to test
-this phase, a greater amount of components of the whole system must be
-available. Such components include hardware, and this report will not cover
-hardware integration. The implementation should be able to run on a standard
+%% TODO: Är det inte en del av Avgränsningarna och inte Metodik?
+Since the purpose is about benchmarking software the phase
+``verification of software safety requirements'' will not influence
+the choice. To be able to test this phase, a greater amount of
+components of the whole system must be available. Such components
+include hardware, and this report will not cover hardware
+integration. The implementation should be able to run on a standard
 PC-machine.
 
-The most interesting part is the phase ``software integration and testing''. Is there a
-tool that one can use to easily combine test and requirements from different
-modules? Is it possible to test functional safety concept from this
-combination, for example by corrupting some software elements?
+The most interesting part of the V-model is the phase ``software
+integration and testing''. Is there a tool that can be used to easily
+combine tests and requirements from different modules? Is it possible
+to test functional safety concept from this combination, for example
+by corrupting some software elements?
 
-%% SKRIV OM vilka delar i ISO~26262 vi kan testa mha Quickcheck (6-9, 6-10,
-%% 6-11)
-
-% \subsection{CORE}
-% A specification package developed by British Aerospace and System Designers.
-
-%\subsection{Promela}
-
+% TODO: Introducera SPIN & Parasoft
 \subsection{SPIN}
-SPIN is used to trace logical design errors in distributed
-software\cite{SPIN:manual}. It supports a high level language, Promela, to
-specify system descriptions. Promela is an acronym for PROcess MEta LAnguage, and
-is a verification model language. The system properties that should be checked
-are written in logical temporal language (LTL), and SPIN reports errors such as
-deadlocks, race conditions and incompleteness between these properties and the
-system model. It also supports embedded C code as part of the model
-specifications. It supports random, interactive and guided simulation, with both
-partial and exhaustive proof techniques.
-
-%% Testar bara erlang kod
-% \subsection{McErlang}
-% McErlang is a model checker written in Erlang used for verifying distributed
-% Erlang programs\cite{MCERLANG:model-checker}. Its purpose is to check a program
-% against a correctness property, but can also among other things check safety
-% or liveness properties.
-
-% McErlang offers two depth-first state traversal model checking algorithms; one
-% checks safety properties and the other is used for checking the liveness
-% properties. McErlang also implements weak process fairness, by omitting non-fair
-% loops from the accepting runs in its liveness algorithm.
-
-%% mCRL2 kod; process algebra
-% \subsection{$\mu$CRL toolset} $\mu$CRL is a process algebraic language which is
-% suited for the analysis of distributed systems. The toolkit is built on this
-% language and contains a theorem prover based on binary decision
-% diagrams\cite{MCRL:manual}.
-
-%% LOTOS kod; specifikationer/protokoll kan testas
-% \subsection{CADP} Construction and Analysis of Distributed Processes (CADP),
-% formerly CAESAR/ALDEBARAN Development Package, is a toolset for the design of
-% distributed systems\cite{CADP:manual}. It includes, among others, tools for
-% equivalence checking, state-space manipulation and model checking, and it also
-% includes several verification algorithms. It provides functionality as
-% step-by-step simulation to parallel model checking.
+SPIN is used to trace logical design errors in distributed software
+\cite{SPIN:manual}. It supports a high level language, called Promela,
+to specify system descriptions. Promela is an acronym for PROcess MEta
+LAnguage, and is a verification model language. The system properties
+that should be checked are written in logical temporal language
+(LTL), and SPIN reports errors such as deadlocks, race conditions and
+incompleteness between these properties and the system model. It also
+supports embedded C code as part of the model specifications. It
+supports random, interactive and guided simulation, with both partial
+and exhaustive proof techniques.
 
 \subsection{Parasoft C/C++test}
 Parasoft C/C++test is a commercial integrated development testing
 solution for C and C++ \cite{PARASOFT:datasheet}. It automates code
 analysis, and enforces code policies depending on given rules. The
 solution is part software, part practical rules for team
-collaboration.
-It can detect certain runtime errors such as memory access errors,
-null pointer referencing, buffer overflows, division by zero and using
-uninitialized memory/variables. It can create and execute unit tests
-and collect code coverage from application executions.
+collaboration.  It can detect certain runtime errors such as memory
+access errors, null pointer referencing, buffer overflows, division by
+zero and the use of uninitialized memory or variables. It can create
+and execute unit tests and collect code coverage from application
+executions.
 
 Parasoft claims that it should be possible to satisfy some of the ASIL
 requirements using their solution \cite{PARASOFT:ASIL}.
 
-%\subsection{Isabelle}
-% Isabelle theorem prover is an interactive theorem prover, successor of the
-% Higher Order Logic (HOL) theorem prover
-
-%% \subsection{Why QuickCheck and Erlang?}
-
 \section{Specification}
-In AUTOSAR, specifications for each module is given in text form. Consequently
-one must first, before a module can be tested, implement the specification for
-that module in code.
+In AUTOSAR, specifications for each module is given in text
+form. Therefore before a module can be tested, that specification must
+first be implemented in code.
 
 \section{Testing}
-%% vilka properties? quickcheck?
-%% kanske är bättre att skriva "Module properties have to take..."
-%% alternativt "Quickcheck properties for a module have to take..."
-Properties for a module have to take the current state in consideration, since
-most functions written in an imperative language are not immutable. This gives
-raise to the idea of a state based testing tool.
-%% .. och plötsligt: en lista:...
-\begin{itemize}
-\item Choose a specification which will be translated to QuickCheck properties
-in parts.
-\item With the use of statistics, show that, with enough tests the state-space
-  will be exhausted.
-\item Evaluate other semi formal techniques and show that the results from them
-shows that QuickCheck is reliable for verification.
-\item Generalize the technique.
-\end{itemize}
+Properties of a module have to take the current state in
+consideration, since most functions written in an imperative language
+are not immutable. This gives raise to the idea of a state based
+testing tool.
 
 \section{Choice of AUTOSAR module to test}
-There were several modules that were up for discussion when it came to the
-choice of a module to test. Since the goal was to get a proof of concept for
-that it was possible to
-get an ASIL-classification and achieve functional safety using QuickCheck, it
-seemed preferable to choose a less complicated module. It was also desirable to
-have the actual C code and not just library files.
+%% TODO: "that it was possible", the goal was to see if it was
+%% possible to use quickcheck...
+%% TODO: "less complicated" in what way?
+When deciding which AUTOSAR module to test, there were a number of
+modules up for discussion. Since the goal was to get a proof of
+concept; examining if it was possible to get an ASIL-classification
+and achieve functional safety using QuickCheck, it seemed preferable
+to choose a less complicated module. It was also desirable to have the
+actual C code and not just library files, because then we could check
+ambiguities in AUTOSAR in a more efficient way.
 
 \section{Implementation}
-The C-code that was to be tested, using QuickCheck, was already unit tested and
-run sharp in lab environments.
+The module that was chosen, was already unit tested and run actively
+in lab environment.
 
-The implementation of the module was done to be able to test API calls,
-also described in appendix~\ref{APP:QUICKCHECK}, against the C-code. The tests
-then checked that the postconditions held, according to figure
-\ref{FIG:api_calls}. The postconditions were written to test that AUTOSAR
-requirements held. In other words that the API calls were called correctly.
+%% TODO: eventuellt skriva om delar i stycket, framför allt i slutet.
+The implementation of the properties was done to be able to test API
+calls, also described in appendix~\ref{APP:QUICKCHECK}, against the
+C-code. QuickCheck then checked that the postconditions held,
+according to figure \ref{FIG:api_calls}. The postconditions were
+written to test that AUTOSAR requirements held. In other words that
+the API calls were called correctly.
+
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics{pictures/api_calls.jpg}
+  \end{center}
+  \caption{Shows Erlang modeled states with calls against the C-code}
+  \label{FIG:api_calls}
+\end{figure}
 
 \subsection{Formal Notation}
-To be able to automatically generate test cases, using QuickCheck,
-AUTOSAR specifications, written in a natural language, needed to be transformed
-into Erlang code. Hence transforming informal notation into formal notation.
+For QuickCheck to be able to automatically generate test cases,
+AUTOSAR specifications written in a natural language, needed to be
+transformed into properties in Erlang code. In other words
+transforming informal notation into formal notation.
 
-A problem when translating the AUTOSAR specifications into code was that there
-were ambiguities. It was easy to see that there were room for different interpretations,
-which most likely would
-result in errors later.
+A problem when translating the AUTOSAR specifications into code was
+that there were ambiguities. It was easy to see that there were room
+for different interpretations, which most likely would result in
+errors later. This is described more precise in section
+\ref{SUBSEC:CONFLICTS}.
 
-The translating process was done iteratively as described in section \ref{SEC:ITERATIVE}
+The translating process was done iteratively as described in section
+\ref{SEC:ITERATIVE}.
 
 \subsection{Independence of the Erlang implementation}
-The implementation in Erlang was done independent of the design
-choices of the C-code. The idea was to ensure an independent model; if the model
-was inspired by the C-code, it could have transmitted errors. Also implementing the
-Erlang module independent of the C-implementation would result in that ambigousities in
-the AUTOSAR specification would be easier to find. This since two different interpretation
-of the same specification would eventually be availible.
+%% TODO: errors or faults?
+The implementation in Erlang was done independent from the design
+choices in the C-code. The idea was to ensure an independent model; if
+the model was inspired by the C-code, it could have transmitted
+faults. Implementing the Erlang module independent of the
+C-implementation would also result in that ambigousities in the
+AUTOSAR specification would be easier to find. This since two
+different interpretation of the same specification would eventually be
+available.
 
 
 
 \subsection{Iterative strategy}
 \label{SEC:ITERATIVE}
-The implementation of the AUTOSAR module in Erlang was done
-in an iterative way. Every piece of code were not required to be implemented before
-tests could be run. This because of that a module in AUTOSAR consist of several API
-calls. It was enough to implement some specification for one API call
-before tests could be run. Of course this gave rise to that only a part of
-the C-code was tested. Also early tests may not have fully tested the
-implemented API call because some branches in the C-code will never have been
-reached before other unimplemented API calls.
-
-\begin{figure}[!h]
-\begin{center}
-\includegraphics{pictures/api_calls.jpg}
-\end{center}
-\caption{Shows Erlang modeled states with calls against the C-code}
-\label{FIG:api_calls}
-\end{figure}
+The implementation of the AUTOSAR module in Erlang was done in an
+iterative way. Every piece of code were not required to be implemented
+before tests could be run. This is because a module in AUTOSAR consist
+of a number of API calls. It was enough to implement some of the
+specifications for one API call before tests could be run. Of course
+this tested only the implemented part of the C-code. Early tests may
+not have fully tested the implemented API call because some branches
+in the C-code will never have been reached before other unimplemented
+API calls.
 
 \subsection{Conflicts and Bugs}
-Early in the implementation phase QuickCheck found differences between the Erlang
-and C-implementation. This was expected because every programmer makes mistakes.
-The question was whether the fault was in the C-code or the Erlang code. Then
-the API was thoroughly read and a conclusion was made. Either a bug in the
-C-code was found or the Erlang-code needed to be corrected. There were however
-cases when the API was ambiguous. In those cases the C-interpretation was chosen
-as correct and the ambiguous specification written down.
+\label{SUBSEC:CONFLICTS}
+%% TODO: Skriv om stycket "every programmer makes mistakes". Det borde
+%% isf läggas till om ambiguites i AUTOSAR tidigare.
+Early in the implementation phase QuickCheck found differences between
+the Erlang and C-implementation. This was expected because every
+programmer makes mistakes.  The question was whether the fault was in
+the C-code or the Erlang code. Then the API was thoroughly read and a
+conclusion was made based on this. Either a bug in the C-code was
+found or the Erlang-code needed to be corrected. There were however
+cases when the API was ambiguous. In those cases the C-interpretation
+was chosen as correct and the ambiguous specification written down.
 
-Surprisingly bugs in the C-code was found early, even though it already run
-sharp in lab environments; only a few specification requirements needed to be
-implemented in Erlang.
+Bugs in the C-code was found early, even though it already run
+actively in lab environments.
 
-If a bug in the C-code was discovered how should the work be continued? Since
-QuickCheck terminates as soon as it finds a counter example something was needed to
-be able to run further tests. Some alternatives were discussed.
+If a bug in the C-code was discovered how should the work be
+continued? Since QuickCheck terminates as soon as it finds a counter
+example, a method for resolving conflicts was needed to be able to run
+further tests. Some alternatives were discussed.
 
+%% TODO: Pros/Cons mellan alternativen
 \begin{enumerate}
-        \item Fix the C-code, in other words change the C source code.
-                \label{ENUMERATE:FixCCode}
-        \item Mocking, in other words simulate different C-code output.
-        \item Change the Erlang module to a faulty behavior to follow the C
-                implementation.
+  \item Fix the C-code, in other words change the source code.
+    \label{ENUMERATE:FixCCode}
+  \item Mocking, in other words simulate different C-code output.
+  \item Change the Erlang module to a faulty behavior to follow the C
+    implementation.
 \end{enumerate}
 
-Item \ref{ENUMERATE:FixCCode} was chosen, see section \ref{sec:handlebugs}.
+%% TODO: Why was item 1 chosen?
+Item \ref{ENUMERATE:FixCCode} was chosen, see section
+\ref{sec:handlebugs}.
 
-When thoroughly reading the AUTOSAR API not only ambiguous rules were found but
-also rules that contradicted each other were recognized. In those cases the
-implementation in the C-code was followed.
+When thoroughly reading the AUTOSAR API not only ambiguous rules were
+found but also rules that contradicted each other were recognized. In
+those cases the implementation in the C-code was followed.
 
 \subsection{Advantage of having the Actual C-code}
-A great tool when a clear interpretation of the AUTOSAR specification was not
-possible was to look into the C-code. Even though QuickCheck can be used to
-test libraries when the actually source code is not available.
+%% TODO: Sista meningen lite lösryckt.
+When it did not exist a clear interpretation of the AUTOSAR
+specification, a great method for understanding, was to examine the C
+code. Even though QuickCheck can be used to test libraries when the
+actually source code is not available.
 
 \section{Evaluation of the Implementation}
 Just passing a number of tests did not say much more then some tests evaluated
