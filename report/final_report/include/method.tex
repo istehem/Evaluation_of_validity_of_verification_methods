@@ -182,48 +182,54 @@ code. Even though QuickCheck can be used to test libraries when the
 actually source code is not available.
 
 \section{Evaluation of the Implementation}
-Just passing a number of tests did not say much more then some tests evaluated
-to true. The next thing to do was to evaluate what was actually tested.
-\subsection{Verifying the tests}
-When the full module was implemented in Erlang code there had to be some assurance
-for that every piece of code in the C implementation was actually tested.
-Code coverage for the Erlang implementation was measured using the Erlang module
-\emph{cover}. To be able to to measure the code coverage of the C-code the
-commercial tool Bullseye Coverage was used. Only by using those tools it was
-easy to see that the result was not good enough. The main problem seemed to be
-that the WdgM was put in an absorbing state and after that following commands
-did not test anything interesting. The reason for that an absorbing state was
-reached was the availing of negative testing. The testing was negative because
-invalid command sequences and arguments were generated.
+If tests come back positive, it does not really say much more than
+that those tests evaluated to true. There is a need to evaluate what
+was actually tested.
 
-Figure \ref{FIG:ONERUN} shows how the status of the watchdog manager changes
-during the execution of API calls. After a number of commands the absorbing
-state \emph{stopped} is reached.
+\subsection{Verifying the tests}
+When the module was fully implemented in Erlang code there had to be
+some assurance of that every piece of code in the C implementation was
+actually tested.  Code coverage for the Erlang implementation was
+measured using the Erlang module \emph{cover}. To be able to measure
+the code coverage of the C-code the commercial tool Bullseye Coverage
+was used. When using those tools it was easy to see that the result
+was not good enough. The main problem seemed to be that the WdgM was
+put in an absorbing state and because of that the following commands
+interesting; they did not change the state. The reason for that an
+absorbing state was reached was the availing of negative testing. The
+testing was negative because invalid command sequences and arguments
+were generated.
+
+Figure \ref{FIG:ONERUN} shows an example of how the status of the
+watchdog manager changed during the execution of API calls. After a
+number of commands the absorbing state \emph{stopped} was reached.
 
 \begin{figure}
   \begin{center}
     \includegraphics{generated_pictures/one_test_history_statuses_freescale.pdf}
-    \caption{Shows how the status changes in the execution of one QuickCheck test}
+    \caption{Shows changes to the global status in the execution of one QuickCheck test.}
     \label{FIG:ONERUN}
   \end{center}
 \end{figure}
 
 \subsection{Finding better test cases}
-The next step was to tweak the generators, that were used by
-QuickCheck to construct valid API-calls. The tweaking of generators is
-done to find better test cases. I.e. there were several branches
-in the C-code that needed a specific sequence of API calls with
-correct arguments, to be reached. For example, it is unreasonable to
-test functions as often as half of the times when the initialization
-function \lstinline!WdgM_Init! has not yet been called.
+The next step was to tweak the generators that were used by QuickCheck
+to construct valid API-calls. This is done to find better test cases,
+i.e. there were a number of branches in the C-code that needed a
+specific sequence of API calls with correct arguments, to be
+reached. For example, it is unreasonable to test functions often when
+the initialization function \lstinline!WdgM_Init! has not yet been
+called.
 
-Because of QuickCheck's weight feature, one can simply change the
-ratio of the generated API calls, by matching on the state and the
-function you want to change probability to.
+Thanks to QuickCheck's weight feature, it is simple to change the
+ratio of the generation of certain API calls; by matching the state
+and the function name of the API call, one can change the probability
+of generation of that call.
 
-For example we have the initialization function \lstinline!WdgM_Init!
-were we want to have a high priority if it has not been called yet,
-and a low priority if it has been called previously.
+As an example we have the initialization function
+\lstinline!WdgM_Init!  were we want to have a high priority if it has
+not been called yet, and a low priority if it has been called
+previously.
 \begin{lstlisting}
 weight(S,  'WdgM_Init') ->
   case S#state.initialized of
@@ -240,56 +246,51 @@ changing the probability properties of the generators and analyze the
 results and the coverage. After the analysis, the generators were
 tweaked even more to make the result and coverage even better.
 
-%% Just checking code coverage was however not good enough for our goals...
-
 To get a better picture of the work flow used in this thesis see
 figure \ref{fig:workflow}.
 
 \begin{figure}[!ht]
-\caption{Work flow}
-\label{fig:workflow}
-\fbox{
-\parbox{\linewidth}{
-\begin{enumerate}
-\item Construct a model for an AUTOSAR module in Erlang
-\item Run QuickCheck for this model and compare the results with the output from
-the c code. \label{compare}
-\item Tweak the generators for the test cases \label{generators}
-    \item Evaluate the results
-    \begin{enumerate}
-      \item What is the state space?
-      \item Which test cases are relevant?
-      \item Collapse irrelevant states
-      \item What can be said about the results?
-    \end{enumerate}
-\item Are the results good enough, does it satisfy the requirements for the ASIL
-levels?
-\item If not go the step \ref{compare}
-\end{enumerate}
-}}
+  \caption{Work flow}
+  \label{fig:workflow}
+  \fbox{
+    \parbox{\linewidth}{
+      \begin{enumerate}
+      \item Construct a model for an AUTOSAR module in Erlang
+      \item Run QuickCheck for this model and compare the results with the output from
+        the C code. \label{compare}
+      \item Tweak the generators for the test cases \label{generators}
+      \item Evaluate the results
+        \begin{enumerate}
+        \item Evaluate the state space
+        \item Evaluate if the test cases are relevant
+        \item Collapse irrelevant states
+        \end{enumerate}
+      \item Are the results good enough, does it satisfy the requirements for the ASIL
+        levels?
+      \item If not go the step \ref{compare}
+      \end{enumerate}
+    }}
 \end{figure}
-%even though correction of the C-code
-%was not part of the thesis. Since there were actually code available, not
-%only libraries, and most bugs was easy to fix this seemed like the best choice,
-%see results.
 
-A challenging step is the analysis of the results. If the testing tool returns zero
-errors what does that say about the robustness of the input byte code? Passed
-100 of 100 tests is just a statement and does not say anything more than that
-some tests passed. Can tests be implemented in a clever way so that it is
-possible to get some kind of confidence on the correctness of the code?
+A challenging step is the analysis of the results. If the testing tool
+returns zero errors what does that say about the robustness of the
+input byte code? Passed 100 of 100 tests is just a statement and does
+not say anything more than that some tests passed. Can tests be
+implemented in a clever way so that it is possible to get some kind of
+confidence on the correctness of the code?
 
 \section{Configurations}
-When the code coverage was calculated it was recognized that every piece of code
-wasn't executed. The reason seemed to be that the current configuration
-disallowed the execution of some parts of the code, even though the
-program behaved correctly. Because the implementation of the
-Erlang module was independent of configurations it was easy to run
-tests on several configuration which resulted in almost full coverage.
+When the code coverage was calculated it was recognized that every
+piece of code wasn't executed. The reason seemed to be that the
+current configuration disallowed the execution of some parts of the
+code, even though the program behaved correctly. It was easy to run
+tests on several configurations, because the implementation of the
+Erlang module was made independent of configurations. This resulted in
+almost full coverage.
 
 Three configurations with different complexity was used. The first
 one, an example configuration (this will further on be called the
-Example configuration), had many supervision functions configured in
+Example configuration), had many supervision functions configured for
 each mode, and followed a strict execution of the program.
 
 There were also a minimal configuration (BSI configuration) which, in
@@ -302,49 +303,57 @@ entities.
 The last configuration (named Freescale configuration), which was one
 of the configurations that were used actively in lab equipment, was
 similar to the example configuration but a bit more relaxed. The
-global status stayed in a good state more often; it was easier to do
-positive testing.
+global status stayed in a non-absorbing state more often; it was
+easier to do positive testing.
 
+%% TODO: Stämmer sista meningen? Stämmer referensen.?
 The tweaking of generators, where the aim is to generate better test
 cases, seemed in some sense to be configuration dependent. Better test
 cases were generated if the generators were tweaked according to a
-specific configuration, see results.
-
-\begin{figure}[!ht]
-\input{pictures/box.tex}
-\caption{Abstract implementation module}
-\end{figure}
+specific configuration, see chapter \ref{CHAPTER:RESULTS}.
 
 \section{Calling the API commands}
 \label{SEC:CALLING_COMMANDS}
-API calls were executed by QuickCheck using the \emph{run\_commands/1} function
-according to \ref{SEC:QuickCheckIntro}. The runtime environment module (RTE) is
-however responsible for the scheduling of the main function, which should be
-executed in a given time interval. Since the RTE was not available when testing
-the watchdog manager the main function was called randomly and it was
-assumed that every time the main function was called a given amount of time had
-passed.
+API calls were executed by QuickCheck using the \emph{run\_commands/1}
+function according to appendix \ref{SEC:QuickCheckIntro}. The runtime
+environment module (RTE) is however responsible for the scheduling of
+the main function, which according to AUTOSAR, should be executed in a
+given time interval. Since the RTE was not available when testing the
+watchdog manager the main function was called randomly and it was
+assumed that every time the main function was called a given amount of
+time had passed.
 
-Except the main function only one internal algorithm used by the watchdog
-manager was time dependent, namely deadline supervision. A deadline supervision
-consist of two checkpoints. One start checkpoint, one stop checkpoint and a
-maximum time it shall take to reach the stop checkpoint after the start
-checkpoint was reached. The AUTOSAR specification was however lacking of a
-clear definition of how time should be represented. The C code just used ticks,
-not actual time stamp, which was incremented every time the main function was
-called. It was in other words assumed that the RTE was able to execute the main
-function correctly and a fixed amount of ticks would always represent the same
-amount of time. Accepting this solution it was easy to adopt the same approach
-in the Erlang module. More about this can be found in section
+%% TODO: meningen "The AUTOSAR specification /../ lacking a clear
+%% definition" är felaktig. AUTOSAR specar tiden till sekunder. Det är
+%% däremot oklart hur man får räknar med sekunderna: om tiden kommer
+%% från cpu klockan, RTEn, main funktions "tick" etc
+Except for the main function, only one internal algorithm that was
+used by the watchdog manager was time dependent, namely the deadline
+supervision algorithm. A supervised entity with deadline supervision
+consists of two checkpoints. One start checkpoint, one stop checkpoint
+and a maximum time it should take to reach the stop checkpoint after
+the start checkpoint was reached. The AUTOSAR specification was
+however lacking of a clear definition of how time should be
+represented. The C code just used ticks, not actual time stamps, which
+was incremented every time the main function was called. It was in
+other words assumed that the RTE was able to execute the main function
+correctly and a fixed amount of ticks would always represent the same
+amount of time. Accepting this solution it was easy to adopt the same
+approach in the Erlang module. More about this can be found in section
 \ref{SEC:FUNCTIONAL_SAFETY_TIME}.
 
 \section{Model State}
-The model state was constructed as easy as possible. Hence, even though it was
-attempting to use a more efficient data structure, a simple record was used to
-represent the model state. The main reason for that was to make it easier to
-follow the model state when for instance using
-\emph{eqc\_statem:show\_states/1}, see appendix \ref{APP:QUI/CKCHECK}. The
-efficiency of the test model was considered less relevant then the readability
-of the model state.  The idea was to make it easy to find the actual bug, when
-there were conflicts between the C-code and the Erlang module, and running the
-actual tests was not considered time or memory critical.
+%% TODO: första meningen: "as easy as possible", vad menas?
+%% TODO: Är det värt att ha med "even though it was tempting to use a
+%% more efficient data structure"? varför var det "tempting" och vad
+%% hade varit "more efficient" i sånna fall?
+The model state was constructed as easy as possible. Even though it
+was tempting to use a more efficient data structure, a simple record
+was used to represent the model state. The main reason for this was to
+make it easy to follow the model state when using
+\emph{eqc\_statem:show\_states/1}, see appendix
+\ref{APP:QUICKCHECK}. The efficiency of the test model was considered
+less relevant than the readability of the model state.  The idea was
+to make it easy to find the actual bug, when conflicts arouse between
+the C-code and the Erlang module. Running the actual tests was also
+not considered time or memory critical.
