@@ -497,15 +497,25 @@ QuikCheck, against the C-code and look for bugs and that the translation into C 
 original module was done correctly. This will assure that the C code are a
 correct translation of the original model that is known to be correct.
 
-
-
 \subsection{Achieving functional safety}
 The $V$ model used by $ISO-26262$ requires that the standard are taken in
 consideration during the hole development process. Hence it is hard to analyse
 code written without the standard in consideration and analyze if it's fulfills
 the standards requirements.
 
+\section{Fulfilled requirements}
+ISO~26262 mention several several requirements that QuickCheck will be able to
+fulfil. Aside from general requirements like that a ''safety plan'' should be
+available, there are tests in which the hardware should be taken in
+consideration. This is beyond the scope of this thesis and can also not be
+tested using QuickCheck. There are also tests that needs several modules
+implemented to make any sense. Such tests have not been executed, since only the
+watchdog manager module has been tested, but should be possible to run after
+implementing more modules in Erlang code. QuickCheck has a module for mocking C
+code, see appendix \ref{SEC:QuickCheckIntro}, which could possible also be used
+for running such tests.
 \subsection{Confidence interval}
+
 %% how certain is the verification
 
 %% LoC
