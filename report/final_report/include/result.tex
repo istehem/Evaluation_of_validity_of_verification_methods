@@ -550,7 +550,19 @@ therefor hard to analyze code that is written without the standard in
 consideration and then examine if it fulfills that standards
 requirements.
 
+\section{Fulfilled requirements}
+ISO~26262 mention several several requirements that QuickCheck will be able to
+fulfil. Aside from general requirements like that a ''safety plan'' should be
+available, there are tests in which the hardware should be taken in
+consideration. This is beyond the scope of this thesis and can also not be
+tested using QuickCheck. There are also tests that needs several modules
+implemented to make any sense. Such tests have not been executed, since only the
+watchdog manager module has been tested, but should be possible to run after
+implementing more modules in Erlang code. QuickCheck has a module for mocking C
+code, see appendix \ref{SEC:QuickCheckIntro}, which could possible also be used
+for running such tests.
 \subsection{Confidence interval}
+
 %% how certain is the verification
 
 %% LoC
