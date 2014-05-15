@@ -215,29 +215,30 @@ covered by running QuickCheck, see table
 \subsection{Example}
 The example configuration is somewhat more complex than the Freescale
 configuration. This is because it supports all functionality of an
-configuration. Because of the complexity, some transition is harder or even
-impossible to reach. Noticeable is that the transition from the failed to
-the okay state, according to figure \ref{FIG:GLOBALSTATUSES} is never made, see
-table \ref{TABLE:STATUSES_EXAMPLE}. The reason for that is that the alive
+configuration. Because of the complexity, some transition is harder or
+even impossible to reach. Noticeable is that the transition from the
+state \lstinline!WDGM_GLOBAL_STATUS_FAILED! to the state
+\lstinline!WDGM_GLOBAL_STATUS_OK! according to figure
+\ref{FIG:GLOBALSTATUSES} is never made, see table
+\ref{TABLE:STATUSES_EXAMPLE}. The reason for that is that the alive
 functions must fail once and then continue without failures. Because
-\lstinline!WdgM_MainFunction! handles the alive supervision calculations, and
-the function \lstinline!WdgM_CheckpointReached! handles the increasing of
-the alive counters. A certain number of calls to
-\lstinline!WdgM_CheckpointReached! must be done between each
-\lstinline!WdgM_MainFunction!. It does not stop there. Each checkpoint may have
-some logical supervision, so the order of the called checkpoints is important as
-well. It is also possible to set deadline supervision for a supervised
-entity. Both deadline supervision and logical supervision is handled by
-\lstinline!WdgM_CheckpointReached!, but with deadline supervision some time,
-specified in the configuration, must have elapsed since the start
-checkpoint. Because ``time'' isn't specified in AUTOSAR, see
-section~\ref{SEC:FUNCTIONAL_SAFETY_TIME}, the model implemented time as the
-C-code, with the use of \lstinline!WdgM_MainFunction!. This is possible because
-we know that \lstinline!WdgM_MainFunction! is called periodically.
-% We tried hard to find a suitable example when the global status transited from
-% \lstinline!WDGM_GLOBAL_STATUS_FAILED! to \lstinline!WDGM_GLOBAL_STATUS_OK!, in
-% the example configuration, but the number of commands needed for this
-% transition expanded to much and somewhere some other supervision failed.
+the \lstinline!WdgM_MainFunction! handles alive supervision
+calculations, and the function \lstinline!WdgM_CheckpointReached!
+handles the increasing of the alive counters, a certain number of
+calls to \lstinline!WdgM_CheckpointReached! must be done before each
+\lstinline!WdgM_MainFunction!. It does not end there. Each checkpoint
+may have some logical supervision, so the order of the called
+checkpoints is important as well. It is also possible to set deadline
+supervision for a supervised entity. Both deadline supervision and
+logical supervision is handled by
+\lstinline!WdgM_CheckpointReached!. Deadline supervision demands that
+a configured amount of time must have elapsed since the start
+checkpoint was visited. Because AUTOSAR does not specify how the
+handling of time should be implemented, see sections
+\ref{SEC:CALLING_COMMANDS} and \ref{SEC:FUNCTIONAL_SAFETY_TIME}, we
+implemented the model as the C-code, with the use of
+\lstinline!WdgM_MainFunction!. This is possible because we know that
+\lstinline!WdgM_MainFunction! is called periodically.
 
 \begin{figure}[!ht]
   \begin{center}
@@ -246,86 +247,93 @@ we know that \lstinline!WdgM_MainFunction! is called periodically.
       \includegraphics{generated_pictures/history_commands_example.pdf}
     }
 
-    \subfigure[Shows percentage of each possible global status hit]{
+    \subfigure[Shows percentage of all visited global status]{
       \label{FIG:STATUSES_EXAMPLE}
       \includegraphics{generated_pictures/history_statuses_example.pdf}
     }
   \end{center}
-  \caption{Example configuration}
+  \caption{Some statistics for the Example configuration}
   \label{FIG:EXAMPLE}
 \end{figure}
 
 \begin{table}[!ht]
-  \caption{Example configuration}
+  \caption{State transitions of the Example configuration}
   \label{TABLE:STATUSES_EXAMPLE}
   \input{generated_tables/history_statuses_example.tex}
 \end{table}
 
 \section{Handle bugs in the C code}
 \label{sec:handlebugs}
-There is a number of possible ways to handle bugs when QuickCheck encounters
-them. The problem is that QuickCheck generates arbitrary command sequences, it
-cannot ``save'' an error and proceed to find the next error. Either the C-code
-or the model needs to be ``corrected''.
-The best way, with the model in mind, would often be to let a third
-party correct the discovered bugs. However this is time consuming because the
-support line has often already much to do, and the releases doesn't come that
-often.
-Another way is to mock, in other words simulate the output of the C-code, the
-erroneous function, but then you will only find one
-bug per function, strictly limiting the probability to find bugs. There are a
-QuickCheck Erlang module for the purpose of mocking C-code, see \ref{APP:SEC:OTHERMODULES}
-Then there is two equally good methods. Either the Erlang model needs to have
-the fault implemented, or the C-code needs to be fixed. There are pros and cons
-with both methods. If the Erlang model introduce bugs, there may be secondary
-failures which are not discovered. This could also happened when correcting the
-C-code, but then more knowledge of the module is needed, and some of the
-secondary failures can easier be avoided. It also takes more time to get the
-extra knowledge of the C-code.
+There is a number of possible ways to handle bugs when QuickCheck
+encounters them. The problem is that QuickCheck generates arbitrary
+command sequences, it cannot ``save'' an error and proceed to find the
+next error. Either the C-code or the model needs to be adjusted.  The
+best way, with the model in mind, would often be to let a third party
+correct the discovered bugs. However this is time consuming because
+the support line has often already much to do, and the releases
+doesn't come that often.  Another way is to mock the faulty API
+call. In other words simulate the output of the C-code, but then you
+will only find one bug per function, strictly limiting the probability
+to find bugs. There is a QuickCheck Erlang module for the purpose of
+mocking C-code, see appendix \ref{APP:SEC:OTHERMODULES}. Then there is
+two equally good methods. Either the Erlang model needs to have the
+fault implemented, or the C-code needs to be fixed. There are pros and
+cons with both methods. If the Erlang model introduce bugs, there may
+be secondary failures which are not discovered. This could also happen
+when correcting the C-code, but then more knowledge of the module is
+needed, and some of the secondary failures can easier be avoided. It
+also takes more time to get the extra knowledge of the C-code.
 
-We choose to correct the C-code, because then we had direct feedback and could
-discover where in the code the bugs were introduced.
+We choose to correct the C-code, because then we had direct feedback
+and could discover where in the code the bugs were introduced.
 
 \section{Statistics}
 The distribution of API-calls seems, according to figure
 \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and
-\ref{FIG:COMMANDS_EXAMPLE}, to be the same for all configuration. The arguments
-to the API calls is however different, even though it is not seen in those plots.
-The most interesting API calls is the ones thats modifies the internal state of
-the watchdog manager, see appendix \ref{APP:API_CALLS}, namely \lstinline!WdgM_Init!,
-\lstinline!WdgM_DeInit!, \lstinline!WdgM_SetMode!, \lstinline!WdgM_MainFunction!,
-\lstinline!WdgM_CheckpointReached! and \lstinline!WdgM_PerformReset!. The reason
-for this is that they will influence the results of future coming API calls.
+\ref{FIG:COMMANDS_EXAMPLE}, to be the same for all configuration. The
+arguments to the API calls is however different, even though it is not
+seen in those plots.  The most interesting API calls is the ones that
+modifies the internal state of the watchdog manager, see appendix
+\ref{APP:API_CALLS}, namely \lstinline!WdgM_Init!,
+\lstinline!WdgM_DeInit!, \lstinline!WdgM_SetMode!,
+\lstinline!WdgM_MainFunction!, and
+\lstinline!WdgM_CheckpointReached!. The reason for this is that they
+will influence the result of following API calls. The function
+\lstinline!WdgM_PerformReset!, could possibly also change the global
+state, but only if it is connected to the watchdog. In case the state
+machine is in an absorbing state, the perform reset function should
+call the watchdog, which will reset the watchdog manager.
 
-The Init and DeInit functions can just put the global
-status between two states, and should only change the internal state of the
-watchdog, when the watchdog is in either \emph{WDGM\_GLOBAL\_STATUS\_OK}
-or \emph{WDGM\_GLOBAL\_STATUS\_DEACTIVATED}, according to
-figure \ref{FIG:GLOBALSTATUSES}. If this happens they will change the internal
-state of the watchdog but will do so in the same manner independent previous
-called commands. The behaviour of this commands will hence not vary much.
-This two functions have also the property that after they are called they will
-always put the watchdog manager in the same state, or a state that has already
-been reached, except for the first time the Init function is called.
+The Init and DeInit functions can just change the global status
+between two states, and should only change the state of the watchdog
+when the watchdog is in either \lstinline!WDGM_GLOBAL_STATUS_OK! or
+\lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!, according to figure
+\ref{FIG:GLOBALSTATUSES}. If this happens they will change the
+internal state of the watchdog independently of previous called
+commands. The behaviour of these commands will therefor not vary much.
 
-NOTE: The PerformReset function is boring why?
-NOTE: The SetMode function changes the mode, why interesting?
+\lstinline!WdgM_SetMode! changes the mode, but should retain the
+global and local statuses of the supervised entities. It should not be
+possible to change the mode if the watchdog manager is in either
+\lstinline!WDGM_GLOBAL_STATUS_EXPIRED! or
+\lstinline!WDGM_GLOBAL_STATUS_STOPPED!.
 
-The two remaining API-calls that are really worth discussing in detailed are the
-main function and the checkpoint reached function. As can be seen in
-figures \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and
-\ref{FIG:COMMANDS_EXAMPLE}, they are also the two commands that are most
-often called.
+The two remaining API-calls that needs to be discussed in details are
+the main function and the checkpoint reached function. As can be seen
+in figures \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and
+\ref{FIG:COMMANDS_EXAMPLE}, they are also the two commands that are
+called the most.
 
 \section{Coverage}
 \subsection{Erlang module}
+%% TODO: Dubbelkolla dessa värden.
 \newcommand{\linecoverage}{97.38\%}
 \newcommand{\bullseyecoverage}{81\%}
-The Erlang module \emph{cover} was used to calculate the line coverage for the
-Erlang module.
-To get an idea of how many tests that needed to be executed, before the line
-coverage of the Erlang module converges against a certain value,
-the coverage measured after each executed test for every configuration.
+The Erlang module \lstinline!cover! was used to calculate the line
+coverage for the Erlang module. To get an idea of how many tests that
+needed to be executed, before the line coverage of the Erlang module
+converges against a certain value, the coverage was measured after
+each executed test for every configuration.
 
 \begin{figure}[!ht]
 \begin{center}
@@ -352,26 +360,31 @@ the coverage measured after each executed test for every configuration.
 \label{FIG:COV_PER_TESTS_EXAMPLE}
 \end{figure}
 
-As can be seen in the plots \ref{FIG:COV_PER_TESTS_BSI},
-\ref{FIG:COV_PER_TESTS_FREESCALE} and \ref{FIG:COV_PER_TESTS_EXAMPLE} the
-example configuration takes the longest time before it converges. It also
-becomes clear that the freescale configuration needs more tests than the BSI
-configuration before it convergence. The complexity of the configuration seems
-hence to play an important part. This is not surprising because a more complex
-configuration may drastically increase the state space, blablabla.
+As can be seen in the figures \ref{FIG:COV_PER_TESTS_BSI},
+\ref{FIG:COV_PER_TESTS_FREESCALE} and \ref{FIG:COV_PER_TESTS_EXAMPLE},
+the example configuration takes the longest time before it
+converges. It also becomes clear that the freescale configuration
+needs more tests than the BSI configuration before it convergence. The
+complexity of the configurations seem to play an important
+part. This is not surprising because a more complex configuration may
+drastically increase the state space.
 
-The coverage results after running all configuration can be seen in table
-\ref{TABLE:COVERAGE}.  The module \emph{wdgm\_pre} checks preconditions of the
-model state, hence constraining the model states ability to change, this will
-affect the \emph{wdgm\_next} module. The \emph{wdgm\_next} module changes the
-model state, and is called after a call to the C-code is performed. Note that
-\emph{wdgm\_next} module are totally independent of the C-code, see appendix
-\ref{APP:QUICKCHECK}. The last mentioned module has two helper modules
-\emph{wdgm\_main} and \emph{wdgm\_checkpointreached} which changes the model
-state if the main function or the checkpointreached function was the most
-recently called functions in the C-code. The remaining measured module
-\emph{wdgm\_post} checks that AUTOSAR specification holds by comparing the
-model state and the actual state of the C-code.
+%% TODO: modulnamnen nämns lite hux flux. Helt plötsligt så pratar vi
+%% om wdgm_pre väldigt naturligt.
+The results of the coverages after running all configuration can be
+seen in table \ref{TABLE:COVERAGE}. The module \lstinline!wdgm_pre!
+checks preconditions of the model state; constraining the model states
+ability to change. This will affect the \lstinline!wdgm_next!
+module. The \lstinline!wdgm_next! module changes the model state, and
+is called after a call to the C-code is performed. Note that
+\lstinline!wdgm_next! module are totally independent of the C-code,
+see appendix \ref{APP:QUICKCHECK}. The \lstinline!wdgm_next! module
+has two helper modules \lstinline!wdgm_main! and
+\lstinline!wdgm_checkpointreached!  which changes the model state if
+the main function or the checkpoint reached function was the most
+recently called functions in the C-code. The module
+\lstinline!wdgm_post! checks that AUTOSAR specification holds, by
+comparing the models state and the actual state of the C-code.
 
 \begin{table}[!ht]
 \caption{Shows coverage statistics generated by the Erlang module cover}.
@@ -392,25 +405,31 @@ wdgm\_next              & 37  & 37 & 100\%
 \end{tabular}
 \end{center}
 \end{table}
-Say something about why everything are not covered ...
-The total line coverage results is \linecoverage.
-\subsection{C-code}
-Bullseye Coverage was used to analyse the coverage of the C-code. The results
-show that the decision coverage is over \bullseyecoverage and all functions except for two is
-covered, see figure \ref{FIG:BULLSEYE}. The reason for that there is function
-which is not covered, is that one function is deprecated and the other is a
-support function to that function. One of our limitations were to not
-implemented deprecated functions into Erlang code.
-The missing condition/decision coverages in the C-code are for example checks
-for null pointers, which never evaluated to false. Many such checks seems to be
-redundant and impossible to evaluate to true, if one excludes the possibility of
-hardware failures or other processes which may corrupt the memory of the watchdog
-manager. There is as well conditions for the \lstinline!WdgMDevErrorDetect!
-configuration parameter, which we did not dare to turn off.
 
-The coverage statistics shown in \ref{FIG:BULLSEYE} is constructed
-using three configuration. Using several configurations gave better results since
-some code is impossible to reach if not certain configuration parameters are set.
+%% TODO: Skriv varför allt inte är täkt i Erlang koden.
+The total line coverage results is \linecoverage.
+
+\subsection{C-code}
+Bullseye Coverage was used to analyse the coverage of the C-code. The
+results show that the decision coverage is over {\bullseyecoverage}
+and all functions except for two is covered, see figure
+\ref{FIG:BULLSEYE}. The reason that there are functions which are not
+covered, is that one of the functions is deprecated and the other is a
+support function to that function. One of our limitations were to not
+implemented deprecated functions into Erlang code.  The missing
+condition/decision coverages in the C-code are for example checks for
+null pointers, some of which never evaluated to false. Many checks
+seems to be redundant and impossible to evaluate to true, if one
+excludes the possibility of hardware failures or other failures which
+may corrupt the memory of the watchdog manager. There is as well
+branches and conditions regarding the \lstinline!WdgMDevErrorDetect!
+configuration parameter, which if turned off resulted in a
+segmentation fault.
+
+The coverage statistics shown in figure \ref{FIG:BULLSEYE} is
+constructed using three configuration. Using several configurations
+gave better results since some code is impossible to reach if not
+certain configuration parameters are set.
 
 \begin{figure}[!ht]
   \setlength\fboxsep{0pt}
@@ -422,31 +441,32 @@ some code is impossible to reach if not certain configuration parameters are set
 
 
 \section{Evaluation of the solution}
-%% The question here that needs to be answered is:
-%% Does the solution ensure functional safety?
 
 \subsection{Functional safety analysis}
-Since one important part of the functional safety concept is that it must be
-taken in consideration during the hole development process, one can not simply
-say that QuickCheck makes it possible to acquire functional safety. There must
-first be a number of assumptions. Not even if it is assumed that
-every step in the development, until the actual implementation of the watchdog
-manager, satisfies the requirements one also has to assume that the remaining
-part of the development, towards a finished vehicle, follows the same
-constrains. Even further, if this is assumed, there is one important
-assumption left before
-one can even reason about how QuickCheck can benefit.
-This assumptions lies in that the model for the watchdog
+%% TODO: dela upp och skriv om meningen "Not even if it is assumed
+%% /../ follows the same constraints."
+Since one important part of the functional safety concept is that it
+must be taken in consideration during the whole development process,
+one can not simply say that QuickCheck makes it possible to acquire
+functional safety. There must first be a number of assumptions. Not
+even if it is assumed that every step in the development, until the
+actual implementation of the watchdog manager, satisfies the
+requirements one also has to assume that the remaining part of the
+development, towards a finished vehicle, follows the same
+constrains. If this is assumed, there is still one important
+assumption left before one can reason about how QuickCheck can
+benefit.  This assumption is based on that the model for the watchdog
 manager is correct, namely the AUTOSAR specification.
 
 \subsubsection{Development error detection}
 \label{SEC:DEVERRORDETECT}
 We discovered that it existed a configuration parameter,
 \lstinline!WdgMDevErrorDetect!, which would turn off functional safety
-checks. This made the C-code crash with segmentation fault as soon as we tested
-something that weren't OK. This could be null pointers, or improper ids. AUTOSAR
-has not been specified enough for the parameter \lstinline!WdgMDevErrorDetect!
-to be switched off. With functional safety in mind, this parameter must be on!
+checks. This made the C-code crash with segmentation fault as soon as
+we did negative testing. This could for example be null pointers or
+improper identification numbers. AUTOSAR is not specified enough for
+the parameter \lstinline!WdgMDevErrorDetect!  to be switched off. With
+functional safety in mind, this parameter must be on!
 
 \subsubsection{Definition of time}
 \label{SEC:FUNCTIONAL_SAFETY_TIME}
@@ -463,63 +483,72 @@ call of \lstinline!WdgM_MainFunction! tick a ``time'' counter.
 
 
 \subsection{Measurements of the state space}
-%% How does one measure the size of the state space that is actually verified?
-One way when trying the measure the state space is to collect statistical data
-during the execution of the tests. It is hard to say much about the hole systems
-state space since it is very large, due to the state explosion problem. In the
-case of an AUTOSAR module the state space also varies on the configuration in
-use, since features an checkpoints can be configured for a certain configuration
-but not for an other configuration.
-However locking at certain parts, that are considered to be important, of the system
-much more can be said. For instance when locking at the internal graphs of the
-watchdog manager one can easily see that every node in those graphs are visited.
+One way when trying the measure the state space is to collect
+statistical data during the execution of the tests. It is hard to say
+much about the whole systems state space since it is very large, due
+to the state explosion problem. In the case of an AUTOSAR module the
+state space also varies on the configuration in use, since features
+and supervision features can be configured.  However looking at
+certain parts that are considered to be important for the system, much
+more can be said. For instance when examining the internal graphs of
+the watchdog manager, one can easily see that every node in those
+graphs are visited.
 
-Measuring the code coverage can in it self tell if important parts of the state
-space are not covered, since parts of the code that changes the state of the
-watchdog manager are not covered. However this parts can in worst case be dead
-code or redundancy if something unexpected happens to the hardware, which is
-beyond this thesis. Therefor total code coverage is hard, or may be even
-impossible to reach.  Even if all lines of code in for example an algorithmic
-part of the watchdog manager are covered this algorithm may not be totally
-verified. This since the state are dependent of actual values of
-variables.
+Measuring the code coverage can in itself tell if important parts of
+the state space are covered or not. This is possible because the parts
+of the code that changes the state of the watchdog manager are not
+covered. These parts can however be dead or redundant code, in the
+worst case, if something unexpected happens to the hardware, which is
+beyond this thesis. Total code coverage is hard, or may be even
+impossible to reach.  Even if all lines of code in for example an
+algorithmic part of the watchdog manager are covered this algorithm
+may not be totally verified. This is because the state are dependent
+of actual values of variables.
 
 \subsection{AUTOSAR}
-Due to the informal syntax of AUTOSAR it is directly not very god fitted for
-functional safety. This since the informal syntax makes it possible for
-different interpretation. To be able to reach the requirements for ASIL (C,D?)
-dependent AUTOSAR modules must be interpreted dependent of each other.
+%% TODO: vad menas med meningen "To be able to reach the requirements /../"?
+Due to the informal syntax of AUTOSAR it is not good fitted for
+functional safety, since the informal syntax makes it possible for
+different interpretation. To be able to reach the requirements for
+ASIL (C,D?)  dependent AUTOSAR modules must be interpreted dependent
+of each other.
 
-One way of doing this is to interpret AUTOSAR in a model based language like
-SPIN and check that the model after transforming it into formal syntax actually
-is valid. Hence the model in itself should contain no bugs.
+One way of doing this is to interpret AUTOSAR in a model based
+language like SPIN and check that the model, after transforming it
+into formal syntax, is valid. The model in itself should then not
+contain any bugs.
 
-This can also be done using Quickcheck but, in a functional safety point of
-view, it seems pointless to test the actual C code before there is assurance for
-that the model actually is correct.
+This can also be done using QuickCheck but, in a functional safety
+point of view, it seems pointless to test the actual C code before
+there is assurance for that the model actually is correct according to
+formal syntax.
 
-C in itself is also a formal language but C is not very good fitted to formally defining
-the actual requirements of AUTOSAR. This, for instance, because of its low level nature.
+C in itself is also a formal language but C is not good fitted to
+formally defining the actual requirements of AUTOSAR. This is for
+instance because of its low level nature.
 
-What is done in this thesis is that given a formally defined AUTOSAR model in C
-define an other model in Erlang and check the two models against each other.
-A better work flow had been, define AUTOSAR in a model based language, check
-that this model holds, implement the actual C-code following the formal notation of
-the previous constructed model. Implementing the C-code would be much easier
-because there are no room for different interpretations. After the C code is written write model
-in Erlang, following the model written in the model based language, again there
-are no room for different interpretations. Check the Erlang module, using
-QuikCheck, against the C-code and look for bugs and that the translation into C of the
-original module was done correctly. This will assure that the C code are a
-correct translation of the original model that is known to be correct.
-
-
+%% TODO: Är inte detta bar utfyllndad?
+What is done in this thesis is that given a formally defined AUTOSAR
+model in C define an other model in Erlang and check the two models
+against each other.  A better work flow had been, define AUTOSAR in a
+model based language, check that this model holds, implement the
+actual C-code following the formal notation of the previous
+constructed model. Implementing the C-code would be much easier
+because there are no room for different interpretations. After the C
+code is written write model in Erlang, following the model written in
+the model based language, again there are no room for different
+interpretations. Check the Erlang module, using QuikCheck, against the
+C-code and look for bugs and that the translation into C of the
+original module was done correctly. This will assure that the C code
+are a correct translation of the original model that is known to be
+correct.
 
 \subsection{Achieving functional safety}
-The $V$ model used by $ISO-26262$ requires that the standard are taken in
-consideration during the hole development process. Hence it is hard to analyse
-code written without the standard in consideration and analyze if it's fulfills
-the standards requirements.
+The $V$ model used by ISO~26262 requires that a certain work flow is
+taken into consideration during the whole development process. It is
+therefor hard to analyze code that is written without the standard in
+consideration and then examine if it fulfills that standards
+requirements.
 
 \subsection{Confidence interval}
 %% how certain is the verification
