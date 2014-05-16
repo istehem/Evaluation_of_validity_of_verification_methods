@@ -77,20 +77,25 @@
 %------------------------------------------------
 % PRESENTATION SLIDES
 %------------------------------------------------
+%================================================
+\section{Before we begin}
+%================================================
+
+\begin{frame}
+  \frametitle{Glossary}
+  \begin{description}
+    \item[Supervised Entity]
+    \item[Checkpoint]
+    \item[Mode]
+    \item[]
+  \end{description}
+\end{frame}
+
 
 
 %================================================
 \section{Watchdog Manager}
 %================================================
-\begin{frame}
-  \frametitle{Supervision functions}
-  \begin{itemize}
-    \item Alive supervision
-    \item Deadline supervision
-    \item Logical supervision
-  \end{itemize}
-\end{frame}
-
 \begin{frame}[fragile]
   \frametitle{Functions}
   \begin{block}{Getters}
@@ -113,6 +118,38 @@
       \item \lstinline!Checkpointreached(SupervisedEntityIdType, CheckpointIdType)!
     \end{itemize}
   \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Supervision functions}
+  \begin{itemize}
+    \item Alive supervision
+    \item Deadline supervision
+    \item Logical supervision
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Alive Supervision}
+  \begin{block}{Values/Variables}
+    Expected alive indications (EAI), property of mode, fixed value
+    Supervision reference cycle (SRC), property of mode, fixed value
+    Min margin (Min), property of mode, fixed value
+    Max margin (Max), property of mode, fixed value
+    Alive counter (AC)
+    Supervision cycle (SC)
+  \end{block}
+  \begin{block}{The algorithm}
+
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Deadline Supervision}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Logical Supervision}
 \end{frame}
 %================================================
 \section{Implementation}
