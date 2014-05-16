@@ -53,6 +53,76 @@
 \usepackage{graphicx}
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
 
+\lstdefinestyle{erlang}{
+   language        = erlang,
+   showstringspaces= false,
+   breaklines      = true,
+   keywordstyle    = {\bfseries},
+   keywordstyle    = [2]{\color{green}},
+   keywordstyle    = [3]{\color{red}},
+   alsoletter      = {?, :},
+   morekeywords    = {
+     fun,
+     begin},
+   morekeywords    = [2]{
+     ?FORALL,
+     ?LET},
+   morekeywords    = [3]{
+     eqc:numtests,
+     eqc:quickcheck,
+     eqc_c:start,
+     eqc\_statem:show\_states,
+     car,
+     car\_xml}
+}
+\lstdefinestyle{c}{
+  language        = c,
+  commentstyle    = \color{purple},
+  keywordstyle    = \color{violet},
+  showstringspaces= false
+}
+\lstdefinestyle{autosar}{
+  breaklines      = false,
+  frame           = l,
+  showstringspaces= false,
+  string          = [s]{``}{''},
+  morestring      = [b]",
+  basicstyle      = \color{red},
+  keywordstyle    = \color{blue},
+  commentstyle    = \color{green},
+  stringstyle     = \color{green},
+  moredelim       = [is][\color{cyan}]{|}{|},
+  literate        = {<=}{{$\leq$}}{1} %% observe no comma
+                    {>=}{{$\geq$}}{1},
+  identifierstyle = \color{black},
+  emph            = {
+    WdgMExpiredSupervisionCycleTol,
+    WdgM_MainFunction,
+    WdgM_SetMode,
+    WdgM_Init,
+    WdgM_DeInit,
+    WdgM_CheckpointReached,
+    WdgM_CalculateAliveSupervision,
+    WdgM_CheckLogicalSupervisedEntities
+  },
+  emphstyle       = {\color{cyan}},
+  morekeywords    = {
+    WDGM\_CORRECT,
+    WDGM\_INCORRECT,
+    WDGM\_GLOBAL\_STATUS\_OK,
+    WDGM\_GLOBAL\_STATUS\_FAILED,
+    WDGM\_GLOBAL\_STATUS\_EXPIRED,
+    WDGM\_GLOBAL\_STATUS\_STOPPED,
+    WDGM\_GLOBAL\_STATUS\_DEACTIVATED,
+    WDGM\_LOCAL\_STATUS\_OK,
+    WDGM\_LOCAL\_STATUS\_FAILED,
+    WDGM\_LOCAL\_STATUS\_EXPIRED,
+    WDGM\_LOCAL\_STATUS\_DEACTIVATED
+  }
+}
+\lstset{language=c}
+
+
 %------------------------------------------------
 % TITLE PAGE
 %------------------------------------------------
@@ -87,10 +157,9 @@
     \item[Supervised Entity]
     \item[Checkpoint]
     \item[Mode]
-    \item[]
+%    \item[]
   \end{description}
 \end{frame}
-
 
 
 %================================================
@@ -131,17 +200,42 @@
 
 \begin{frame}
   \frametitle{Alive Supervision}
-  \begin{block}{Values/Variables}
-    Expected alive indications (EAI), property of mode, fixed value
-    Supervision reference cycle (SRC), property of mode, fixed value
-    Min margin (Min), property of mode, fixed value
-    Max margin (Max), property of mode, fixed value
-    Alive counter (AC)
-    Supervision cycle (SC)
+  \begin{block}{Statement}
+    A checkpoint that is monitored by alive supervision, should be
+    reached a number of times between each cycle.
   \end{block}
-  \begin{block}{The algorithm}
+\end{frame}
 
+\begin{frame}
+  \begin{block}{Values/Variables}
+    \begin{description}
+      \item[Expected alive indications] (EAI), property of mode, fixed
+        value from configuration
+      \item[Supervision reference cycle] (SRC), property of mode, fixed value
+        from configuration
+      \item[Min margin] (Min), property of mode, fixed value from configuration
+      \item[Max margin] (Max), property of mode, fixed value from configuration
+      \item[Alive counter] (AC)
+      \item[Supervision cycle] (SC)
+    \end{description}
   \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{block}{The algorithm}
+    \begin{lstlisting}
+      if (SC Mod SRC == 0)
+        // perform alive supervision
+        if (-Min <= AI - EAI <= Max)
+           Alive supervision is correct
+        else
+           Alive supervision is incorrect
+    \end{lstlisting}
+  \end{block}
+  Performed in the MainFunction, also increments the supervision
+  cycles.\\
+  CheckpointReached increments the alive indications for a certain
+  checkpoint.
 \end{frame}
 
 \begin{frame}
@@ -368,7 +462,7 @@
     \item generated command sequences of up to 120 commands (really no limit)
     \item 95\% starts with the command \verb!WdgM_Init!
     \item global statuses
-    %% kanske hör mer till implementationen men vi borde nämna procentsatser på
+    %% kanske hÃ¶r mer till implementationen men vi borde nÃ¤mna procentsatser pÃ¥
     %% globalstatusar kanske?
     % \item There is five global statuses, a functional system initiates to
     %   \verb!WDGM_GLOBAL_STATUS_DEACTIVATED!, and if the command
@@ -443,9 +537,9 @@
 %   \frametitle{Kolumner}
 %   \begin{columns}[c]
 %     \column{.45\textwidth}
-%     vänster
+%     vÃ¤nster
 %     \column{.5\textwidth}
-%     höger
+%     hÃ¶ger
 %   \end{columns}
 % \end{frame}
 
