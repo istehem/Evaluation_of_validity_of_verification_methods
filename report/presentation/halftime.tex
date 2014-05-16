@@ -157,7 +157,7 @@
     \item[Supervised Entity]
     \item[Checkpoint]
     \item[Mode]
-%    \item[]
+    \item[Global/Local status]
   \end{description}
 \end{frame}
 
@@ -198,6 +198,9 @@
   \end{itemize}
 \end{frame}
 
+%------------------------------------------------
+\subsection{Alive supervision}
+%------------------------------------------------
 \begin{frame}
   \frametitle{Alive Supervision}
   \begin{block}{Statement}
@@ -207,6 +210,7 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Alive Supervision}
   \begin{block}{Values/Variables}
     \begin{description}
       \item[Expected alive indications] (EAI), property of mode, fixed
@@ -222,10 +226,10 @@
 \end{frame}
 
 \begin{frame}[fragile]
+  \frametitle{Alive Supervision}
   \begin{block}{The algorithm}
     \begin{lstlisting}
       if (SC Mod SRC == 0)
-        // perform alive supervision
         if (-Min <= AI - EAI <= Max)
            Alive supervision is correct
         else
@@ -234,17 +238,96 @@
   \end{block}
   Performed in the MainFunction, also increments the supervision
   cycles.\\
-  CheckpointReached increments the alive indications for a certain
+  CheckpointReached increments the alive indications for the
   checkpoint.
+\end{frame}
+
+%------------------------------------------------
+\subsection{Deadline supervision}
+%------------------------------------------------
+\begin{frame}
+  \frametitle{Deadline Supervision}
+  \begin{block}{Statement}
+    Deadline supervision checks that the time it takes between two
+    checkpoints is within a marginal
+  \end{block}
 \end{frame}
 
 \begin{frame}
   \frametitle{Deadline Supervision}
+  \begin{block}{Values/Variables}
+    \begin{description}
+      \item[Start checkpoint] described by the configuration
+      \item[Stop checkpoint] described by the configuration
+      \item[Current timestamp]
+      \item[Min margin] fixed value from configuration
+      \item[Max margin] fixed value from configuration
+    \end{description}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Deadline Supervision}
+  \begin{block}{The algorithm}
+    \begin{lstlisting}
+    if( Start && Current == 0 )
+      // start the clock
+      Current = now()
+    else if( End && Min <= now() - Current <= Max )
+      Deadline supervision is correct
+    else
+      Deadline supervision is incorrect
+    \end{lstlisting}
+  \end{block}
+  Performed by CheckpointReached.
+\end{frame}
+
+%------------------------------------------------
+\subsection{Logical supervision}
+%------------------------------------------------
+\begin{frame}
+  \frametitle{Logical Supervision}
+  \begin{block}{Statement}
+    The program that is supervised by logical supervision should have
+    a specific execution flow. The flow can be visualized by a
+    graph.
+  \end{block}
 \end{frame}
 
 \begin{frame}
   \frametitle{Logical Supervision}
+  \begin{block}{Values/Variables}
+    \begin{description}
+      \item[Start checkpoints]
+      \item[End checkpoints]
+      \item[Transitions] between checkpoints
+      \item[Is started?] if the graph has been started
+      \item[Current checkpoint]
+    \end{description}
+  \end{block}
 \end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Logical Supervision}
+  \begin{block}{The algorithm}
+    \begin{lstlisting}
+      if( !Started && CP in Start checkpoints )
+        Started = true
+        Current = CP
+      else if( Started )
+        if( CP in End checkpoints )
+          Started = false
+          Current = null
+        // Causal ordered
+        else if( Current -> CP in Transitions )
+          Current = CP
+      else
+        Logical supervision is incorrect
+    \end{lstlisting}
+  \end{block}
+  Performed by CheckpointReached.
+\end{frame}
+
 %================================================
 \section{Implementation}
 %================================================
