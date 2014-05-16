@@ -95,22 +95,22 @@
   \frametitle{Functions}
   \begin{block}{Getters}
     \begin{itemize}
-      \item \lstinline!WdgM_GetVersionInfo!
-      \item \lstinline!WdgM_GetMode!
-      \item \lstinline!WdgM_GetLocalStatus!
-      \item \lstinline!WdgM_GetGlobalStatus!
-      \item \lstinline!WdgM_GetFirstExpiredSEID!
+      \item \lstinline!GetVersionInfo(VersionInfoType*)!
+      \item \lstinline!GetMode(ModeType*)!
+      \item \lstinline!GetLocalStatus(SupervisedEntityIdType, LocalStatusType*)!
+      \item \lstinline!GetGlobalStatus(GlobalStatusType*)!
+      \item \lstinline!GetFirstExpiredSEID(SupervisedEntityIdType*)!
     \end{itemize}
   \end{block}
 
-  \begin{block}{Setters}
+  \begin{block}{Setters (interesting)}
     \begin{itemize}
-      \item \lstinline!WdgM_Init!
-      \item \lstinline!WdgM_DeInit!
-      \item \lstinline!WdgM_PerformReset!
-      \item \lstinline!WdgM_SetMode!
-      \item \lstinline!WdgM_MainFunction!
-      \item \lstinline!WdgM_Checkpointreached!
+      \item \lstinline!Init(ConfigType*)!
+      \item \lstinline!DeInit()!
+      \item \lstinline!PerformReset()!
+      \item \lstinline!SetMode(ModeType, uint16)!
+      \item \lstinline!MainFunction()!
+      \item \lstinline!Checkpointreached(SupervisedEntityIdType, CheckpointIdType)!
     \end{itemize}
   \end{block}
 \end{frame}
