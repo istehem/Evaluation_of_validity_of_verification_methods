@@ -1,18 +1,32 @@
-AUTOSAR does not seem to be well fitted for functional safety due to
-the informal syntax. There are no specific model to follow, and lots
-of ambiguities.
+It is possible to achieve some functional safety using QuickCheck, at
+least within the software units. There are however a number of
+ISO~26262 requirements that is not possible to achieve with only a
+software testing tool. For example requirements that verifies the
+hardware specifications or how the safety plan should be made. It is
+hard to use the ISO~26262 V reference model if the software units do
+not follow system properties that has been verified by a system
+model. Because AUTOSAR is written with informal syntax, it can't be
+used to verify the software units. This means one must translate the
+AUTOSAR requirements to formal syntax and verify that the formal
+requirements means the same as the informal requirements.
 
-ISO 26262 development cycle, the V reference model, is hard to use if
-the software have not been developed for a verified system model. It
-is especially hard if there exist code that is written before the
-ISO-standard.
+It is important to not only measure the state space, but also the code
+coverage. This can also be done with the use of QuickCheck. It is easy
+to measure Erlang coverages, and it is also easy to specify which
+compiler QuickCheck should use to perform C code coverages.
+QuickCheck gathers information about the state space, which is
+outputted after a test has been run.
 
-Fault injection tests on the software level seems easy to implemented
-using QuickCheck. It is also easy to connect several AUTOSAR modules,
-and test it with QuickCheck.
+Both negative and positive testing can be implemented with the use of
+QuickCheck. Negative testing can be time-consuming because the program
+quickly comes to an absorbing state. It is therefor important to tweak
+the generators correctly.
 
-QuickCheck may be time-consuming when doing negative testing (future
-work).
+Integration tests can also easily be implemented, by connecting
+several AUTOSAR modules. When doing this even more ISO~26262
+requirements can be evaluated and verified.
 
-Measuring coverage of both C and Erlang code can be done between
-QuickCheck runs by the Erlang implementation.
+One needs to be aware of the configuration of the AUTOSAR module which
+is going to be implemented, because it may contain variables that is
+not safe to turn off. It may also be difficult to reach the whole
+state space if the configuration is to simple or to complex.
