@@ -1,14 +1,18 @@
-Autosar don't seem to be well fitted for functional safety due to informal
-syntax. There are no specific model, to follow etcetera, etcetera. Motivate
-more.
+AUTOSAR does not seem to be well fitted for functional safety due to
+the informal syntax. There are no specific model to follow, and lots
+of ambiguities.
 
-The V shape: model -> code -> test -> ... Hard using AUTOSAR. Especially using
-code that are written before the ISO-standard. It is a process from the
-beginning.
+ISO 26262 development cycle, the V reference model, is hard to use if
+the software have not been developed for a verified system model. It
+is especially hard if there exist code that is written before the
+ISO-standard.
 
+Fault injection tests on the software level seems easy to implemented
+using QuickCheck. It is also easy to connect several AUTOSAR modules,
+and test it with QuickCheck.
 
-Fault injection tests seems easy to implemented, in the software level, when having several AUTOSAR
-modules written in Erlang, and tested by QuichCheck. However QuickCheck may be
-time-consuming when using negative testing (future work).
+QuickCheck may be time-consuming when doing negative testing (future
+work).
 
-Measuring coverage of C and Erlang code are done within Quickcheck runs.
+Measuring coverage of both C and Erlang code can be done between
+QuickCheck runs by the Erlang implementation.
