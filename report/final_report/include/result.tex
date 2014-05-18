@@ -63,8 +63,6 @@ the requirements for functional safety, see section
 \subsection{Collapsing states}
 %% TODO: write something that QuickCheck automatically does this
 
-
-
 \section{State Machine}
 The watchdog manager's state machine is shown in figure
 \ref{FIG:GLOBALSTATUSES}. Its transitions depend on the changes of the
@@ -511,12 +509,11 @@ may not be totally verified. This is because the state are dependent
 of actual values of variables.
 
 \subsection{AUTOSAR}
-%% TODO: vad menas med meningen "To be able to reach the requirements /../"?
 Due to the informal syntax of AUTOSAR it is not good fitted for
 functional safety, since the informal syntax makes it possible for
-different interpretation. To be able to reach the requirements for
-ASIL (C,D?)  dependent AUTOSAR modules must be interpreted dependent
-of each other.
+different interpretation. To be able to reach the requirements for a higher
+ASIL classification, AUTOSAR modules must be interpreted dependently. In other
+means they must agree on the same model.
 
 One way of doing this is to interpret AUTOSAR in a model based
 language like SPIN and check that the model, after transforming it
@@ -555,7 +552,7 @@ therefor hard to analyze code that is written without the standard in
 consideration and then examine if it fulfills that standards
 requirements.
 
-\section{Fulfilled requirements}
+\subsection{Fulfilled requirements}
 ISO~26262 mention several several requirements that QuickCheck will be able to
 fulfil. Aside from general requirements like that a ''safety plan'' should be
 available, there are tests in which the hardware should be taken in
