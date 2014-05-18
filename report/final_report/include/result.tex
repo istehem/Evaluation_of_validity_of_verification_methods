@@ -221,25 +221,7 @@ state \lstinline!WDGM_GLOBAL_STATUS_FAILED! to the state
 \lstinline!WDGM_GLOBAL_STATUS_OK! according to figure
 \ref{FIG:GLOBALSTATUSES} is never made, see table
 \ref{TABLE:STATUSES_EXAMPLE}. The reason for that is that the alive
-functions must fail once and then continue without failures. Because
-the \lstinline!WdgM_MainFunction! handles alive supervision
-calculations, and the function \lstinline!WdgM_CheckpointReached!
-handles the increasing of the alive counters, a certain number of
-calls to \lstinline!WdgM_CheckpointReached! must be done before each
-\lstinline!WdgM_MainFunction!. It does not end there. Each checkpoint
-may have some logical supervision, so the order of the called
-checkpoints is important as well. It is also possible to set deadline
-supervision for a supervised entity. Both deadline supervision and
-logical supervision is handled by
-\lstinline!WdgM_CheckpointReached!. Deadline supervision demands that
-a configured amount of time must have elapsed since the start
-checkpoint was visited. Because AUTOSAR does not specify how the
-handling of time should be implemented, see sections
-\ref{SEC:CALLING_COMMANDS} and \ref{SEC:FUNCTIONAL_SAFETY_TIME}, we
-implemented the model as the C-code, with the use of
-\lstinline!WdgM_MainFunction!. This is possible because we know that
-\lstinline!WdgM_MainFunction! is called periodically.
-
+functions must fail once and then continue without failures.
 \begin{figure}[!ht]
   \begin{center}
     \subfigure[Shows percentage of each possible command executed]{
@@ -292,17 +274,16 @@ The distribution of API-calls seems, according to figure
 \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and
 \ref{FIG:COMMANDS_EXAMPLE}, to be the same for all configuration. The
 arguments to the API calls is however different, even though it is not
-seen in those plots.  The most interesting API calls is the ones that
+seen in those plots.
+
+\subsection{Important Functions}
+The most interesting API calls is the ones that
 modifies the internal state of the watchdog manager, see appendix
 \ref{APP:API_CALLS}, namely \lstinline!WdgM_Init!,
 \lstinline!WdgM_DeInit!, \lstinline!WdgM_SetMode!,
 \lstinline!WdgM_MainFunction!, and
 \lstinline!WdgM_CheckpointReached!. The reason for this is that they
-will influence the result of following API calls. The function
-\lstinline!WdgM_PerformReset!, could possibly also change the global
-state, but only if it is connected to the watchdog. In case the state
-machine is in an absorbing state, the perform reset function should
-call the watchdog, which will reset the watchdog manager.
+will influence the result of following API calls.
 
 The Init and DeInit functions can just change the global status
 between two states, and should only change the state of the watchdog
@@ -323,6 +304,27 @@ the main function and the checkpoint reached function. As can be seen
 in figures \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and
 \ref{FIG:COMMANDS_EXAMPLE}, they are also the two commands that are
 called the most.
+
+\subsubsection{\lstinline!WdgM_MainFunction!}
+The \lstinline!WdgM_MainFunction! handles alive supervision
+calculations, and the function \lstinline!WdgM_CheckpointReached!
+handles the increasing of the alive counters, a certain number of
+calls to \lstinline!WdgM_CheckpointReached! must be done before each
+\lstinline!WdgM_MainFunction!. It does not end there. Each checkpoint
+may have some logical supervision, so the order of the called
+checkpoints is important as well. It is also possible to set deadline
+supervision for a supervised entity. Both deadline supervision and
+logical supervision is handled by
+
+\subsubsection{\lstinline!WdgM_CheckpointReached!}
+\lstinline!WdgM_CheckpointReached!. Deadline supervision demands that
+a configured amount of time must have elapsed since the start
+checkpoint was visited. Because AUTOSAR does not specify how the
+handling of time should be implemented, see sections
+\ref{SEC:CALLING_COMMANDS} and \ref{SEC:FUNCTIONAL_SAFETY_TIME}, we
+implemented the model as the C-code, with the use of
+\lstinline!WdgM_MainFunction!. This is possible because we know that
+\lstinline!WdgM_MainFunction! is called periodically.
 
 \section{Coverage}
 \subsection{Erlang module}
@@ -380,7 +382,7 @@ is called after a call to the C-code is performed. Note that
 \lstinline!wdgm_next! module are totally independent of the C-code,
 see appendix \ref{APP:QUICKCHECK}. The \lstinline!wdgm_next! module
 has two helper modules \lstinline!wdgm_main! and
-\lstinline!wdgm_checkpointreached!  which changes the model state if
+\lstinline!wdgm_checkpointreached! which changes the model state if
 the main function or the checkpoint reached function was the most
 recently called functions in the C-code. The module
 \lstinline!wdgm_post! checks that AUTOSAR specification holds, by
@@ -480,7 +482,6 @@ marginal, then the deadline supervision for the supervised entity with the given
 checkpoint will fail. Because it is known that \lstinline!WdgM_MainFunction! should
 be called periodically, it could be used for the measurements of time. For each
 call of \lstinline!WdgM_MainFunction! tick a ``time'' counter.
-
 
 \subsection{Measurements of the state space}
 One way when trying the measure the state space is to collect
