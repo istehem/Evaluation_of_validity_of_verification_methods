@@ -120,7 +120,7 @@
     WDGM\_LOCAL\_STATUS\_DEACTIVATED
   }
 }
-\lstset{language=c}
+\lstset{language=c, mathescape}
 
 
 %------------------------------------------------
@@ -251,7 +251,7 @@
   \begin{block}{The algorithm}
     \begin{lstlisting}
       if (SC Mod SRC == 0)
-        if (-Min <= AI - EAI <= Max)
+        if (-Min $\in$ AI - EAI $\in$ Max)
            Alive supervision is correct
         else
            Alive supervision is incorrect
@@ -294,7 +294,7 @@
     if( Start && Current == 0 )
       // start the clock
       Current = now()
-    else if( End && Min <= now() - Current <= Max )
+    else if( End && Min $\leq$ now() - Current $\leq$ Max )
       Deadline supervision is correct
     else
       Deadline supervision is incorrect
@@ -332,11 +332,11 @@
   \frametitle{Logical Supervision}
   \begin{block}{The algorithm}
     \begin{lstlisting}
-      if( !Started && CP in Start checkpoints )
+      if( !Started && CP $\in$ Start checkpoints )
         Started = true
         Current = CP
       else if( Started )
-        if( CP in End checkpoints )
+        if( CP $\in$ End checkpoints )
           Started = false
           Current = null
         // Causal ordered
@@ -460,17 +460,17 @@
 
 \begin{frame}
   \frametitle{Good methods}
-  \begin{block}{Fix Model}
+  \begin{block}{``Fix'' Model}
     \begin{description}
       \item[+] We can continue testing
-      \item[-] Cant test c-code from another configuration or updated version etc.
+      \item[-] Can't test c-code from another configuration or updated version etc.
     \end{description}
   \end{block}
 
   \begin{block}{Fix C-code}
     \begin{description}
       \item[+] We can continue testing
-      \item[-] Need to get knowledge of the structure etc.
+      \item[-] Time consuming; need to get knowledge of the structure etc.
     \end{description}
   \end{block}
 
