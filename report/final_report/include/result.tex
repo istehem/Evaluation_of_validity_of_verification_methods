@@ -443,27 +443,27 @@ certain configuration parameters are set.
 \section{Evaluation of the solution}
 
 \subsection{Functional safety analysis}
+%% Fixed!?
 %% TODO: dela upp och skriv om meningen "Not even if it is assumed
 %% /../ follows the same constraints."
-Since one important part of the functional safety concept is that it
-must be taken in consideration during the whole development process,
-one can not simply say that QuickCheck makes it possible to acquire
-functional safety. There must first be a number of assumptions. Not
-even if it is assumed that every step in the development, until the
-actual implementation of the watchdog manager, satisfies the
-requirements one also has to assume that the remaining part of the
-development, towards a finished vehicle, follows the same
-constrains. If this is assumed, there is still one important
-assumption left before one can reason about how QuickCheck can
-benefit.  This assumption is based on that the model for the watchdog
-manager is correct, namely the AUTOSAR specification.
+Since one important part of the functional safety concept is that it must be
+taken in consideration during the whole development process, one can not simply
+say that QuickCheck makes it possible to acquire functional safety. There must
+first be a number of assumptions. Not even if it is assumed that every step in
+the development, until the actual implementation of the watchdog manager,
+satisfies the requirements for functional safety one also has to assume that the
+remaining part of the development, towards a finished vehicle, follows the same
+constrains. If this is assumed, there is still one important assumption left
+before one can reason about how QuickCheck can benefit.  This assumption is
+based on that the model for the watchdog manager is correct, namely the AUTOSAR
+specification.
 
 \subsubsection{Development error detection}
 \label{SEC:DEVERRORDETECT}
-We discovered that it existed a configuration parameter,
+It was discovered that it existed a configuration parameter,
 \lstinline!WdgMDevErrorDetect!, which would turn off functional safety
 checks. This made the C-code crash with segmentation fault as soon as
-we did negative testing. This could for example be null pointers or
+negative testing was performed. This could for example be null pointers or
 improper identification numbers. AUTOSAR is not specified enough for
 the parameter \lstinline!WdgMDevErrorDetect!  to be switched off. With
 functional safety in mind, this parameter must be on!
@@ -477,7 +477,7 @@ parameter given for each mode. Time is also needed for deadline supervision. In
 deadline supervision when a start checkpoint is reached, a timer should
 start. If the final checkpoint is not reached within the configured time
 marginal, then the deadline supervision for the supervised entity with the given
-checkpoint will fail. Because we know that \lstinline!WdgM_MainFunction! should
+checkpoint will fail. Because it is known that \lstinline!WdgM_MainFunction! should
 be called periodically, it could be used for the measurements of time. For each
 call of \lstinline!WdgM_MainFunction! tick a ``time'' counter.
 
