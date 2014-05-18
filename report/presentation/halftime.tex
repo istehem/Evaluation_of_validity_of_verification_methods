@@ -179,8 +179,11 @@
   \end{itemize}
 \end{frame}
 
+%----------------------------------------------
+\subsection{Supervision algorithms}
+%----------------------------------------------
 %------------------------------------------------
-\subsection{Alive supervision}
+%\subsection{Alive supervision}
 %------------------------------------------------
 \begin{frame}
   \frametitle{Alive Supervision}
@@ -224,7 +227,7 @@
 \end{frame}
 
 %------------------------------------------------
-\subsection{Deadline supervision}
+% \subsection{Deadline supervision}
 %------------------------------------------------
 \begin{frame}
   \frametitle{Deadline Supervision}
@@ -264,7 +267,7 @@
 \end{frame}
 
 %------------------------------------------------
-\subsection{Logical supervision}
+% \subsection{Logical supervision}
 %------------------------------------------------
 \begin{frame}
   \frametitle{Logical Supervision}
@@ -335,7 +338,7 @@
 \section{Implementation}
 %================================================
 %------------------------------------------------
-\subsubsection{C code}
+\subsection{C code}
 %------------------------------------------------
 \begin{frame}
   \frametitle{Generating the C byte code}
@@ -374,7 +377,10 @@
 \end{frame}
 
 %----------------------------------------------
-\subsection{Negative testing}
+\subsection{Testing}
+%----------------------------------------------
+%----------------------------------------------
+%\subsection{Negative testing}
 %----------------------------------------------
 
 \begin{frame}
@@ -387,7 +393,7 @@
 \end{frame}
 
 %----------------------------------------------
-\subsection{Positive testing}
+%\subsection{Positive testing}
 %----------------------------------------------
 
 \begin{frame}
@@ -400,7 +406,10 @@
 \end{frame}
 
 %================================================
-\section{How to handle bugs}
+\section{Bugs}
+%================================================
+%================================================
+% \section{How to handle bugs}
 %================================================
 %------------------------------------------------
 %\subsection{Less good methods}
@@ -454,10 +463,10 @@
 \end{frame}
 
 %================================================
-\section{The bugs have we found}
+% \section{The bugs have we found}
 %================================================
 %------------------------------------------------
-%\subsection{C-code}
+% \subsection{C-code}
 %------------------------------------------------
 
 \begin{frame}
@@ -509,7 +518,7 @@
 \end{frame}
 
 %================================================
-\section{Testing}
+\section{Coverage \& Statistics}
 %================================================
 %------------------------------------------------
 %\subsection{Coverage}
@@ -520,7 +529,7 @@
   \begin{itemize}
     \item line coverage of Erlang code (97.38\%)
     \item call coverage of C code(81\%)
-    \item state coverage
+    \item state coverage (100\% of valid transitions, 0\% of invalid transitions)
   \end{itemize}
 \end{frame}
 
@@ -533,95 +542,29 @@
   \begin{itemize}
     \item generated command sequences of up to 120 commands (really no limit)
     \item 95\% starts with the command \verb!WdgM_Init!
-    \item global statuses
-    %% kanske hör mer till implementationen men vi borde nämna procentsatser på
-    %% globalstatusar kanske?
-    % \item There is five global statuses, a functional system initiates to
-    %   \verb!WDGM_GLOBAL_STATUS_DEACTIVATED!, and if the command
-    %   \verb!WdgM_Init! is successfully called, the global status should be
-    %   \verb!WDGM_GLOBAL_STATUS_OK!. After that, only the commands
-    %   \verb!WdgM_Mainfunction! and \verb!WdgM_DeInit! can change the global
-    %   status.
   \end{itemize}
 \end{frame}
 
-%------------------------------------------------
-%\subsection{Suitable tests}
-%------------------------------------------------
-
+%================================================
+\section{Functional Safety}
+%================================================
 \begin{frame}[fragile]
-  \frametitle{Suitability of tests}
-  We generate lists of commands, most of which starts with
-  \verb!WdgM_Init! or it has \verb!WdgM_Init! in the first 2-4
-  commands. This is a precondition for all other functions except
-  \verb!WdgM_GetFirstExpiredSEId!.\\[0.5cm]
-
-  The functions that change the state considerably is
-  \verb!WdgM_Checkpointreached!, \verb!WdgM_SetMode! and
-  \verb!WdgM_Mainfunction!.  Therefor we prioritize these functions in
-  the generation.
+  \frametitle{DevErrorDetect}
+  Dangerous configuration flag \verb!DevErrorDetect!
 \end{frame}
 
 %================================================
 \section{Future work}
 %================================================
-
 \begin{frame}[fragile]
-  \frametitle{Functional Safety}
-  We will look at how this testing suites ISO26262. We have good hopes of
-  achieving some kind of classification.\\[0.5cm]
-
-  When the configuration flag \verb!DevErrorDetect! is off, you may get
-  segmentation faults.
-\end{frame}
-
-\begin{frame}
-  \frametitle{Bug report}
-  As stated, we have found a lot of bugs and we have modified the C-code.
-\end{frame}
-
-\begin{frame}
-  \frametitle{Shrinking....}
-  We found out that there is some problems when QuickCheck tries to
-  shrink failed tests. This is because most of the commands we send in
-  depend on the state, and QuickCheck just tries to shrink the generated
-  commands/arguments. Many of which will fail because some other
-  (previous) command has been neglected.\\[0.5cm]
-
-  It is possible to guide QuickCheck to shrink correctly, but it wont
-  be a part of this thesis, because time.
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Combining modules}
+  \frametitle{Integration testing}
   Another part of future work could be to implement a model for
   \verb!WdgIf! and get the two modules to work coherently.
 \end{frame}
-%------------------------------------------------
-
-% \begin{frame}
-%   \frametitle{Kolumner}
-%   \begin{columns}[c]
-%     \column{.45\textwidth}
-%     vänster
-%     \column{.5\textwidth}
-%     höger
-%   \end{columns}
-% \end{frame}
-
-% \begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
-%   \frametitle{Verbatim}
-%   \begin{example}[Theorem Slide Code]
-% \begin{verbatim}
-% Code
-% \end{verbatim}
-%   \end{example}
-% \end{frame}
 
 %================================================
 \section{Questions}
 %================================================
-
 \begin{frame}
   \Huge{\centerline{Questions?}}
 \end{frame}
