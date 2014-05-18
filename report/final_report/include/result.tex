@@ -274,17 +274,16 @@ The distribution of API-calls seems, according to figure
 \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and
 \ref{FIG:COMMANDS_EXAMPLE}, to be the same for all configuration. The
 arguments to the API calls is however different, even though it is not
-seen in those plots.  The most interesting API calls is the ones that
+seen in those plots.
+
+\subsection{Important Functions}
+The most interesting API calls is the ones that
 modifies the internal state of the watchdog manager, see appendix
 \ref{APP:API_CALLS}, namely \lstinline!WdgM_Init!,
 \lstinline!WdgM_DeInit!, \lstinline!WdgM_SetMode!,
 \lstinline!WdgM_MainFunction!, and
 \lstinline!WdgM_CheckpointReached!. The reason for this is that they
-will influence the result of following API calls. The function
-\lstinline!WdgM_PerformReset!, could possibly also change the global
-state, but only if it is connected to the watchdog. In case the state
-machine is in an absorbing state, the perform reset function should
-call the watchdog, which will reset the watchdog manager.
+will influence the result of following API calls.
 
 The Init and DeInit functions can just change the global status
 between two states, and should only change the state of the watchdog
@@ -306,6 +305,7 @@ in figures \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and
 \ref{FIG:COMMANDS_EXAMPLE}, they are also the two commands that are
 called the most.
 
+\subsubsection{\lstinline!WdgM_MainFunction!}
 The \lstinline!WdgM_MainFunction! handles alive supervision
 calculations, and the function \lstinline!WdgM_CheckpointReached!
 handles the increasing of the alive counters, a certain number of
@@ -315,6 +315,8 @@ may have some logical supervision, so the order of the called
 checkpoints is important as well. It is also possible to set deadline
 supervision for a supervised entity. Both deadline supervision and
 logical supervision is handled by
+
+\subsubsection{\lstinline!WdgM_CheckpointReached!}
 \lstinline!WdgM_CheckpointReached!. Deadline supervision demands that
 a configured amount of time must have elapsed since the start
 checkpoint was visited. Because AUTOSAR does not specify how the
