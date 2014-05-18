@@ -2,48 +2,7 @@
 
 \mode<presentation> {
 
-%\usetheme{default}
-%\usetheme{AnnArbor}
-%\usetheme{Antibes}
-%\usetheme{Bergen}
-%\usetheme{Berkeley}
-%\usetheme{Berlin}
-% \usetheme{Boadilla}
 \usetheme{CambridgeUS}
-%\usetheme{Copenhagen}
-%\usetheme{Darmstadt}
-%\usetheme{Dresden}
-%\usetheme{Frankfurt}
-%\usetheme{Goettingen}
-%\usetheme{Hannover}
-%\usetheme{Ilmenau}
-%\usetheme{JuanLesPins}
-%\usetheme{Luebeck}
-% \usetheme{Madrid}
-%\usetheme{Malmoe}
-%\usetheme{Marburg}
-%\usetheme{Montpellier}
-%\usetheme{PaloAlto}
-%\usetheme{Pittsburgh}
-%\usetheme{Rochester}
-%\usetheme{Singapore}
-%\usetheme{Szeged}
-%\usetheme{Warsaw}
-
-%\usecolortheme{albatross}
-%\usecolortheme{beaver}
-%\usecolortheme{beetle}
-%\usecolortheme{crane}
-%\usecolortheme{dolphin}
-%\usecolortheme{dove}
-%\usecolortheme{fly}
-%\usecolortheme{lily}
-%\usecolortheme{orchid}
-%\usecolortheme{rose}
-%\usecolortheme{seagull}
-%\usecolortheme{seahorse}
-%\usecolortheme{whale}
-%\usecolortheme{wolverine}
 
 \setbeamertemplate{footline}[page number]
 \setbeamertemplate{navigation symbols}{}
@@ -51,6 +10,7 @@
 
 \usepackage{listings}
 \usepackage{graphicx}
+\usepackage{tikz}
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
 
 \lstdefinestyle{erlang}{
@@ -349,13 +309,43 @@
   Performed by CheckpointReached.
 \end{frame}
 
+%------------------------------------------------
+\subsection{The state machine}
+%------------------------------------------------
+
+\begin{frame}
+  \frametitle{The state machine}
+  Each supervised entity has a local supervision status that the main
+  function changes depending on the results from the local supervision
+  functions.\\
+
+  The global status of the watchdog manager is calculated after the
+  local supervision status for all supervised entities.\\
+
+  The new global status also depends on which global status the
+  watchdog manager had before.
+\end{frame}
+
+\begin{frame}
+  \frametitle{The state machine}
+  \includegraphics[keepaspectratio, width=0.7\linewidth]{globalstatuses}
+\end{frame}
+
 %================================================
 \section{Implementation}
 %================================================
 %------------------------------------------------
-% \subsubsection{Stubs}
+\subsubsection{C code}
 %------------------------------------------------
+\begin{frame}
+  \frametitle{Generating the C byte code}
+  \include{configuration_to_bytecode}
+\end{frame}
 
+\begin{frame}
+  \frametitle{QuickCheck}
+  \include{bytecode_to_quickcheck}
+\end{frame}
 
 %------------------------------------------------
 \subsection{Erlang implementation of AUTOSAR}
@@ -364,28 +354,23 @@
 \begin{frame}
   \frametitle{How QuickCheck works}
   Generators, preconditions, postconditions, changes to model state.
-  \begin{figure}
-    \includegraphics[keepaspectratio, width=0.7\linewidth]{api_calls}
-  \end{figure}
-\end{frame}
 
-\begin{frame}
-  \frametitle{Example configuration}
-  Covers most of the model, still quite small.\\
-  DevErrorDetect is on.\\
+  \includegraphics[keepaspectratio, width=0.7\linewidth]{api_calls}
 \end{frame}
 
 %------------------------------------------------
-\subsection{Limitations}
+\subsection{Configurations}
 %------------------------------------------------
 
 \begin{frame}
-  \frametitle{DevErrorDetect}
+  \frametitle{Configurations}
+  Three different configurations\\
   \begin{itemize}
-    \item positive testing
-    \item missing requirements
-    \item segmentation faults
+    \item Example configuration
+    \item BSI configuration
+    \item Freescale configuration
   \end{itemize}
+  DevErrorDetect
 \end{frame}
 
 %----------------------------------------------
@@ -393,7 +378,12 @@
 %----------------------------------------------
 
 \begin{frame}
-  \frametitle{Red}
+  \frametitle{Negative testing}
+  \begin{itemize}
+    \item non existing arguments
+    \item null pointers
+    \item absorbing state
+  \end{itemize}
 \end{frame}
 
 %----------------------------------------------
@@ -401,33 +391,12 @@
 %----------------------------------------------
 
 \begin{frame}
-  \frametitle{Green}
-\end{frame}
-
-%------------------------------------------------
-\subsection{Tweaking the generators}
-%------------------------------------------------
-
-\begin{frame}
-  \frametitle{What test cases are interesting?}
+  \frametitle{Positive testing}
   \begin{itemize}
-    \item Negative testing
-    \begin{itemize}
-      \item good to cover bad arguments
-    \end{itemize}
-    \item Positive testing
-    \begin{itemize}
-      \item no absorbing state
-      \item correct arguments
-      \item correct command sequences
-    \end{itemize}
+    \item no absorbing state
+    \item correct arguments
+    \item correct command sequences
   \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \begin{figure}
-    \includegraphics[keepaspectratio, width=0.7\linewidth]{globalstatuses}
-  \end{figure}
 \end{frame}
 
 %================================================
@@ -438,7 +407,7 @@
 %------------------------------------------------
 
 \begin{frame}
-  \frametitle{Less good methods}
+  \frametitle{Bugs}
   \begin{block}{Report bug}
     \begin{description}
       \item[+] Not our job to correct the code
@@ -459,7 +428,7 @@
 %------------------------------------------------
 
 \begin{frame}
-  \frametitle{Good methods}
+  \frametitle{Bugs}
   \begin{block}{``Fix'' Model}
     \begin{description}
       \item[+] We can continue testing
@@ -477,8 +446,9 @@
   \begin{block}{Mocking}
     \begin{description}
       \item[+] We can continue testing
-      \item[-] Need to make a model for how it should work. The pitfall is if we
-        implement the mocked function after the state machine.
+      \item[-] Need to make a model for how it should work. The
+        pitfall is if we implement the mocked function after the state
+        machine.
     \end{description}
   \end{block}
 \end{frame}
@@ -547,12 +517,10 @@
 
 \begin{frame}
   \frametitle{Coverage}
-  % if our model behave like the c model, then we can test our models function
-  % coverage and check that we test all functions.
   \begin{itemize}
-    \item line coverage analysis (not absolute, due to bugs in C-code)
-    \item variables in the state
-    \item call coverage (not absolute)
+    \item line coverage of Erlang code (97.38\%)
+    \item call coverage of C code(81\%)
+    \item state coverage
   \end{itemize}
 \end{frame}
 
@@ -575,12 +543,6 @@
     %   \verb!WdgM_Mainfunction! and \verb!WdgM_DeInit! can change the global
     %   status.
   \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \begin{figure}
-    \includegraphics[keepaspectratio, width=0.7\linewidth]{globalstatuses}
-  \end{figure}
 \end{frame}
 
 %------------------------------------------------
