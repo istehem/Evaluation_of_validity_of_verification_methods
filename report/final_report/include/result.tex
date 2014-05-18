@@ -185,7 +185,11 @@ also one of the configurations that is actively used in lab
 environments. The state machine for the global status is totally
 covered by running QuickCheck, see table
 \ref{TABLE:STATUSES_FREESCALE} and figure
-\ref{FIG:STATUSES_FREESCALE}.
+\ref{FIG:STATUSES_FREESCALE}. Locking at table \ref{TABLE:STATUSES_FREESCALE}
+one can see that some transitions are done very seldom. This is due to a lot of
+things must be fulfilled for those transitions to occur, which also highly depend on
+the configuration supplied. Due to the randomness factor of QuickCheck such cases are
+hard to reach.
 
 %% TODO: Fyll på text, beskriv resultaten. Det är i dagsläget den
 %% kortaste texten om konfigurationer, trots att det är den viktigaste
