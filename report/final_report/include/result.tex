@@ -44,10 +44,24 @@ were found. This emphasizes the importance of finding tests that are
 critical for the system and not lean the results only on line
 coverage.
 
-%% TODO: Skriva att viktigaste prioriteringen är logical supervision.
-%% TODO: Skriv om internal vs external graphs/supervision
 Since there are different supervisions of checkpoints that can be
-configured at the same time the failure reason ...
+configured at the same time, the supervision functions must be
+prioritized when generating command sequences and arguments. A
+checkpoint that is generated to many times can for example cause the
+alive supervision to fail because it goes outside of its bound. The
+same can happen if it is not generated enough. If a checkpoint is
+generated only because it needs to be inside of its alive supervision
+bound, then there is a chance that rules for deadline or logical
+supervision is violated. The easiest way to implement prioritized
+checkpoint generation is to start with logical supervision. This is
+because logical supervision follows certain graphs; transitions
+between checkpoints. Logical supervision maintains both internal
+graphs, inside of each supervised entity, and external graphs which is
+transitions between supervised entities. It is easy to get
+the current next checkpoint(s) for all graphs, and then check whether
+a checkpoint also is configured for alive or deadline supervision. If
+it is, calculate the status for those supervision functions and then
+choose which checkpoint should be selected.
 
 \subsection{Tweaking the generators}
 The generators did not need to be tweaked much when performing
@@ -55,13 +69,18 @@ negative testing since if the commands are uniformly random generated
 by QuickCheck a invalid behavior will quickly arise. However, with a
 small probability of generation, null pointers were also passed as
 arguments to the API-commands to see how the system behaved. Turning
-of the configuration parameter \lstinline!'WdgMDevErrorDetect'! caused
+of the configuration parameter \lstinline!WdgMDevErrorDetect! caused
 segmentation faults when passing null pointers. This does not follow
 the requirements for functional safety, see section
 \ref{SEC:DEVERRORDETECT}.
 
 \subsection{Collapsing states}
-%% TODO: write something that QuickCheck automatically does this
+%% TODO: Utfyllnad
+QuickCheck automatically collapse the states when a test fails. This
+process is called shrinking. After a command sequence have been
+generated and failed, QuickCheck tries to remove commands in the
+sequence in order to find the minimal sequence. This makes it easier
+to find where in the code the failure arouse from.
 
 \section{State Machine}
 The watchdog manager's state machine is shown in figure
