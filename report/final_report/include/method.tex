@@ -122,8 +122,6 @@ AUTOSAR specification would be easier to find. This since two
 different interpretation of the same specification would eventually be
 available.
 
-
-
 \subsection{Iterative strategy}
 \label{SEC:ITERATIVE}
 The implementation of the AUTOSAR module in Erlang was done in an
@@ -181,6 +179,28 @@ specification, a great method for understanding, was to examine the C
 code. Even though QuickCheck can be used to test libraries when the
 actually source code is not available.
 
+\section{Implementation structure}
+The final implementation consisted of several Erlang modules. Table
+\ref{TABLE:MODULES} lists the modules defining the watchdog manager.
+There are also other modules that reads configuration files, defines the
+generators, measuring code coverage etcetera, those modules have however no
+no equivalence in the C-code.
+
+\begin{table}[!ht]
+\caption{Erlang modules defining the watchdog manager}
+\label{TABLE:MODULES}
+\begin{tabular}{l|p{0.7\linewidth}}
+\hline
+wdgm\_helper            & Helper used by the watchdog manager implementation \\
+wdgm\_checkpointreached & Erlang version of checkpointreached, see \ref{SEC:CHECKPOINTREACHED} \\
+wdgm\_main              & Erlang version of the main function, see \ref{SEC:MAINFUNCTION} \\
+wdgm\_pre               & Checks for AUTOSAR preconditions \\
+wdgm\_post              & Checks for AUTOSAR postconditions \\
+wdgm\_next              & Defines the watchdog manager model, uses
+wdgm\_checkpointreached, wdgm\_main and wdgm\_helper
+\end{tabular}
+\end{table}
+
 \section{Evaluation of the Implementation}
 If tests come back positive, it does not really say much more than
 that those tests evaluated to true. There is a need to evaluate what
@@ -190,7 +210,11 @@ was actually tested.
 When the module was fully implemented in Erlang code there had to be
 some assurance of that every piece of code in the C implementation was
 actually tested.  Code coverage for the Erlang implementation was
-measured using the Erlang module \emph{cover}. To be able to measure
+measured using the Erlang module \emph{cover}. The coverage were only measured
+on the modules listed in \ref{TABLE:MODULES} since they are the only modules
+that defines the Erlang version of the watchdog manager.
+
+To be able to measure
 the code coverage of the C-code the commercial tool Bullseye Coverage
 was used. When using those tools it was easy to see that the result
 was not good enough. The main problem seemed to be that the WdgM was

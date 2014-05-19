@@ -322,6 +322,7 @@ Sets a new mode for the watchdog manager.
 \subsection{WdgM\_GetMode}
 Returns the current mode for the watchdog manager\footnotemark[\thefootnote].
 \subsection{WdgM\_CheckpointReached}
+\label{SEC:CHECKPOINTREACHED}
 Performs deadline and logical supervision for a given supervised entity.
 \subsection{WdgM\_GetLocalStatus}
 Returns the local status of a supervised entity\footnotemark[\thefootnote].
@@ -334,6 +335,7 @@ thereby causing the hardware watchdogs to cause an external hardware reset.
 Returns the supervised entity that first reached the state
 \emph{WDGM\_LOCAL\_STATUS\_EXPIRED}\footnotemark[\thefootnote].
 \subsection{WdgM\_MainFunction}
+\label{SEC:MAINFUNCTION}
 The main function is periodically called, it first updates the local statuses by
 running alive supervision for the supervised entities and then sets the global
 status depending on the current state of the watchdog manager; this includes the
