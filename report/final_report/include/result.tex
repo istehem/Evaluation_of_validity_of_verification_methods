@@ -444,69 +444,25 @@ certain configuration parameters are set.
 \end{figure}
 
 
-\section{Evaluation of the solution}
+\section{Functional Safety analysis}
+The $V$ model used by ISO~26262 requires that a certain work flow is
+taken into consideration during the whole development process. It is
+therefor hard to analyze code that is written without the standard in
+consideration and then examine if it fulfills that standards
+requirements.
 
-\subsection{Functional safety analysis}
-%% Fixed!?
-%% TODO: dela upp och skriv om meningen "Not even if it is assumed
-%% /../ follows the same constraints."
-Since one important part of the functional safety concept is that it must be
-taken in consideration during the whole development process, one can not simply
-say that QuickCheck makes it possible to acquire functional safety. There must
-first be a number of assumptions. Not even if it is assumed that every step in
-the development, until the actual implementation of the watchdog manager,
-satisfies the requirements for functional safety one also has to assume that the
-remaining part of the development, towards a finished vehicle, follows the same
-constrains. If this is assumed, there is still one important assumption left
-before one can reason about how QuickCheck can benefit.  This assumption is
-based on that the model for the watchdog manager is correct, namely the AUTOSAR
+Since one important part of the functional safety concept is that it
+must be taken in consideration during the whole development process,
+one can not simply say that QuickCheck makes it possible to acquire
+functional safety. There must first be a number of assumptions. If
+every development step before the implementation of the watchdog
+manager satisfies the requirements for functional safety, one also
+must follow the same constraints in the remaining part of the
+development life cycle to achieve functional safety. If this is
+assumed, there is still one important assumption left before one can
+reason about how QuickCheck can benefit. This assumption is based on
+that the model for the watchdog manager is correct, namely the AUTOSAR
 specification.
-
-\subsubsection{Development error detection}
-\label{SEC:DEVERRORDETECT}
-It was discovered that it existed a configuration parameter,
-\lstinline!WdgMDevErrorDetect!, which would turn off functional safety
-checks. This made the C-code crash with segmentation fault as soon as
-negative testing was performed. This could for example be null pointers or
-improper identification numbers. AUTOSAR is not specified enough for
-the parameter \lstinline!WdgMDevErrorDetect!  to be switched off. With
-functional safety in mind, this parameter must be on!
-
-\subsubsection{Definition of time}
-\label{SEC:FUNCTIONAL_SAFETY_TIME}
-In AUTOSAR time is specified as seconds and there are two functions that need to
-keep track of the time. First it is the main function that needs to be scheduled
-periodically by the runtime environment. This is done with a configuration
-parameter given for each mode. Time is also needed for deadline supervision. In
-deadline supervision when a start checkpoint is reached, a timer should
-start. If the final checkpoint is not reached within the configured time
-marginal, then the deadline supervision for the supervised entity with the given
-checkpoint will fail. Because it is known that \lstinline!WdgM_MainFunction! should
-be called periodically, it could be used for the measurements of time. For each
-call of \lstinline!WdgM_MainFunction! tick a ``time'' counter.
-
-\subsection{Measurements of the state space}
-One way when trying the measure the state space is to collect
-statistical data during the execution of the tests. It is hard to say
-much about the whole systems state space since it is very large, due
-to the state explosion problem. In the case of an AUTOSAR module the
-state space also varies on the configuration in use, since features
-and supervision features can be configured.  However looking at
-certain parts that are considered to be important for the system, much
-more can be said. For instance when examining the internal graphs of
-the watchdog manager, one can easily see that every node in those
-graphs are visited.
-
-Measuring the code coverage can in itself tell if important parts of
-the state space are covered or not. This is possible because the parts
-of the code that changes the state of the watchdog manager are not
-covered. These parts can however be dead or redundant code, in the
-worst case, if something unexpected happens to the hardware, which is
-beyond this thesis. Total code coverage is hard, or may be even
-impossible to reach.  Even if all lines of code in for example an
-algorithmic part of the watchdog manager are covered this algorithm
-may not be totally verified. This is because the state are dependent
-of actual values of variables.
 
 \subsection{AUTOSAR}
 Due to the informal syntax of AUTOSAR it is not good fitted for
@@ -545,14 +501,31 @@ original module was done correctly. This will assure that the C code
 are a correct translation of the original model that is known to be
 correct.
 
-\subsection{Achieving functional safety}
-The $V$ model used by ISO~26262 requires that a certain work flow is
-taken into consideration during the whole development process. It is
-therefor hard to analyze code that is written without the standard in
-consideration and then examine if it fulfills that standards
-requirements.
+\subsubsection{Development error detection}
+\label{SEC:DEVERRORDETECT}
+It was discovered that it existed a configuration parameter,
+\lstinline!WdgMDevErrorDetect!, which would turn off functional safety
+checks. This made the C-code crash with segmentation fault as soon as
+negative testing was performed. This could for example be null pointers or
+improper identification numbers. AUTOSAR is not specified enough for
+the parameter \lstinline!WdgMDevErrorDetect!  to be switched off. With
+functional safety in mind, this parameter must be on!
 
-\subsection{Fulfilled requirements}
+\subsubsection{Definition of time}
+\label{SEC:FUNCTIONAL_SAFETY_TIME}
+In AUTOSAR time is specified as seconds and there are two functions that need to
+keep track of the time. First it is the main function that needs to be scheduled
+periodically by the runtime environment. This is done with a configuration
+parameter given for each mode. Time is also needed for deadline supervision. In
+deadline supervision when a start checkpoint is reached, a timer should
+start. If the final checkpoint is not reached within the configured time
+marginal, then the deadline supervision for the supervised entity with the given
+checkpoint will fail. Because it is known that \lstinline!WdgM_MainFunction! should
+be called periodically, it could be used for the measurements of time. For each
+call of \lstinline!WdgM_MainFunction! tick a ``time'' counter.
+
+
+\subsection{Fulfilled ISO~26262 requirements}
 ISO~26262 mention several several requirements that QuickCheck will be able to
 fulfil. Aside from general requirements like that a ''safety plan'' should be
 available, there are tests in which the hardware should be taken in
@@ -563,6 +536,7 @@ watchdog manager module has been tested, but should be possible to run after
 implementing more modules in Erlang code. QuickCheck has a module for mocking C
 code, see appendix \ref{SEC:QuickCheckIntro}, which could possible also be used
 for running such tests.
+
 \subsection{Confidence interval}
 
 %% how certain is the verification
@@ -575,3 +549,27 @@ for running such tests.
 %% *.erl: 2006 | 1470
 %% *.hrl: 68 | 64
 %% total erlang: 2074 | 1534
+
+
+\subsection{Measurements of the state space}
+One way when trying the measure the state space is to collect
+statistical data during the execution of the tests. It is hard to say
+much about the whole systems state space since it is very large, due
+to the state explosion problem. In the case of an AUTOSAR module the
+state space also varies on the configuration in use, since features
+and supervision features can be configured.  However looking at
+certain parts that are considered to be important for the system, much
+more can be said. For instance when examining the internal graphs of
+the watchdog manager, one can easily see that every node in those
+graphs are visited.
+
+Measuring the code coverage can in itself tell if important parts of
+the state space are covered or not. This is possible because the parts
+of the code that changes the state of the watchdog manager are not
+covered. These parts can however be dead or redundant code, in the
+worst case, if something unexpected happens to the hardware, which is
+beyond this thesis. Total code coverage is hard, or may be even
+impossible to reach.  Even if all lines of code in for example an
+algorithmic part of the watchdog manager are covered this algorithm
+may not be totally verified. This is because the state are dependent
+of actual values of variables.
