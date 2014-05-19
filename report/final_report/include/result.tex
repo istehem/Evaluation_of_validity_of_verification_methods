@@ -515,8 +515,6 @@ C in itself is also a formal language but C is not good fitted to
 formally defining the actual requirements of AUTOSAR. This is for
 instance because of its low level nature.
 
-%% TODO: Trycka lite extra på att vi inte kunde göra något åt att C
-%% modellen redan fanns?
 In this thesis a defined AUTOSAR model already existed, written in C
 code, and then an other model was later implemented in Erlang and
 compared against the first model. A better work flow, with functional
@@ -531,7 +529,10 @@ different interpretations. After the two implementations of the model,
 compare those using QuickCheck. If there are no bugs, then the
 original model was translated into C code correctly.
 
-\subsubsection{Development error detection}
+The proposed work flow would require a lot of work which, is beyond the scope of
+this thesis. For example the C-code needs to be rewritten.
+
+\subsubsectiFor example theerror detection}
 \label{SEC:DEVERRORDETECT}
 It was discovered that it existed a configuration parameter,
 \lstinline!WdgMDevErrorDetect!, which would turn off functional safety
