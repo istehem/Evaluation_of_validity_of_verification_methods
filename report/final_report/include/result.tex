@@ -44,10 +44,24 @@ were found. This emphasizes the importance of finding tests that are
 critical for the system and not lean the results only on line
 coverage.
 
-%% TODO: Skriva att viktigaste prioriteringen är logical supervision.
-%% TODO: Skriv om internal vs external graphs/supervision
 Since there are different supervisions of checkpoints that can be
-configured at the same time the failure reason ...
+configured at the same time, the supervision functions must be
+prioritized when generating command sequences and arguments. A
+checkpoint that is generated to many times can for example cause the
+alive supervision to fail because it goes outside of its bound. The
+same can happen if it is not generated enough. If a checkpoint is
+generated only because it needs to be inside of its alive supervision
+bound, then there is a chance that rules for deadline or logical
+supervision is violated. The easiest way to implement prioritized
+checkpoint generation is to start with logical supervision. This is
+because logical supervision follows certain graphs; transitions
+between checkpoints. Logical supervision maintains both internal
+graphs, inside of each supervised entity, and external graphs which is
+transitions between supervised entities. It is easy to get
+the current next checkpoint(s) for all graphs, and then check whether
+a checkpoint also is configured for alive or deadline supervision. If
+it is, calculate the status for those supervision functions and then
+choose which checkpoint should be selected.
 
 \subsection{Tweaking the generators}
 The generators did not need to be tweaked much when performing
@@ -55,13 +69,18 @@ negative testing since if the commands are uniformly random generated
 by QuickCheck a invalid behavior will quickly arise. However, with a
 small probability of generation, null pointers were also passed as
 arguments to the API-commands to see how the system behaved. Turning
-of the configuration parameter \lstinline!'WdgMDevErrorDetect'! caused
+of the configuration parameter \lstinline!WdgMDevErrorDetect! caused
 segmentation faults when passing null pointers. This does not follow
 the requirements for functional safety, see section
 \ref{SEC:DEVERRORDETECT}.
 
 \subsection{Collapsing states}
-%% TODO: write something that QuickCheck automatically does this
+%% TODO: Utfyllnad
+QuickCheck automatically collapse the states when a test fails. This
+process is called shrinking. After a command sequence have been
+generated and failed, QuickCheck tries to remove commands in the
+sequence in order to find the minimal sequence. This makes it easier
+to find where in the code the failure arouse from.
 
 \section{State Machine}
 The watchdog manager's state machine is shown in figure
@@ -373,9 +392,8 @@ complexity of the configurations seem to play an important
 part. This is not surprising because a more complex configuration may
 drastically increase the state space.
 
-%% TODO: modulnamnen nämns lite hux flux. Helt plötsligt så pratar vi
-%% om wdgm_pre väldigt naturligt.
-The results of the coverages after running all configuration can be
+The Erlang model is separated into a number of files. The results of
+the coverages of these files, after running all configuration, can be
 seen in table \ref{TABLE:COVERAGE}. The module \lstinline!wdgm_pre!
 checks preconditions of the model state; constraining the model states
 ability to change. This will affect the \lstinline!wdgm_next!
@@ -410,8 +428,18 @@ wdgm\_next              & 37  & 37 & 100\%
 \end{center}
 \end{table}
 
-%% TODO: Skriv varför allt inte är täkt i Erlang koden.
-The total line coverage results is \linecoverage.
+The total line coverage results is \linecoverage. The reason we don't
+achieve 100\% code coverage depends on certain limitations. Some lines
+can not be covered when the configuration parameter
+\lstinline!WdgMDevErrorDetect! is true. On the other hand, if it is
+false, then the C model will fail with a segmentation fault and the
+Erlang model will not be covered any way. There are also a number of
+implementation specific lines, which an other C code model might
+reach but the one that we had. There is also places that depended on
+the configuration to be more simple. A good idea is to supply
+configurations that only has specific supervision functions
+configured. Then it should be possible to prioritize only that
+supervision function and get better coverages.
 
 \subsection{C-code}
 Bullseye Coverage was used to analyse the coverage of the C-code. The
@@ -485,21 +513,21 @@ C in itself is also a formal language but C is not good fitted to
 formally defining the actual requirements of AUTOSAR. This is for
 instance because of its low level nature.
 
-%% TODO: Är inte detta bar utfyllndad?
-What is done in this thesis is that given a formally defined AUTOSAR
-model in C define an other model in Erlang and check the two models
-against each other.  A better work flow had been, define AUTOSAR in a
-model based language, check that this model holds, implement the
-actual C-code following the formal notation of the previous
-constructed model. Implementing the C-code would be much easier
-because there are no room for different interpretations. After the C
-code is written write model in Erlang, following the model written in
-the model based language, again there are no room for different
-interpretations. Check the Erlang module, using QuikCheck, against the
-C-code and look for bugs and that the translation into C of the
-original module was done correctly. This will assure that the C code
-are a correct translation of the original model that is known to be
-correct.
+%% TODO: Trycka lite extra på att vi inte kunde göra något åt att C
+%% modellen redan fanns?
+In this thesis a defined AUTOSAR model already existed, written in C
+code, and then an other model was later implemented in Erlang and
+compared against the first model. A better work flow, with functional
+safety in mind, had been to define AUTOSAR in a model based language
+and check that this model holds. Then implement the actual C-code
+following the formal notation of the previous constructed
+model. Implementing the C-code would be easier because then there are
+no room for different interpretations. After the C code is
+implemented, write the model in Erlang following the formal model
+written in the model based language. Then there are again no room for
+different interpretations. After the two implementations of the model,
+compare those using QuickCheck. If there are no bugs, then the
+original model was translated into C code correctly.
 
 \subsubsection{Development error detection}
 \label{SEC:DEVERRORDETECT}
