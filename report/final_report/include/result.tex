@@ -485,21 +485,21 @@ C in itself is also a formal language but C is not good fitted to
 formally defining the actual requirements of AUTOSAR. This is for
 instance because of its low level nature.
 
-%% TODO: Är inte detta bar utfyllndad?
-What is done in this thesis is that given a formally defined AUTOSAR
-model in C define an other model in Erlang and check the two models
-against each other.  A better work flow had been, define AUTOSAR in a
-model based language, check that this model holds, implement the
-actual C-code following the formal notation of the previous
-constructed model. Implementing the C-code would be much easier
-because there are no room for different interpretations. After the C
-code is written write model in Erlang, following the model written in
-the model based language, again there are no room for different
-interpretations. Check the Erlang module, using QuikCheck, against the
-C-code and look for bugs and that the translation into C of the
-original module was done correctly. This will assure that the C code
-are a correct translation of the original model that is known to be
-correct.
+%% TODO: Trycka lite extra på att vi inte kunde göra något åt att C
+%% modellen redan fanns?
+In this thesis a defined AUTOSAR model already existed, written in C
+code, and then an other model was later implemented in Erlang and
+compared against the first model. A better work flow, with functional
+safety in mind, had been to define AUTOSAR in a model based language
+and check that this model holds. Then implement the actual C-code
+following the formal notation of the previous constructed
+model. Implementing the C-code would be easier because then there are
+no room for different interpretations. After the C code is
+implemented, write the model in Erlang following the formal model
+written in the model based language. Then there are again no room for
+different interpretations. After the two implementations of the model,
+compare those using QuickCheck. If there are no bugs, then the
+original model was translated into C code correctly.
 
 \subsubsection{Development error detection}
 \label{SEC:DEVERRORDETECT}
