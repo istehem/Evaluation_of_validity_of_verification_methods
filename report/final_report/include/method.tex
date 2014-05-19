@@ -1,15 +1,9 @@
 \section{Existing verification tools}
-%% TODO: Skriv om stycket.
-Software unit testing can be achieved by almost any tool.
-The choice of verification tool is therefore not the most
-interesting when it comes to this. One can of course take the
-simplicity to achieve good unit testing into account, but it is not
-what makes a verification tool unique for this projects goals.
-% Consequently this phase is not the most interesting when it comes to
-% the choice of a tool verification. Of course one can take the
-% simplicity to achieve good unit testing into account, but it is
-% not what makes a verification tool especially unique for this projects
-% goals.
+Software unit testing can be achieved by almost any tool.  The choice
+of verification tool is therefore not the most interesting when it
+comes to pure unit testing. One can of course take the simplicity to
+achieve good unit testing into account, but it is not what makes a
+verification tool unique for this projects goals.
 
 %% TODO: Är det inte en del av Avgränsningarna och inte Metodik?
 Since the purpose is about benchmarking software the phase
@@ -26,7 +20,11 @@ combine tests and requirements from different modules? Is it possible
 to test functional safety concept from this combination, for example
 by corrupting some software elements?
 
-% TODO: Introducera SPIN & Parasoft
+Two tools that can be used in order to achieve better code and some
+functional safety is SPIN and Parasoft C/C++test. While SPIN can
+verify the model, Parasoft C/C++test defines policies on work flow as
+well as coding.
+
 \subsection{SPIN}
 SPIN is used to trace logical design errors in distributed software
 \cite{SPIN:manual}. It supports a high level language, called Promela,
@@ -65,8 +63,6 @@ are not immutable. This gives raise to the idea of a state based
 testing tool.
 
 \section{Choice of AUTOSAR module to test}
-%% TODO: "that it was possible", the goal was to see if it was
-%% possible to use quickcheck...
 %% TODO: "less complicated" in what way?
 When deciding which AUTOSAR module to test, there were a number of
 modules up for discussion. Since the goal was to get a proof of
@@ -112,7 +108,6 @@ The translating process was done iteratively as described in section
 \ref{SEC:ITERATIVE}.
 
 \subsection{Independence of the Erlang implementation}
-%% TODO: errors or faults?
 The implementation in Erlang was done independent from the design
 choices in the C-code. The idea was to ensure an independent model; if
 the model was inspired by the C-code, it could have transmitted
@@ -155,18 +150,22 @@ continued? Since QuickCheck terminates as soon as it finds a counter
 example, a method for resolving conflicts was needed to be able to run
 further tests. Some alternatives were discussed.
 
-%% TODO: Pros/Cons mellan alternativen
 \begin{enumerate}
-  \item Fix the C-code, in other words change the source code.
+  \item Fix the C-code, in other words change the source
+    code. Knowledge about the structure in the C code is needed.
     \label{ENUMERATE:FixCCode}
-  \item Mocking, in other words simulate different C-code output.
+  \item Mocking, in other words simulate different C code output. The
+    pitfall is if that each mocked function eliminates all bugs in the
+    function. Not only a selected subset; at most one bug per function
+    can then be found.
   \item Change the Erlang module to a faulty behavior to follow the C
-    implementation.
+    implementation. The problem is that other configurations or
+    updated versions of the C code will show up as faulty when using
+    the same Erlang model.
 \end{enumerate}
 
-%% TODO: Why was item 1 chosen?
-Item \ref{ENUMERATE:FixCCode} was chosen, see section
-\ref{sec:handlebugs}.
+Item \ref{ENUMERATE:FixCCode} was chosen because this was the most dynamic
+and allowed further bugs to be found, see section \ref{sec:handlebugs}.
 
 When thoroughly reading the AUTOSAR API not only ambiguous rules were
 found but also rules that contradicted each other were recognized. In
