@@ -57,11 +57,11 @@ checkpoint generation is to start with logical supervision. This is
 because logical supervision follows certain graphs; transitions
 between checkpoints. Logical supervision maintains both internal
 graphs, inside of each supervised entity, and external graphs which is
-transitions between supervised entities. It is easy to get
-the current next checkpoint(s) for all graphs, and then check whether
-a checkpoint also is configured for alive or deadline supervision. If
-it is, calculate the status for those supervision functions and then
-choose which checkpoint should be selected.
+transitions between supervised entities. It is easy to get next
+possible checkpoints for all graphs, and then check whether one of
+those checkpoints also is configured for alive or deadline
+supervision. If it is, calculate the status for those supervision
+functions and then choose which checkpoint should be selected.
 
 \subsection{Tweaking the generators}
 The generators did not need to be tweaked much when performing
@@ -312,7 +312,7 @@ when the watchdog is in either \lstinline!WDGM_GLOBAL_STATUS_OK! or
 \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!, according to figure
 \ref{FIG:GLOBALSTATUSES}. If this happens they will change the
 internal state of the watchdog independently of previous called
-commands. The behaviour of these commands will therefor not vary much.
+commands. The behavior of these commands will therefor not vary much.
 
 \lstinline!WdgM_SetMode! changes the mode, but should retain the
 global and local statuses of the supervised entities. It should not be
@@ -335,17 +335,17 @@ calls to \lstinline!WdgM_CheckpointReached! must be done before each
 may have some logical supervision, so the order of the called
 checkpoints is important as well. It is also possible to set deadline
 supervision for a supervised entity. Both deadline supervision and
-logical supervision is handled by
+logical supervision is handled by \lstinline!WdgM_CheckpointReached!.
 
 \subsubsection{\lstinline!WdgM_CheckpointReached!}
-\lstinline!WdgM_CheckpointReached!. Deadline supervision demands that
-a configured amount of time must have elapsed since the start
-checkpoint was visited. Because AUTOSAR does not specify how the
-handling of time should be implemented, see sections
-\ref{SEC:CALLING_COMMANDS} and \ref{SEC:FUNCTIONAL_SAFETY_TIME}, we
-implemented the model as the C-code, with the use of
-\lstinline!WdgM_MainFunction!. This is possible because we know that
-\lstinline!WdgM_MainFunction! is called periodically.
+Deadline supervision demands that a configured amount of time must
+have elapsed since the start checkpoint was visited. Because AUTOSAR
+does not specify how the handling of time should be implemented, see
+sections \ref{SEC:CALLING_COMMANDS} and
+\ref{SEC:FUNCTIONAL_SAFETY_TIME}, we implemented the model as the
+C-code, with the use of \lstinline!WdgM_MainFunction!. This is
+possible because we know that \lstinline!WdgM_MainFunction! is called
+periodically.
 
 \section{Coverage}
 \subsection{Erlang module}
@@ -444,7 +444,7 @@ configured. Then it should be possible to prioritize only that
 supervision function and get better coverages.
 
 \subsection{C-code}
-Bullseye Coverage was used to analyse the coverage of the C-code. The
+Bullseye Coverage was used to analyze the coverage of the C-code. The
 results show that the decision coverage is over {\bullseyecoverage}
 and all functions except for two is covered, see figure
 \ref{FIG:BULLSEYE}. The reason that there are functions which are not
@@ -546,7 +546,7 @@ functional safety in mind, this parameter must be on!
 \label{SEC:FUNCTIONAL_SAFETY_TIME}
 In AUTOSAR time is specified as seconds and there are two functions that need to
 keep track of the time. First it is the main function that needs to be scheduled
-periodically by the runtime environment. This is done with a configuration
+periodically by the run-time environment. This is done with a configuration
 parameter given for each mode. Time is also needed for deadline supervision. In
 deadline supervision when a start checkpoint is reached, a timer should
 start. If the final checkpoint is not reached within the configured time
@@ -558,7 +558,7 @@ call of \lstinline!WdgM_MainFunction! tick a ``time'' counter.
 
 \subsection{Fulfilled ISO~26262 requirements}
 ISO~26262 mention several requirements that QuickCheck will be able to
-fulfil. Aside from general requirements like that a ''safety plan'' should be
+fulfill. Aside from general requirements like that a ''safety plan'' should be
 available, there are tests in which the hardware should be taken in
 consideration. This is beyond the scope of this thesis and can also not be
 tested using QuickCheck. There are also tests that needs several modules
