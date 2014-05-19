@@ -172,11 +172,10 @@ found but also rules that contradicted each other were recognized. In
 those cases the implementation in the C-code was followed.
 
 \subsection{Advantage of having the Actual C-code}
-%% TODO: Sista meningen lite lösryckt.
+%% TODO: Sista meningen lite lösryckt?
 When it did not exist a clear interpretation of the AUTOSAR
 specification, a great method for understanding, was to examine the C
-code. Even though QuickCheck can be used to test libraries when the
-actually source code is not available.
+code. Even though QuickCheck can be used to test libraries when the source code is not available.
 
 \section{Implementation structure}
 The final implementation consisted of several Erlang modules. Table
@@ -348,10 +347,6 @@ watchdog manager the main function was called randomly and it was
 assumed that every time the main function was called a given amount of
 time had passed.
 
-%% TODO: meningen "The AUTOSAR specification /../ lacking a clear
-%% definition" är felaktig. AUTOSAR specar tiden till sekunder. Det är
-%% däremot oklart hur man får räknar med sekunderna: om tiden kommer
-%% från cpu klockan, RTEn, main funktions "tick" etc
 Except for the main function, only one internal algorithm that was
 used by the watchdog manager was time dependent, namely the deadline
 supervision algorithm. A supervised entity with deadline supervision
@@ -359,7 +354,7 @@ consists of two checkpoints. One start checkpoint, one stop checkpoint
 and a maximum time it should take to reach the stop checkpoint after
 the start checkpoint was reached. The AUTOSAR specification was
 however lacking of a clear definition of how time should be
-represented. The C code just used ticks, not actual time stamps, which
+handled. The C code just used ticks, not actual time stamps, which
 was incremented every time the main function was called. It was in
 other words assumed that the RTE was able to execute the main function
 correctly and a fixed amount of ticks would always represent the same
@@ -368,17 +363,14 @@ approach in the Erlang module. More about this can be found in section
 \ref{SEC:FUNCTIONAL_SAFETY_TIME}.
 
 \section{Model State}
-%% TODO: första meningen: "as easy as possible", vad menas?
-%% TODO: Är det värt att ha med "even though it was tempting to use a
-%% more efficient data structure"? varför var det "tempting" och vad
-%% hade varit "more efficient" i sånna fall?
-The model state was constructed as easy as possible. Even though it
-was tempting to use a more efficient data structure, a simple record
-was used to represent the model state. The main reason for this was to
-make it easy to follow the model state when using
-\emph{eqc\_statem:show\_states/1}, see appendix
-\ref{APP:QUICKCHECK}. The efficiency of the test model was considered
-less relevant than the readability of the model state.  The idea was
-to make it easy to find the actual bug, when conflicts arouse between
-the C-code and the Erlang module. Running the actual tests was also
-not considered time or memory critical.
+The model state was constructed as minimal as possible. Even though it
+was tempting to use a more efficient data structure, a simple Erlang
+record was used to represent the model state. Using more efficient
+data structures could for instance speed up the execution of
+tests. The main reason for using a record was to make it easy to
+follow the model state when using \emph{eqc\_statem:show\_states/1},
+see appendix \ref{APP:QUICKCHECK}. The efficiency of the test model
+was considered less relevant than the readability of the model state.
+The idea was to make it easy to find the actual bug, when conflicts
+arouse between the C-code and the Erlang module. Running the actual
+tests was also not considered time or memory critical.
