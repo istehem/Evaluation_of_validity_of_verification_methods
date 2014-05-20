@@ -82,8 +82,7 @@
   showstringspaces= false
 }
 \lstdefinestyle{autosar}{
-  breaklines      = false,
-  frame           = l,
+  breaklines      = falsaryframe           = l,
   showstringspaces= false,
   string          = [s]{``}{''},
   morestring      = [b]",
@@ -133,6 +132,20 @@
 \institute{Chalmers University of Technology, Mecel AB}
 \date{\today}
 
+\newcommand{\gloss}[1]{
+\begin{frame}
+  \frametitle{Glossary}
+  \begin{description}
+    \item [Supervised Entity]
+    \item<#1->[Checkpoint]
+    \item [Mode]
+%    \item[-]
+  \end{description}
+\end{frame}
+}
+
+%================================================
+
 \begin{document}
 
 \begin{frame}
@@ -150,16 +163,6 @@
 %================================================
 \section{Before we begin}
 %================================================
-
-\begin{frame}
-  \frametitle{Glossary}
-  \begin{description}
-    \item[Supervised Entity]
-    \item[Checkpoint]
-    \item[Mode]
-%    \item[]
-  \end{description}
-\end{frame}
 
 
 %================================================
@@ -199,6 +202,8 @@
   \end{block}
 \end{frame}
 
+\gloss{1}
+
 %================================================
 \section{Watchdog Manager}
 %================================================
@@ -225,6 +230,8 @@
     \end{itemize}
   \end{block}
 \end{frame}
+
+\gloss{2}
 
 \begin{frame}
   \frametitle{Supervision functions}
