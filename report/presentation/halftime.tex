@@ -90,15 +90,6 @@
 \date{\today}
 
 \newcommand{\gloss}[1]{
-\begin{frame}
-  \frametitle{Glossary}
-  \begin{description}
-    \item [Supervised Entity]
-    \item<#1->[Checkpoint]
-    \item [Mode]
-%    \item[-]
-  \end{description}
-\end{frame}
 }
 
 %================================================
@@ -160,7 +151,16 @@
   \end{block}
 \end{frame}
 
-\gloss{1}
+\begin{frame}<1>[label=glossary]
+  \frametitle{Glossary}
+  \begin{description}
+    \item<1->[Supervised Entity]
+    \item<2->[Checkpoint]
+    \item<3->[Mode]
+%    \item[-]
+  \end{description}
+\end{frame}
+
 
 %================================================
 \section{Watchdog Manager}
@@ -189,7 +189,7 @@
   \end{block}
 \end{frame}
 
-\gloss{2}
+\againframe<2>{glossary}
 
 \begin{frame}
   \frametitle{Supervision functions}
