@@ -1,11 +1,9 @@
 \documentclass{beamer}
 
 \mode<presentation> {
-
-\usetheme{CambridgeUS}
-
-\setbeamertemplate{footline}[page number]
-\setbeamertemplate{navigation symbols}{}
+  \usetheme{CambridgeUS}
+  \setbeamertemplate{footline}[page number]
+  \setbeamertemplate{navigation symbols}{}
 }
 
 \usepackage{listings}
@@ -108,9 +106,8 @@
 % PRESENTATION SLIDES
 %------------------------------------------------
 %================================================
-\section{Before we begin}
+\section{Introduction}
 %================================================
-
 \begin{frame}[fragile]
   \frametitle{Introduction}
   \begin{block}{Background}
@@ -144,17 +141,13 @@
 
 \againframe<2>{glossary}
 \againframe<3>{glossary}
-
-%================================================
-\section{Introduction}
-%================================================
-
 \begin{frame}[fragile]
   \frametitle{Introduction}
   \begin{block}{Objective}
     \begin{itemize}
-        \item Atomization of tests on modules in AUTOSAR
-        \item Reach the requirements for a higher ASIL
+        \item Automation of tests on modules in AUTOSAR
+        \item Examine if it is possible to reach the requirements for
+          a higher ASIL classification
         \item Functional Safety
     \end{itemize}
    \end{block}
@@ -162,14 +155,20 @@
     \begin{itemize}
         \item Model based testing
         \item QuickCheck
+        \item Other
     \end{itemize}
   \end{block}
 \end{frame}
+
 
 %================================================
 \section{Watchdog Manager}
 %================================================
 \againframe<4>{glossary}
+
+\begin{frame}
+  \frametitle{Watchdog Manager}
+\end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Functions}
@@ -363,7 +362,6 @@
 \section{Implementation}
 %================================================
 %------------------------------------------------
-\againframe<5>{glossary}
 
 \subsection{C code}
 %------------------------------------------------
@@ -380,6 +378,8 @@
 %------------------------------------------------
 \subsection{Erlang implementation of AUTOSAR}
 %------------------------------------------------
+
+\againframe<5>{glossary}
 
 \begin{frame}
   \frametitle{How QuickCheck works}
