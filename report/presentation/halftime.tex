@@ -111,16 +111,39 @@
 \section{Before we begin}
 %================================================
 
-\begin{frame}
+\begin{frame}[fragile]
+  \frametitle{Introduction}
+  \begin{block}{Background}
+    \begin{itemize}
+        \item Vehicle are becoming more complex
+        \item Circa 80 processes
+        \item Close to hundred million lines of code
+        \item More functionality
+        \item Safety critical
+        \item Testing are becoming even more important
+        \item Testing more then half the production cost
+    \end{itemize}
+   \end{block}
+\end{frame}
+
+\begin{frame}<1>[label=glossary]
   \frametitle{Glossary}
   \begin{description}
-    \item[Supervised Entity]
-    \item[Checkpoint]
-    \item[Mode]
-    \item[Global/Local status]
+    \item<1->[AUTOSAR (AUTomotive Open System ARchitecture)]
+    \item<2->[ASIL (Automotive Safety Integrity Level)]
+    \item<3->[Functional Safety (according to ISO~26262)]
+    \item<4->[WdgM (Wathdog Mangager)]
+    \item<5->[QuickCheck (A commercial module for Erlang)]
+    %\item<2->
+    %\item<1->[Supervised Entity]
+    %\item<2->[Checkpoint]
+    %\item<3->[Mode]
+%    \item[-]
   \end{description}
 \end{frame}
 
+\againframe<2>{glossary}
+\againframe<3>{glossary}
 
 %================================================
 \section{Introduction}
@@ -146,6 +169,8 @@
 %================================================
 \section{Watchdog Manager}
 %================================================
+\againframe<4>{glossary}
+
 \begin{frame}[fragile]
   \frametitle{Functions}
   \begin{block}{Getters}
@@ -338,6 +363,8 @@
 \section{Implementation}
 %================================================
 %------------------------------------------------
+\againframe<5>{glossary}
+
 \subsection{C code}
 %------------------------------------------------
 \begin{frame}
