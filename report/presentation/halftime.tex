@@ -2,7 +2,48 @@
 
 \mode<presentation> {
 
+%\usetheme{default}
+%\usetheme{AnnArbor}
+%\usetheme{Antibes}
+%\usetheme{Bergen}
+%\usetheme{Berkeley}
+%\usetheme{Berlin}
+% \usetheme{Boadilla}
 \usetheme{CambridgeUS}
+%\usetheme{Copenhagen}
+%\usetheme{Darmstadt}
+%\usetheme{Dresden}
+%\usetheme{Frankfurt}
+%\usetheme{Goettingen}
+%\usetheme{Hannover}
+%\usetheme{Ilmenau}
+%\usetheme{JuanLesPins}
+%\usetheme{Luebeck}
+% \usetheme{Madrid}
+%\usetheme{Malmoe}
+%\usetheme{Marburg}
+%\usetheme{Montpellier}
+%\usetheme{PaloAlto}
+%\usetheme{Pittsburgh}
+%\usetheme{Rochester}
+%\usetheme{Singapore}
+%\usetheme{Szeged}
+%\usetheme{Warsaw}
+
+%\usecolortheme{albatross}
+%\usecolortheme{beaver}
+%\usecolortheme{beetle}
+%\usecolortheme{crane}
+%\usecolortheme{dolphin}
+%\usecolortheme{dove}
+%\usecolortheme{fly}
+%\usecolortheme{lily}
+%\usecolortheme{orchid}
+%\usecolortheme{rose}
+%\usecolortheme{seagull}
+%\usecolortheme{seahorse}
+%\usecolortheme{whale}
+%\usecolortheme{wolverine}
 
 \setbeamertemplate{footline}[page number]
 \setbeamertemplate{navigation symbols}{}
@@ -10,7 +51,6 @@
 
 \usepackage{listings}
 \usepackage{graphicx}
-\usepackage{tikz}
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
 
 \lstdefinestyle{erlang}{
@@ -80,7 +120,7 @@
     WDGM\_LOCAL\_STATUS\_DEACTIVATED
   }
 }
-\lstset{language=c, mathescape}
+\lstset{language=c}
 
 
 %------------------------------------------------
@@ -117,7 +157,7 @@
     \item[Supervised Entity]
     \item[Checkpoint]
     \item[Mode]
-    \item[Global/Local status]
+%    \item[]
   \end{description}
 \end{frame}
 
@@ -128,9 +168,32 @@
 
 \begin{frame}[fragile]
   \frametitle{Introduction}
+  \begin{block}{Background}
+    \begin{itemize}
+        \item Automatization
+        \item Vehicle are becoming more complex
+        \item Circa 80 processes
+        \item Millions lines of code
+        \item More functionality
+        \item Safety critical
+        \item Testing are becoming even more important
+        \item Testing more then half the production cost
+    \end{itemize}
+   \end{block}
+  \begin{block}{Resources}
+    \begin{itemize}
+        \item Model based testing
+        \item QuickCheck
+        \item Other
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Introduction}
   \begin{block}{Objective}
     \begin{itemize}
-        \item Atomization of tests on modules in AUTOSAR
+        \item Automatization of tests on modules in AUTOSAR
         \item Reach the requirements for a higher ASIL
         \item Functional Safety
     \end{itemize}
@@ -139,6 +202,7 @@
     \begin{itemize}
         \item Model based testing
         \item QuickCheck
+        \item Other
     \end{itemize}
   \end{block}
 \end{frame}
@@ -179,12 +243,6 @@
   \end{itemize}
 \end{frame}
 
-%----------------------------------------------
-\subsection{Supervision algorithms}
-%----------------------------------------------
-%------------------------------------------------
-%\subsection{Alive supervision}
-%------------------------------------------------
 \begin{frame}
   \frametitle{Alive Supervision}
   \begin{block}{Statement}
@@ -194,7 +252,6 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Alive Supervision}
   \begin{block}{Values/Variables}
     \begin{description}
       \item[Expected alive indications] (EAI), property of mode, fixed
@@ -210,11 +267,11 @@
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Alive Supervision}
   \begin{block}{The algorithm}
     \begin{lstlisting}
       if (SC Mod SRC == 0)
-        if (-Min $\in$ AI - EAI $\in$ Max)
+        // perform alive supervision
+        if (-Min <= AI - EAI <= Max)
            Alive supervision is correct
         else
            Alive supervision is incorrect
@@ -222,133 +279,24 @@
   \end{block}
   Performed in the MainFunction, also increments the supervision
   cycles.\\
-  CheckpointReached increments the alive indications for the
+  CheckpointReached increments the alive indications for a certain
   checkpoint.
 \end{frame}
 
-%------------------------------------------------
-% \subsection{Deadline supervision}
-%------------------------------------------------
 \begin{frame}
   \frametitle{Deadline Supervision}
-  \begin{block}{Statement}
-    Deadline supervision checks that the time it takes between two
-    checkpoints is within a marginal
-  \end{block}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Deadline Supervision}
-  \begin{block}{Values/Variables}
-    \begin{description}
-      \item[Start checkpoint] described by the configuration
-      \item[Stop checkpoint] described by the configuration
-      \item[Current timestamp]
-      \item[Min margin] fixed value from configuration
-      \item[Max margin] fixed value from configuration
-    \end{description}
-  \end{block}
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Deadline Supervision}
-  \begin{block}{The algorithm}
-    \begin{lstlisting}
-    if( Start && Current == 0 )
-      // start the clock
-      Current = now()
-    else if( End && Min $\leq$ now() - Current $\leq$ Max )
-      Deadline supervision is correct
-    else
-      Deadline supervision is incorrect
-    \end{lstlisting}
-  \end{block}
-  Performed by CheckpointReached.
-\end{frame}
-
-%------------------------------------------------
-% \subsection{Logical supervision}
-%------------------------------------------------
-\begin{frame}
-  \frametitle{Logical Supervision}
-  \begin{block}{Statement}
-    The program that is supervised by logical supervision should have
-    a specific execution flow. The flow can be visualized by a
-    graph.
-  \end{block}
 \end{frame}
 
 \begin{frame}
   \frametitle{Logical Supervision}
-  \begin{block}{Values/Variables}
-    \begin{description}
-      \item[Start checkpoints]
-      \item[End checkpoints]
-      \item[Transitions] between checkpoints
-      \item[Is started?] if the graph has been started
-      \item[Current checkpoint]
-    \end{description}
-  \end{block}
 \end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Logical Supervision}
-  \begin{block}{The algorithm}
-    \begin{lstlisting}
-      if( !Started && CP $\in$ Start checkpoints )
-        Started = true
-        Current = CP
-      else if( Started )
-        if( CP $\in$ End checkpoints )
-          Started = false
-          Current = null
-        // Causal ordered
-        else if( Current -> CP in Transitions )
-          Current = CP
-      else
-        Logical supervision is incorrect
-    \end{lstlisting}
-  \end{block}
-  Performed by CheckpointReached.
-\end{frame}
-
-%------------------------------------------------
-\subsection{The state machine}
-%------------------------------------------------
-
-\begin{frame}
-  \frametitle{The state machine}
-  Each supervised entity has a local supervision status that the main
-  function changes depending on the results from the local supervision
-  functions.\\
-
-  The global status of the watchdog manager is calculated after the
-  local supervision status for all supervised entities.\\
-
-  The new global status also depends on which global status the
-  watchdog manager had before.
-\end{frame}
-
-\begin{frame}
-  \frametitle{The state machine}
-  \includegraphics[keepaspectratio, width=0.7\linewidth]{globalstatuses}
-\end{frame}
-
 %================================================
 \section{Implementation}
 %================================================
 %------------------------------------------------
-\subsection{C code}
+% \subsubsection{Stubs}
 %------------------------------------------------
-\begin{frame}
-  \frametitle{Generating the C byte code}
-  \include{configuration_to_bytecode}
-\end{frame}
 
-\begin{frame}
-  \frametitle{QuickCheck}
-  \include{bytecode_to_quickcheck}
-\end{frame}
 
 %------------------------------------------------
 \subsection{Erlang implementation of AUTOSAR}
@@ -357,66 +305,81 @@
 \begin{frame}
   \frametitle{How QuickCheck works}
   Generators, preconditions, postconditions, changes to model state.
+  \begin{figure}
+    \includegraphics[keepaspectratio, width=0.7\linewidth]{api_calls}
+  \end{figure}
+\end{frame}
 
-  \includegraphics[keepaspectratio, width=0.7\linewidth]{api_calls}
+\begin{frame}
+  \frametitle{Example configuration}
+  Covers most of the model, still quite small.\\
+  DevErrorDetect is on.\\
 \end{frame}
 
 %------------------------------------------------
-\subsection{Configurations}
+\subsection{Limitations}
 %------------------------------------------------
 
 \begin{frame}
-  \frametitle{Configurations}
-  Three different configurations\\
+  \frametitle{DevErrorDetect}
   \begin{itemize}
-    \item Example configuration
-    \item BSI configuration
-    \item Freescale configuration
+    \item positive testing
+    \item missing requirements
+    \item segmentation faults
   \end{itemize}
-  DevErrorDetect
 \end{frame}
 
 %----------------------------------------------
-\subsection{Testing}
-%----------------------------------------------
-%----------------------------------------------
-%\subsection{Negative testing}
+\subsection{Negative testing}
 %----------------------------------------------
 
 \begin{frame}
-  \frametitle{Negative testing}
-  \begin{itemize}
-    \item non existing arguments
-    \item null pointers
-    \item absorbing state
-  \end{itemize}
+  \frametitle{Red}
 \end{frame}
 
 %----------------------------------------------
-%\subsection{Positive testing}
+\subsection{Positive testing}
 %----------------------------------------------
 
 \begin{frame}
-  \frametitle{Positive testing}
+  \frametitle{Green}
+\end{frame}
+
+%------------------------------------------------
+\subsection{Tweaking the generators}
+%------------------------------------------------
+
+\begin{frame}
+  \frametitle{What test cases are interesting?}
   \begin{itemize}
-    \item no absorbing state
-    \item correct arguments
-    \item correct command sequences
+    \item Negative testing
+    \begin{itemize}
+      \item good to cover bad arguments
+    \end{itemize}
+    \item Positive testing
+    \begin{itemize}
+      \item no absorbing state
+      \item correct arguments
+      \item correct command sequences
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \begin{figure}
+    \includegraphics[keepaspectratio, width=0.7\linewidth]{globalstatuses}
+  \end{figure}
+\end{frame}
+
 %================================================
-\section{Bugs}
-%================================================
-%================================================
-% \section{How to handle bugs}
+\section{How to handle bugs}
 %================================================
 %------------------------------------------------
 %\subsection{Less good methods}
 %------------------------------------------------
 
 \begin{frame}
-  \frametitle{Bugs}
+  \frametitle{Less good methods}
   \begin{block}{Report bug}
     \begin{description}
       \item[+] Not our job to correct the code
@@ -437,36 +400,35 @@
 %------------------------------------------------
 
 \begin{frame}
-  \frametitle{Bugs}
-  \begin{block}{``Fix'' Model}
+  \frametitle{Good methods}
+  \begin{block}{Fix Model}
     \begin{description}
       \item[+] We can continue testing
-      \item[-] Can't test c-code from another configuration or updated version etc.
+      \item[-] Cant test c-code from another configuration or updated version etc.
     \end{description}
   \end{block}
 
   \begin{block}{Fix C-code}
     \begin{description}
       \item[+] We can continue testing
-      \item[-] Time consuming; need to get knowledge of the structure etc.
+      \item[-] Need to get knowledge of the structure etc.
     \end{description}
   \end{block}
 
   \begin{block}{Mocking}
     \begin{description}
       \item[+] We can continue testing
-      \item[-] Need to make a model for how it should work. The
-        pitfall is if we implement the mocked function after the state
-        machine.
+      \item[-] Need to make a model for how it should work. The pitfall is if we
+        implement the mocked function after the state machine.
     \end{description}
   \end{block}
 \end{frame}
 
 %================================================
-% \section{The bugs have we found}
+\section{The bugs have we found}
 %================================================
 %------------------------------------------------
-% \subsection{C-code}
+%\subsection{C-code}
 %------------------------------------------------
 
 \begin{frame}
@@ -518,7 +480,7 @@
 \end{frame}
 
 %================================================
-\section{Coverage \& Statistics}
+\section{Testing}
 %================================================
 %------------------------------------------------
 %\subsection{Coverage}
@@ -526,10 +488,12 @@
 
 \begin{frame}
   \frametitle{Coverage}
+  % if our model behave like the c model, then we can test our models function
+  % coverage and check that we test all functions.
   \begin{itemize}
-    \item line coverage of Erlang code (97.38\%)
-    \item call coverage of C code(81\%)
-    \item state coverage (100\% of valid transitions, 0\% of invalid transitions)
+    \item line coverage analysis (not absolute, due to bugs in C-code)
+    \item variables in the state
+    \item call coverage (not absolute)
   \end{itemize}
 \end{frame}
 
@@ -542,29 +506,101 @@
   \begin{itemize}
     \item generated command sequences of up to 120 commands (really no limit)
     \item 95\% starts with the command \verb!WdgM_Init!
+    \item global statuses
+    %% kanske hör mer till implementationen men vi borde nämna procentsatser på
+    %% globalstatusar kanske?
+    % \item There is five global statuses, a functional system initiates to
+    %   \verb!WDGM_GLOBAL_STATUS_DEACTIVATED!, and if the command
+    %   \verb!WdgM_Init! is successfully called, the global status should be
+    %   \verb!WDGM_GLOBAL_STATUS_OK!. After that, only the commands
+    %   \verb!WdgM_Mainfunction! and \verb!WdgM_DeInit! can change the global
+    %   status.
   \end{itemize}
 \end{frame}
 
-%================================================
-\section{Functional Safety}
-%================================================
+\begin{frame}
+  \begin{figure}
+    \includegraphics[keepaspectratio, width=0.7\linewidth]{globalstatuses}
+  \end{figure}
+\end{frame}
+
+%------------------------------------------------
+%\subsection{Suitable tests}
+%------------------------------------------------
+
 \begin{frame}[fragile]
-  \frametitle{DevErrorDetect}
-  Dangerous configuration flag \verb!DevErrorDetect!
+  \frametitle{Suitability of tests}
+  We generate lists of commands, most of which starts with
+  \verb!WdgM_Init! or it has \verb!WdgM_Init! in the first 2-4
+  commands. This is a precondition for all other functions except
+  \verb!WdgM_GetFirstExpiredSEId!.\\[0.5cm]
+
+  The functions that change the state considerably is
+  \verb!WdgM_Checkpointreached!, \verb!WdgM_SetMode! and
+  \verb!WdgM_Mainfunction!.  Therefor we prioritize these functions in
+  the generation.
 \end{frame}
 
 %================================================
 \section{Future work}
 %================================================
+
 \begin{frame}[fragile]
-  \frametitle{Integration testing}
+  \frametitle{Functional Safety}
+  We will look at how this testing suites ISO26262. We have good hopes of
+  achieving some kind of classification.\\[0.5cm]
+
+  When the configuration flag \verb!DevErrorDetect! is off, you may get
+  segmentation faults.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Bug report}
+  As stated, we have found a lot of bugs and we have modified the C-code.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Shrinking....}
+  We found out that there is some problems when QuickCheck tries to
+  shrink failed tests. This is because most of the commands we send in
+  depend on the state, and QuickCheck just tries to shrink the generated
+  commands/arguments. Many of which will fail because some other
+  (previous) command has been neglected.\\[0.5cm]
+
+  It is possible to guide QuickCheck to shrink correctly, but it wont
+  be a part of this thesis, because time.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Combining modules}
   Another part of future work could be to implement a model for
   \verb!WdgIf! and get the two modules to work coherently.
 \end{frame}
+%------------------------------------------------
+
+% \begin{frame}
+%   \frametitle{Kolumner}
+%   \begin{columns}[c]
+%     \column{.45\textwidth}
+%     vänster
+%     \column{.5\textwidth}
+%     höger
+%   \end{columns}
+% \end{frame}
+
+% \begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
+%   \frametitle{Verbatim}
+%   \begin{example}[Theorem Slide Code]
+% \begin{verbatim}
+% Code
+% \end{verbatim}
+%   \end{example}
+% \end{frame}
 
 %================================================
 \section{Questions}
 %================================================
+
 \begin{frame}
   \Huge{\centerline{Questions?}}
 \end{frame}
