@@ -1,11 +1,9 @@
 \documentclass{beamer}
 
 \mode<presentation> {
-
-\usetheme{CambridgeUS}
-
-\setbeamertemplate{footline}[page number]
-\setbeamertemplate{navigation symbols}{}
+  \usetheme{CambridgeUS}
+  \setbeamertemplate{footline}[page number]
+  \setbeamertemplate{navigation symbols}{}
 }
 
 \usepackage{listings}
@@ -108,30 +106,30 @@
 % PRESENTATION SLIDES
 %------------------------------------------------
 %================================================
-\section{Before we begin}
-%================================================
-
-\begin{frame}
-  \frametitle{Glossary}
-  \begin{description}
-    \item[Supervised Entity]
-    \item[Checkpoint]
-    \item[Mode]
-    \item[Global/Local status]
-  \end{description}
-\end{frame}
-
-
-%================================================
 \section{Introduction}
 %================================================
+\begin{frame}[fragile]
+  \frametitle{Introduction}
+  \begin{block}{Background}
+    \begin{itemize}
+        \item Vehicle are becoming more complex
+        \item Circa 80 processes
+        \item Close to hundred million lines of code
+        \item More functionality
+        \item Safety critical
+        \item Testing are becoming even more important
+        \item Testing more then half the production cost
+    \end{itemize}
+   \end{block}
+\end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Introduction}
   \begin{block}{Objective}
     \begin{itemize}
-        \item Atomization of tests on modules in AUTOSAR
-        \item Reach the requirements for a higher ASIL
+        \item Automation of tests on modules in AUTOSAR
+        \item Examine if it is possible to reach the requirements for
+          a higher ASIL classification
         \item Functional Safety
     \end{itemize}
    \end{block}
@@ -139,13 +137,33 @@
     \begin{itemize}
         \item Model based testing
         \item QuickCheck
+        \item Other
     \end{itemize}
   \end{block}
+\end{frame}
+
+\begin{frame}<1>[label=glossary]
+  \frametitle{Glossary}
+  \begin{description}
+    \item<1->[AUTOSAR]
+    \item<1->[ASIL]
+    \item<2->[Supervised Entity]
+    \item<2->[Checkpoint]
+    \item<2->[Mode]
+    \item<2->[Global/Local status]
+  \end{description}
 \end{frame}
 
 %================================================
 \section{Watchdog Manager}
 %================================================
+
+\begin{frame}
+  \frametitle{Watchdog Manager}
+\end{frame}
+
+\againframe<2>{glossary}
+
 \begin{frame}[fragile]
   \frametitle{Functions}
   \begin{block}{Getters}
