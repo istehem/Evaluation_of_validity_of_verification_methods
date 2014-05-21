@@ -445,55 +445,29 @@
 %================================================
 % \section{How to handle bugs}
 %================================================
-%------------------------------------------------
-%\subsection{Less good methods}
-%------------------------------------------------
-
 \begin{frame}
   \frametitle{Bugs}
-  \begin{block}{Report bug}
-    \begin{description}
-      \item[+] Not our job to correct the code
-      \item[-] Unknown time delay, probably weeks...
-    \end{description}
-  \end{block}
-
-  \begin{block}{Skip the function with the bug}
-    \begin{description}
-      \item[+] We can continue testing
-      \item[-] After finding some bugs, we don't have anything to test at all
-    \end{description}
-  \end{block}
-\end{frame}
-
-%------------------------------------------------
-%\subsection{Good Methods}
-%------------------------------------------------
-
-\begin{frame}
-  \frametitle{Bugs}
-  \begin{block}{``Fix'' Model}
-    \begin{description}
-      \item[+] We can continue testing
-      \item[-] Can't test c-code from another configuration or updated version etc.
-    \end{description}
-  \end{block}
-
-  \begin{block}{Fix C-code}
-    \begin{description}
-      \item[+] We can continue testing
-      \item[-] Time consuming; need to get knowledge of the structure etc.
-    \end{description}
-  \end{block}
-
-  \begin{block}{Mocking}
-    \begin{description}
-      \item[+] We can continue testing
-      \item[-] Need to make a model for how it should work. The
-        pitfall is if we implement the mocked function after the state
-        machine.
-    \end{description}
-  \end{block}
+  \begin{itemize}
+    \item Report bug
+    % \item[+] Not our job to correct the code
+    % \item[-] Unknown time delay, probably weeks...
+    \item Skip the function with the bug
+    % \item[+] We can continue testing
+    % \item[-] After finding some bugs, we don't have anything to test
+    % at all
+    \item ``Fix'' the model
+    % \item[+] We can continue testing
+    % \item[-] Can't test c-code from another configuration or updated
+    % version etc.
+    \item Fix C-code
+    % \item[+] We can continue testing
+    % \item[-] Time consuming; need to get knowledge of the structure
+    % etc.
+    \item Mocking function with bug
+    % \item[+] We can continue testing
+    % \item[-] Need to make a model for how it should work. The pitfall
+    %   is if we implement the mocked function after the state machine.
+  \end{itemize}
 \end{frame}
 
 %================================================
