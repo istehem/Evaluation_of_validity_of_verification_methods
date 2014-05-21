@@ -265,10 +265,17 @@ implementation or the C code? In those cases we choose to follow the C
 implementation.
 
 \section{Coverage \& Statistics}
-The reason we don't get 100\% line coverage of the Erlang module is
-that
+The reason we don't achieve 100\% code coverage depends on certain limitations.
+Some lines can not be covered when the configuration parameter
+\emph{WdgMDevErrorDetect} is true. On the other hand, if it is
+false, then the C model will fail with a segmentation fault and the
+Erlang model will not be covered any way.
 
-The same goes for the Condition/Decision coverage of the C code.
+The missing coverage in the C-code are for example checks for null
+pointers, some of which never evaluated to false. Many checks seems to be
+redundant and impossible to evaluate to true, if one excludes the possibility
+of hardware failures or other failures which may corrupt the memory of the
+watchdog manager.
 
 \section{Functional safety}
 The configuration holds a dangerous parameter that is called
