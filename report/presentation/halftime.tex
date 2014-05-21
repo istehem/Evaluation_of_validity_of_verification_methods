@@ -451,7 +451,7 @@
     \item Report bug
     % \item[+] Not our job to correct the code
     % \item[-] Unknown time delay, probably weeks...
-    \item Skip the function with the bug
+    % \item Skip the function with the bug
     % \item[+] We can continue testing
     % \item[-] After finding some bugs, we don't have anything to test
     % at all
@@ -463,7 +463,7 @@
     % \item[+] We can continue testing
     % \item[-] Time consuming; need to get knowledge of the structure
     % etc.
-    \item Mocking function with bug
+    % \item Mocking function with bug
     % \item[+] We can continue testing
     % \item[-] Need to make a model for how it should work. The pitfall
     %   is if we implement the mocked function after the state machine.
@@ -478,52 +478,70 @@
 %------------------------------------------------
 
 \begin{frame}
-  \frametitle{C-code}
-  \begin{tabular}{l l}
-    Requirement & Our classification\\\hline
-    WDGM286 & Medium\\
-    WDGM077 & Low-Medium\footnote{\label{footnot:ett} Together their classification is Medium-High}\\
-    WDGM117 & Low-Medium$^{\ref{footnot:ett}}$ \\
-    WDGM215 & Low-Medium$^{\ref{footnot:ett}}$ \\
-    WDGM216 & Low-Medium$^{\ref{footnot:ett}}$ \\
-    WDGM219 & Low-Medium$^{\ref{footnot:ett}}$ \\
-    WDGM220 & Low-Medium$^{\ref{footnot:ett}}$ \\
-    WDGM182 & High\\
-    7.2.3.2 & Medium\footnote{\label{footnot:tva} Together with WDGM252 and WDGM274
-      this could be dangerous}\\
-    WDGM255 & Low\\
-    fig. 4  & Low
-  \end{tabular}
+  \frametitle{Bugs we found}
+  \begin{block}{C code}
+    Alot
+  \end{block}
+
+  \begin{block}{Generated C code}
+    Some
+  \end{block}
+
+  \begin{block}{AUTOSAR complications}
+    \begin{itemize}
+      \item ambiguous meaning
+      \item conflicting requirements
+      \item omitted requirements/explanations
+      \item spelling of configuration parameters
+      \item references
+    \end{itemize}
+  \end{block}
+
+  % \begin{tabular}{l l}
+  %   Requirement & Our classification\\\hline
+  %   WDGM286 & Medium\\
+  %   WDGM077 & Low-Medium\footnote{\label{footnot:ett} Together their classification is Medium-High}\\
+  %   WDGM117 & Low-Medium$^{\ref{footnot:ett}}$ \\
+  %   WDGM215 & Low-Medium$^{\ref{footnot:ett}}$ \\
+  %   WDGM216 & Low-Medium$^{\ref{footnot:ett}}$ \\
+  %   WDGM219 & Low-Medium$^{\ref{footnot:ett}}$ \\
+  %   WDGM220 & Low-Medium$^{\ref{footnot:ett}}$ \\
+  %   WDGM182 & High\\
+  %   7.2.3.2 & Medium\footnote{\label{footnot:tva} Together with WDGM252 and WDGM274
+  %     this could be dangerous}\\
+  %   WDGM255 & Low\\
+  %   fig. 4  & Low
+  % \end{tabular}
 \end{frame}
 
 %------------------------------------------------
 %\subsection{Generated C-code}
 %------------------------------------------------
 
-\begin{frame}
-  \frametitle{Generated C-code and include-files}
-  \begin{tabular}{l l}
-    Requirement & Our classification\\\hline
-    p. 27       & Low\\
-    fig. 4      & Low\\
-  \end{tabular}
-\end{frame}
+% \begin{frame}
+%   \frametitle{Generated C-code and include-files}
+%   \begin{tabular}{l l}
+%     Requirement & Our classification\\\hline
+%     p. 27       & Low\\
+%     fig. 4      & Low\\
+%   \end{tabular}
+% \end{frame}
 
 %------------------------------------------------
 %\subsection{AUTOSAR}
 %------------------------------------------------
 
-\begin{frame}
-  \frametitle{AUTOSAR}
-  AUTOSAR complications
-  \begin{itemize}
-    \item ambiguous meaning
-    \item conflicting requirements
-    \item omitted requirements/explanations
-    \item spelling of configuration parameters
-    \item references
-  \end{itemize}
-\end{frame}
+% \begin{frame}
+%   \frametitle{AUTOSAR}
+%   AUTOSAR complications
+%   \begin{itemize}
+%     \item ambiguous meaning
+%     \item conflicting requirements
+%     \item omitted requirements/explanations
+%     \item spelling of configuration parameters
+%     \item references
+%   \end{itemize}
+% \end{frame}
 
 %================================================
 \section{Coverage \& Statistics}
@@ -569,6 +587,13 @@
   \frametitle{Integration testing}
   Another part of future work could be to implement a model for
   \verb!WdgIf! and get the two modules to work coherently.
+\end{frame}
+
+%================================================
+\section{Conclusions}
+%================================================
+\begin{frame}
+  \frametitle{Conclusions}
 \end{frame}
 
 %================================================

@@ -23,15 +23,86 @@ night vision, traffic sign recognision will be mandatory in new cars
 in the future. Cars will be connected with each other, they will be
 connected with roadside management systems and also with the Internet.
 
-vehicles are already safety critical, because you don't want to crash
+Vehicles are already safety critical, because you don't want to crash
 because of a software failure.
+
+Already different components share a limited number of
+resources. Adding more functionality means even more components will
+share resources. For example, you don't want your brakes to stop
+working because your stereo has a software malfunction.
+
+Research has shown that testing accounts for around half of all
+software development costs.
+
 \section{Glossary-1}
+Before we move on we have some key words you will need to comprehend.
+
+AUTOSAR is a standard for implementing vehicle software components,
+which consists of around 80 module specifications.
+
+AUTOSAR's concept is to make it possible for vehicle manufacturers to
+buy components from different software companies, which will still
+work together in unison.
+
 \section{Glossary-2}
+Functional safety is a relative new concept in the automotive
+industry.
+
+It defines the development process from idea to product.
+
+Every step in the process must fulfill certain requirements.
+
+The main idea is if a component in the system fails, then the whole
+system should not fail.
+
 \section{Glossary-3}
+ASIL refers to the classification of functional safety.
+
+A software function with a higher ASIL classification need to
+experience more rigorous testing.
+
 \section{Objectives}
+Our objectives are to automate the testing of AUTOSAR modules. The
+goal is to reduce the costs of testing and make the code more
+reliable.
+
+We also aim to examine if it is possible to reach a higher ASIL classification.
+
 \section{Watchdog manager}
+Since AUTOSAR consists of many module specifications, we had to start
+somewhere and choose one specification.
+
+We choose the watchdog manager.
+
+The watchdog is a hardware component that is used to detect and
+recover from computer malfunctions.
+
+The watchdog manager configures and supervises all watchdogs in the
+system.
+
+\textbf{CONFIGURATION}
+
 \section{Glossary-4}
+A supervised entity is a critical section in a piece of code that
+needs to follow a certain behavior.
+
+\textbf{CHECKPOINTS}
+
 \section{Functions in WdgM}
+AUTOSAR specifies eleven API calls for the watchdog manager.
+
+These can be divided into two groups; get-functions, and functions
+that changes the state of the watchdog manager.
+
+The get functions shall of course follow certain requirements, but the
+will not change the state since their only task is to retrieve
+information about the state.
+
+Then there is the set functions that changes the state of the Watchdog
+manager.
+
+The init function must be called first, because it initializes the
+watchdog manager. It takes a configuration as argument.
 \section{Supervision mechanisms}
 \section{The state machine}
 \section{Global statuses}
