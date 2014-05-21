@@ -248,6 +248,22 @@ and Erlang. Such bugs will not be discovered by QuickCheck since both
 implementations will agree on the same incorrect model.
 
 \section{Bugs we found}
+A lot of bugs were found in the C-code, even bugs that was considered safety
+critical.  Bugs that were considered safety critical were mainly bugs in the
+supervision algorithms.  Most of the bugs were easy to fix but some needed a
+lot of C code to be rewritten.
+
+Even bugs in the generated code were found. Such bugs corrupted mainly the
+initial state of the watchdog manager.
+
+A lot of errors and ambiguity's etcetera were found in the AUTOSAR
+specification. Errors like misspelling of configuration parameter etcetera are
+not very likely to cause errors in implementations but still doesn't make the
+standard very trustworthy. Worst are however ambiguities in the specification,
+there were situations when we could not tell who was faulty. Our Erlang
+implementation or the C code? In those cases we choose to follow the C
+implementation.
+
 
 \section{Coverage}
 \section{Statistics}
