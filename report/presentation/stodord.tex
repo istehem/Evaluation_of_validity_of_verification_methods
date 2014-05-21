@@ -284,12 +284,25 @@ If several AUTOSAR modules is translated into Erlang code, they can be
 combined and QuickCheck can then test the dependencies of the whole
 connected system.
 
+One can also try to test more configurations in order to gain even
+better test results.
+
 \section{Conclusions}
 QuickCheck can be used in some extent to implement functional
 safety. The problem is that AUTOSAR is written with informal syntax
 and therefor must first be translated into formal syntax. Also
 functional safety is a process that stretches from idea to product,
 and not only at the software development level.
+
+One needs to be aware that it may be difficult to reach the whole
+state space if the configuration is to complex or not complex
+enough. There may also be configuration parameters that is not safe
+for the reliability of the system to turn off.
+
+It is important to measure the tested state space, but it is equally
+important to measure the code coverage. These two are semi independent
+of each other. One can have almost 100\% code coverage without covering
+the full state space.
 
 \section{Questions?}
 
