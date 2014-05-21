@@ -554,14 +554,15 @@
   \frametitle{Coverage \& Statistics}
   \begin{block}{Coverage}
     \begin{itemize}
-      \item line coverage of Erlang code (97.38\%)
-      \item call coverage of C code(81\%)
-      \item state coverage (100\% of valid transitions, 0\% of invalid transitions)
+      \item Line coverage of Erlang code (97.38\%)
+      \item Function coverage of the C code (100\%)
+      \item Condition/Decision coverage of C code (81\%)
+      \item State coverage (100\% of valid transitions, 0\% of invalid transitions)
     \end{itemize}
   \end{block}
   \begin{block}{Statistics}
     \begin{itemize}
-      \item generated command sequences of up to 120 commands (really no limit)
+      \item Generated command sequences of up to 120 commands (really no limit)
       \item 95\% starts with the command \verb!WdgM_Init!
     \end{itemize}
   \end{block}
@@ -572,9 +573,7 @@
 %================================================
 \begin{frame}[fragile]
   \frametitle{Development Error Detection}
-  Dangerous configuration parameter. If turned off then the Watchdog
-  Manager stops checking for null pointers. It is turned off before
-  production.
+  Dangerous configuration parameter.
 \end{frame}
 
 %================================================
@@ -590,11 +589,7 @@
 %================================================
 \begin{frame}
   \frametitle{Conclusions}
-  QuickCheck can be used in some extent to implement functional
-  safety. The problem is that AUTOSAR is written with informal syntax
-  and therefor must first be translated into formal syntax. Also
-  functional safety is a process that stretches from idea to product,
-  and not only at the software development level.
+  QuickCheck and functional safety.
 \end{frame}
 
 %================================================

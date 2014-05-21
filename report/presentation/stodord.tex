@@ -264,12 +264,33 @@ there were situations when we could not tell who was faulty. Our Erlang
 implementation or the C code? In those cases we choose to follow the C
 implementation.
 
+\section{Coverage \& Statistics}
+The reason we don't get 100\% line coverage of the Erlang module is
+that
 
-\section{Coverage}
-\section{Statistics}
+The same goes for the Condition/Decision coverage of the C code.
+
 \section{Functional safety}
+The configuration holds a dangerous parameter that is called
+DevErrorDetect. This parameter will allow the Watchdog manager to
+check for development errors like null pointers. If the parameter is
+turned of and a function is called with invalid data, then the whole
+system will crash.
+
+This parameter is actually turned off before the code is sent to production.
+
 \section{Future work}
+If several AUTOSAR modules is translated into Erlang code, they can be
+combined and QuickCheck can then test the dependencies of the whole
+connected system.
+
 \section{Conclusions}
+QuickCheck can be used in some extent to implement functional
+safety. The problem is that AUTOSAR is written with informal syntax
+and therefor must first be translated into formal syntax. Also
+functional safety is a process that stretches from idea to product,
+and not only at the software development level.
+
 \section{Questions?}
 
 \end{document}
