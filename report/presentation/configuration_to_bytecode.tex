@@ -2,13 +2,14 @@
 \node at (4,4) {Configuration};
 \draw[->] (4,3.8) -- (4,2);
 \draw (3,0) rectangle (5,2) node at (4,1) {Generator};
-\draw[->] (5,1) -- (7,1); %% -> Compiler
-\node at (8,4) {C code}; %% -> Compiler
-\draw[->] (8,3.8) -- (8,2);
-\node at (8,-2) {Stubs/};
-\node at (8,-2.5) {Dependencies};
-\draw[->] (8,-1.8) -- (8,0);
-\draw (7,0) rectangle (9,2) node at (8,1) {Compiler};
-\draw[->] (9,1) -- (10,1);
-\node at (11,1) {Byte code};
+\draw[->] (5,1) -- (9,1); %% -> Compiler
+\node at (7,0.5) {Generated C code};
+\node at (10,4) {C code}; %% -> Compiler
+\draw[->] (10,3.8) -- (10,2);
+\node at (10,-2) {Stubs/};
+\node at (10,-2.5) {Dependencies};
+\draw[->] (10,-1.8) -- (10,0);
+\draw (9,0) rectangle (11,2) node at (10,1) {Compiler};
+\draw[->] (11,1) -- (12,1);
+\node at (13,1) {Byte code};
 \end{tikzpicture}
