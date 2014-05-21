@@ -550,34 +550,31 @@
 %\subsection{Coverage}
 %------------------------------------------------
 
-\begin{frame}
-  \frametitle{Coverage}
-  \begin{itemize}
-    \item line coverage of Erlang code (97.38\%)
-    \item call coverage of C code(81\%)
-    \item state coverage (100\% of valid transitions, 0\% of invalid transitions)
-  \end{itemize}
-\end{frame}
-
-%------------------------------------------------
-%\subsection{Statistics}
-%------------------------------------------------
-
 \begin{frame}[fragile]
-  \frametitle{Statistics}
-  \begin{itemize}
-    \item generated command sequences of up to 120 commands (really no limit)
-    \item 95\% starts with the command \verb!WdgM_Init!
-  \end{itemize}
+  \frametitle{Coverage \& Statistics}
+  \begin{block}{Coverage}
+    \begin{itemize}
+      \item line coverage of Erlang code (97.38\%)
+      \item call coverage of C code(81\%)
+      \item state coverage (100\% of valid transitions, 0\% of invalid transitions)
+    \end{itemize}
+  \end{block}
+  \begin{block}{Statistics}
+    \begin{itemize}
+      \item generated command sequences of up to 120 commands (really no limit)
+      \item 95\% starts with the command \verb!WdgM_Init!
+    \end{itemize}
+  \end{block}
 \end{frame}
 
 %================================================
 \section{Functional Safety}
 %================================================
 \begin{frame}[fragile]
-  \frametitle{DevErrorDetect}
-  Development Error Detect parameter
-  Dangerous configuration flag \verb!DevErrorDetect!
+  \frametitle{Development Error Detection}
+  Dangerous configuration parameter. If turned off then the Watchdog
+  Manager stops checking for null pointers. It is turned off before
+  production.
 \end{frame}
 
 %================================================
@@ -585,8 +582,7 @@
 %================================================
 \begin{frame}[fragile]
   \frametitle{Integration testing}
-  Another part of future work could be to implement a model for
-  \verb!WdgIf! and get the two modules to work coherently.
+  Test dependent modules together.
 \end{frame}
 
 %================================================
@@ -594,6 +590,11 @@
 %================================================
 \begin{frame}
   \frametitle{Conclusions}
+  QuickCheck can be used in some extent to implement functional
+  safety. The problem is that AUTOSAR is written with informal syntax
+  and therefor must first be translated into formal syntax. Also
+  functional safety is a process that stretches from idea to product,
+  and not only at the software development level.
 \end{frame}
 
 %================================================
