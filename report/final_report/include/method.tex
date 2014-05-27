@@ -69,8 +69,8 @@ modules up for discussion. Since the goal was to get a proof of
 concept; examining if it was possible to get an ASIL-classification
 and achieve functional safety using QuickCheck, it seemed preferable
 to choose a less complicated module. It was also desirable to have the
-actual C code and not just library files, because then we could check
-ambiguities in AUTOSAR in a more efficient way.
+actual C code and not just library files, because then ambiguities in
+AUTOSAR could be checked in a more efficient way.
 
 \section{Implementation}
 The module that was chosen, was already unit tested and run actively
@@ -161,7 +161,8 @@ further tests. Some alternatives were discussed.
   \item Change the Erlang module to a faulty behavior to follow the C
     implementation. The problem is that other configurations or
     updated versions of the C code will show up as faulty when using
-    the same Erlang model.
+    the same Erlang model, and it could be hard to discover secondary
+    failures.
 \end{enumerate}
 
 Item \ref{ENUMERATE:FixCCode} was chosen because this was the most dynamic
@@ -172,10 +173,13 @@ found but also rules that contradicted each other were recognized. In
 those cases the implementation in the C-code was followed.
 
 \subsection{Advantage of having the Actual C-code}
-%% TODO: Sista meningen lite lösryckt?
 When it did not exist a clear interpretation of the AUTOSAR
-specification, a great method for understanding, was to examine the C
-code. Even though QuickCheck can be used to test libraries when the source code is not available.
+specification, a great method for understanding was to examine the C
+code.
+QuickCheck can be used to test libraries when only the compiled
+source code is available, but this make the ambiguities harder to
+discover. A third model would then be needed to justify whether the C
+model or the Erlang model would be correct.
 
 \section{Implementation structure}
 The final implementation consisted of several Erlang modules. Table
@@ -191,20 +195,21 @@ equivalence in the C-code.
 \hline
 modules & descriptions \\
 \hline
-wdgm\_helper            & Helper module used by  wdgm\_helper \\
-wdgm\_checkpointreached & Erlang version of checkpointreached, see \ref{SEC:CHECKPOINTREACHED} \\
-wdgm\_main              & Erlang version of the main function, see \ref{SEC:MAINFUNCTION} \\
-wdgm\_pre               & Checks for AUTOSAR preconditions \\
-wdgm\_post              & Checks for AUTOSAR postconditions \\
-wdgm\_next              & Defines the watchdog manager model, uses
-wdgm\_checkpointreached, wdgm\_main and wdgm\_helper
+wdgm\_helper            & Helper module used by most of the other modules. \\
+wdgm\_checkpointreached & Erlang version of checkpointreached, see appendix \ref{SEC:CHECKPOINTREACHED}. \\
+wdgm\_main              & Erlang version of the main function, see appendix \ref{SEC:MAINFUNCTION}. \\
+wdgm\_pre               & Checks for AUTOSAR preconditions.\\
+wdgm\_post              & Checks for AUTOSAR postconditions.\\
+wdgm\_next              & Defines the watchdog manager state model,
+utilizes both wdgm\_checkpointreached and wdgm\_main.
 \end{tabular}
 \end{table}
 
 \section{Evaluation of the Implementation}
 If tests come back positive, it does not really say much more than
-that those tests evaluated to true. There is a need to evaluate what
-was actually tested.
+that those tests evaluated to true. There was a need to evaluate what
+was actually tested. Coverage of the code and also coverage of visited
+states was needed to evaluate tests.
 
 \subsection{Verifying the tests}
 When the module was fully implemented in Erlang code there had to be
@@ -274,8 +279,6 @@ To get a better picture of the work flow used in this thesis see
 figure \ref{fig:workflow}.
 
 \begin{figure}[!ht]
-  \caption{Work flow}
-  \label{fig:workflow}
   \fbox{
     \parbox{\linewidth}{
       \begin{enumerate}
@@ -294,6 +297,8 @@ figure \ref{fig:workflow}.
       \item If not go the step \ref{compare}
       \end{enumerate}
     }}
+  \caption{Work flow}
+  \label{fig:workflow}
 \end{figure}
 
 A challenging step is the analysis of the results. If the testing tool
@@ -322,7 +327,7 @@ lack of supervision functions, only could change the global status
 between \lstinline!WDGM_GLOBAL_STATUS_OK! and
 \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!. This on the other hand,
 tested some null conditions, for example when there are no supervised
-entities.
+entities. For more information about the states, see appendix \ref{APP:GLOBALSTATUS}.
 
 The last configuration (named Freescale configuration), which was one
 of the configurations that were used actively in lab equipment, was
