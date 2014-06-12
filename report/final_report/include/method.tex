@@ -72,6 +72,21 @@ to choose a less complicated module. It was also desirable to have the
 actual C code and not just library files, because then ambiguities in
 AUTOSAR could be checked in a more efficient way.
 
+\section{The Watchdog Mangar (WdgM)}
+The AUTOSAR module that was chosen was the watchdog manager. This module seemed
+to fit the needs because it is a medium sized module which is highly state
+dependent and safety critical. It is safety critical since it monitors the
+hardware watchdogs. Since the objective was to be able to formally
+verify AUTOSAR modules and thereby examine if it was possible to higher the
+ASIL-classification, it seemed reasonable to chose a safety critical module. To
+evaluate if it was possible to reach the objectives, a module with some
+functionality, which still was not to complex, was desirable.  The watchdog
+manager is described in detail in appendix \ref{APPENDIX:WDGM}. As described in
+\ref{APP:GLOBALSTATUS} the watchdog manager has a global status that defines its
+general behavior. This status can be assigned 5 different values.
+The global status was considered very important, since it specifies
+correct and incorrect behaviour of the watchdog manager.
+
 \section{Implementation}
 The module that was chosen, was already unit tested and run actively
 in lab environment.
