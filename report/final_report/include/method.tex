@@ -1,27 +1,27 @@
 \section{Existing verification tools}
 Software unit testing can be achieved by almost any tool.  The choice
-of verification tool is therefore not the most interesting when it
+of verification tool was therefore not the most interesting when it
 comes to pure unit testing. One can of course take the simplicity to
-achieve good unit testing into account, but it is not what makes a
-verification tool unique for this projects goals.
+achieve good unit testing into account, but this was not goals of this
+project.
 
 %% TODO: Är det inte en del av Avgränsningarna och inte Metodik?
-Since the purpose is about bench marking software the phase
+Since the purpose was about bench marking software the phase
 ``verification of software safety requirements'' will not influence
 the choice. To be able to test this phase, a greater amount of
 components of the whole system must be available. Such components
 include hardware, and this report will not cover hardware
-integration. The implementation should be able to run on a standard
-PC-machine.
+integration. The scope of this project was to be able to run the
+implementation on a standard PC-machine.
 
-The most interesting part of the V-model is the phase ``software
-integration and testing''. Is there a tool that can be used to easily
-combine tests and requirements from different modules? Is it possible
-to test functional safety concept from this combination, for example
-by corrupting some software elements?
+The most interesting part of the V-model was the phase ``software
+integration and testing''. If it exists a tool that could be used to
+easily combine tests and requirements from different modules, and if
+it was possible to test functional safety concept from this
+combination, for example by corrupting some software elements.
 
-Two tools that can be used in order to achieve better code and some
-functional safety is SPIN and Parasoft C/C++test. While SPIN can
+Two tools that could be used in order to achieve better code and some
+functional safety was SPIN and Parasoft C/C++test. While SPIN can
 verify the model, Parasoft C/C++test defines policies on work flow as
 well as coding.
 
@@ -258,22 +258,21 @@ number of commands the absorbing state \emph{stopped} was reached.
 
 \subsection{Finding better test cases}
 The next step was to tweak the generators that were used by QuickCheck
-to construct valid API-calls. This is done to find better test cases,
+to construct valid API-calls. This was done to find better test cases,
 i.e. there were a number of branches in the C-code that needed a
 specific sequence of API calls with correct arguments, to be
-reached. For example, it is unreasonable to test functions often when
+reached. For example, it was unreasonable to test functions often when
 the initialization function \lstinline!WdgM_Init! has not yet been
 called.
 
-Thanks to QuickCheck's weight feature, it is simple to change the
+Thanks to QuickCheck's weight feature, it was simple to change the
 ratio of the generation of certain API calls; by matching the state
 and the function name of the API call, one can change the probability
 of generation of that call.
 
-As an example we have the initialization function
-\lstinline!WdgM_Init!  were we want to have a high priority if it has
-not been called yet, and a low priority if it has been called
-previously.
+For example the initialization function \lstinline!WdgM_Init! should
+have a high priority if it had not been called previously, and a low
+priority if it had been called previously.
 \begin{lstlisting}
 weight(S,  'WdgM_Init') ->
   case S#state.initialized of
@@ -281,8 +280,8 @@ weight(S,  'WdgM_Init') ->
     _                              -> 200
   end;
 \end{lstlisting}
-It is a good idea not to lower some ratios to much, because then
-certain API sequences would not be generated, and bugs might be
+It was a good idea not to lower some ratios to much, because then
+certain API sequences would not be generated, and bugs could have been
 missed.
 
 The tweaking of the generators were implemented in a iterative way by
@@ -316,9 +315,9 @@ figure \ref{fig:workflow}.
   \label{fig:workflow}
 \end{figure}
 
-A challenging step is the analysis of the results. If the testing tool
-returns zero errors what does that say about the robustness of the
-input byte code? Passed 100 of 100 tests is just a statement and does
+A challenging step was the analysis of the results. If the testing tool
+returned zero errors what did that say about the robustness of the
+input byte code? Passing 100 of 100 tests is just a statement and does
 not say anything more than that some tests passed. Can tests be
 implemented in a clever way so that it is possible to get some kind of
 confidence on the correctness of the code?
@@ -351,7 +350,7 @@ global status stayed in a non-absorbing state more often; it was
 easier to do positive testing.
 
 %% TODO: Stämmer sista meningen? Stämmer referensen.?
-The tweaking of generators, where the aim is to generate better test
+The tweaking of generators, where the aim was to generate better test
 cases, seemed in some sense to be configuration dependent. Better test
 cases were generated if the generators were tweaked according to a
 specific configuration, see chapter \ref{CHAPTER:RESULTS}.

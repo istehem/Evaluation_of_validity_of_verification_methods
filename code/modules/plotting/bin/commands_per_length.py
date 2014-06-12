@@ -20,10 +20,11 @@ def draw_plot():
             #legend = legend.T(loc = (0,150))
             )
 
-
     for i in function_names():
-        ar.add_plot(line_plot.T(data = get_data_for_item(data,function_names()[i]),line_style=colors[i-1],
-             label=function_names()[i].lower()))
+        if i in [1,5,6,8,9,11]: #[2,3,4,7,10]
+            ar.add_plot(line_plot.T(data = get_data_for_item(data,function_names()[i]),
+                                    line_style=colors[i-1],
+                                    label=function_names()[i].lower()))
 
     ar.draw()
     tb = text_box.T(loc=(40,130),text="Commands")

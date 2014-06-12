@@ -4,7 +4,9 @@
 \section{Achieving good test cases}
 To find good test cases is not trivial. It may not be enough to
 generate test cases which follows a correct behavior. Negative testing
-also needs to be taken into consideration.
+also needs to be taken into consideration, otherwise a module that is
+incorrectly implemented could return bad arguments or results to other
+modules.
 
 \subsection{Negative Testing}
 The problem with negative testing is that the watchdog manager quickly
@@ -62,6 +64,10 @@ possible checkpoints for all graphs, and then check whether one of
 those checkpoints also is configured for alive or deadline
 supervision. If it is, calculate the status for those supervision
 functions and then choose which checkpoint should be selected.
+If prioritized checkpoint generation is not implemented with logical
+supervision as foundation, alive supervision or deadline supervision
+could be used. This is harder because it is more likely to end up with
+a checkpoint that violates logical supervision rules.
 
 \subsection{Tweaking the generators}
 The generators did not need to be tweaked much when performing
@@ -145,20 +151,25 @@ the configuration, never executed. Those untested requirements also
 leaves other requirements untested because the watchdog manager never
 reaches a state when those other requirements must hold.
 
-%% TODO: Dela upp grafer i mindre delar, exempelvis getters vs setters
-%% och positive vs negative testing
 \begin{figure}[!ht]
-  \begin{center}
-    \subfigure[Shows percentage of each possible command executed]{
-      \label{FIG:COMMANDS_BSI}
-      \includegraphics{generated_pictures/history_commands_bsi.pdf}
-    }
+  \subfigure[Shows percentage of each possible command executed; state
+  dependent functions to the left and get functions to the right.]{
+    \label{FIG:COMMANDS_BSI}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_bsi_setters.pdf}
+    \end{minipage}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_bsi_getters.pdf}
+    \end{minipage}
+  }
 
-    \subfigure[Shows percentage of each visited global status]{
-      \label{FIG:STATUSES_BSI}
-      \includegraphics{generated_pictures/history_statuses_bsi.pdf}
-    }
-  \end{center}
+  \subfigure[Shows percentage of each visited global status]{
+    \label{FIG:STATUSES_BSI}
+     \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth
+      ]{generated_pictures/history_statuses_bsi_recoverable.pdf}
+    \end{minipage}
+  }
   \caption{Some statistics of the BSI minimal configuration.}
   \label{FIG:BSI}
 \end{figure}
@@ -213,16 +224,26 @@ hard to reach.
 %% konfigurationen.
 
 \begin{figure}[!ht]
-  \begin{center}
-    \subfigure[Shows percentage of each possible command executed]{
-      \includegraphics{generated_pictures/history_commands_freescale.pdf}
-      \label{FIG:COMMANDS_FREESCALE}
-    }
-    \subfigure[Shows percentage of all visited global status]{
-      \label{FIG:STATUSES_FREESCALE}
-      \includegraphics{generated_pictures/history_statuses_freescale.pdf}
-    }
-  \end{center}
+  \subfigure[Shows percentage of each possible command executed, state
+  dependent functions to the left and get functions to the right.]{
+    \label{FIG:COMMANDS_FREESCALE}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_freescale_setters.pdf}
+    \end{minipage}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_freescale_getters.pdf}
+    \end{minipage}
+  }
+  \subfigure[Shows percentage of all visited global status,
+  recoverable statuses to the left and non recoverable to the right.]{
+    \label{FIG:STATUSES_FREESCALE}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_statuses_freescale_recoverable.pdf}
+    \end{minipage}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_statuses_freescale_nonrecoverable.pdf}
+    \end{minipage}
+  }
   \caption{Some statistics for the Freescale configuration.}
   \label{FIG:FREESCALE}
 \end{figure}
@@ -244,17 +265,27 @@ state \lstinline!WDGM_GLOBAL_STATUS_FAILED! to the state
 \ref{TABLE:STATUSES_EXAMPLE}. The reason for that is that the alive
 functions must fail once and then continue without failures.
 \begin{figure}[!ht]
-  \begin{center}
-    \subfigure[Shows percentage of each possible command executed]{
-      \label{FIG:COMMANDS_EXAMPLE}
-      \includegraphics{generated_pictures/history_commands_example.pdf}
-    }
+  \subfigure[Shows percentage of each possible command executed, state
+  dependent functions to the left and get functions to the right.]{
+    \label{FIG:COMMANDS_EXAMPLE}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_example_setters.pdf}
+    \end{minipage}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_example_getters.pdf}
+    \end{minipage}
+  }
 
-    \subfigure[Shows percentage of all visited global status]{
-      \label{FIG:STATUSES_EXAMPLE}
-      \includegraphics{generated_pictures/history_statuses_example.pdf}
-    }
-  \end{center}
+  \subfigure[Shows percentage of all visited global status,
+  recoverable statuses to the left and non recoverable to the right.]{
+    \label{FIG:STATUSES_EXAMPLE}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_statuses_example_recoverable.pdf}
+    \end{minipage}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_statuses_example_nonrecoverable.pdf}
+    \end{minipage}
+  }
   \caption{Some statistics for the Example configuration}
   \label{FIG:EXAMPLE}
 \end{figure}
@@ -307,7 +338,7 @@ modifies the internal state of the watchdog manager, see appendix
 will influence the result of following API calls.
 
 The Init and DeInit functions can just change the global status
-between two states, and should only change the state of the watchdog
+between two states and should only change the state of the watchdog
 when the watchdog is in either \lstinline!WDGM_GLOBAL_STATUS_OK! or
 \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!, according to figure
 \ref{FIG:GLOBALSTATUSES}. If this happens they will change the
@@ -348,6 +379,7 @@ possible because we know that \lstinline!WdgM_MainFunction! is called
 periodically.
 
 \section{Coverage}
+\label{SEC:COVERAGE}
 \subsection{Erlang module}
 %% TODO: Dubbelkolla dessa värden.
 \newcommand{\linecoverage}{97.38\%}
@@ -461,7 +493,7 @@ configuration parameter, which if turned off resulted in a
 segmentation fault.
 
 The coverage statistics shown in figure \ref{FIG:BULLSEYE} is
-constructed using three configuration. Using several configurations
+constructed using the three configurations mentioned. Using several configurations
 gave better results since some code is impossible to reach if not
 certain configuration parameters are set.
 
@@ -569,18 +601,15 @@ code, see appendix \ref{SEC:QuickCheckIntro}, which could possible also be used
 for running such tests.
 
 \subsection{Confidence interval}
-
-%% how certain is the verification
-
-%% LoC
-%% right side of pipe:  without blank lines and comments
-%% *.c files: 3271 | 1736
-%% *.h files: 18964 | 10942
-%% total c-code: 22235 | 12678
-%% *.erl: 2006 | 1470
-%% *.hrl: 68 | 64
-%% total erlang: 2074 | 1534
-
+As seen in section \ref{SEC:COVERAGE}, total coverage of a module
+could be hard to reach, because the code is configuration
+dependent. This makes it also hard to predict how well tested a module
+is with the use of a confidence interval. One can at least say that
+the more complex a configuration is, the more test cases is needed to
+improve the coverage. For the Freescale configuration for example, it
+took approximately 400 test cases to achieve 90\% code coverage, while
+it only took around 200 test cases to achieve the maximum 38\%
+coverage the BSI configuration could supply.
 
 \subsection{Measurements of the state space}
 One way when trying the measure the state space is to collect

@@ -22,8 +22,10 @@ def draw_plot():
 
 
     for i in status_names():
-        ar.add_plot(line_plot.T(data = get_data_for_item(data,status_names()[i]),line_style=colors[i-1],
-             label=status_names()[i][19:].lower()))
+        if i in [1,2]: #[3,4,5]
+            ar.add_plot(line_plot.T(data = get_data_for_item(data,status_names()[i]),
+                                    line_style=colors[i-1],
+                                    label=status_names()[i][19:].lower()))
 
     ar.draw()
     tb_s = text_box.T(loc=(40,130),text="Global Statuses")
