@@ -151,20 +151,25 @@ the configuration, never executed. Those untested requirements also
 leaves other requirements untested because the watchdog manager never
 reaches a state when those other requirements must hold.
 
-%% TODO: Dela upp grafer i mindre delar, exempelvis getters vs setters
-%% och positive vs negative testing
 \begin{figure}[!ht]
-  \begin{center}
-    \subfigure[Shows percentage of each possible command executed]{
-      \label{FIG:COMMANDS_BSI}
-      \includegraphics{generated_pictures/history_commands_bsi.pdf}
-    }
+  \subfigure[Shows percentage of each possible command executed; state
+  dependent functions to the left and get functions to the right.]{
+    \label{FIG:COMMANDS_BSI}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_bsi_setters.pdf}
+    \end{minipage}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_bsi_getters.pdf}
+    \end{minipage}
+  }
 
-    \subfigure[Shows percentage of each visited global status]{
-      \label{FIG:STATUSES_BSI}
-      \includegraphics{generated_pictures/history_statuses_bsi.pdf}
-    }
-  \end{center}
+  \subfigure[Shows percentage of each visited global status]{
+    \label{FIG:STATUSES_BSI}
+     \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth
+      ]{generated_pictures/history_statuses_bsi_recoverable.pdf}
+    \end{minipage}
+  }
   \caption{Some statistics of the BSI minimal configuration.}
   \label{FIG:BSI}
 \end{figure}
@@ -219,16 +224,26 @@ hard to reach.
 %% konfigurationen.
 
 \begin{figure}[!ht]
-  \begin{center}
-    \subfigure[Shows percentage of each possible command executed]{
-      \includegraphics{generated_pictures/history_commands_freescale.pdf}
-      \label{FIG:COMMANDS_FREESCALE}
-    }
-    \subfigure[Shows percentage of all visited global status]{
-      \label{FIG:STATUSES_FREESCALE}
-      \includegraphics{generated_pictures/history_statuses_freescale.pdf}
-    }
-  \end{center}
+  \subfigure[Shows percentage of each possible command executed, state
+  dependent functions to the left and get functions to the right.]{
+    \label{FIG:COMMANDS_FREESCALE}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_freescale_setters.pdf}
+    \end{minipage}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_freescale_getters.pdf}
+    \end{minipage}
+  }
+  \subfigure[Shows percentage of all visited global status,
+  recoverable statuses to the left and non recoverable to the right.]{
+    \label{FIG:STATUSES_FREESCALE}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_statuses_freescale_recoverable.pdf}
+    \end{minipage}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_statuses_freescale_nonrecoverable.pdf}
+    \end{minipage}
+  }
   \caption{Some statistics for the Freescale configuration.}
   \label{FIG:FREESCALE}
 \end{figure}
@@ -250,17 +265,27 @@ state \lstinline!WDGM_GLOBAL_STATUS_FAILED! to the state
 \ref{TABLE:STATUSES_EXAMPLE}. The reason for that is that the alive
 functions must fail once and then continue without failures.
 \begin{figure}[!ht]
-  \begin{center}
-    \subfigure[Shows percentage of each possible command executed]{
-      \label{FIG:COMMANDS_EXAMPLE}
-      \includegraphics{generated_pictures/history_commands_example.pdf}
-    }
+  \subfigure[Shows percentage of each possible command executed, state
+  dependent functions to the left and get functions to the right.]{
+    \label{FIG:COMMANDS_EXAMPLE}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_example_setters.pdf}
+    \end{minipage}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_commands_example_getters.pdf}
+    \end{minipage}
+  }
 
-    \subfigure[Shows percentage of all visited global status]{
-      \label{FIG:STATUSES_EXAMPLE}
-      \includegraphics{generated_pictures/history_statuses_example.pdf}
-    }
-  \end{center}
+  \subfigure[Shows percentage of all visited global status,
+  recoverable statuses to the left and non recoverable to the right.]{
+    \label{FIG:STATUSES_EXAMPLE}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_statuses_example_recoverable.pdf}
+    \end{minipage}
+    \begin{minipage}{0.48\linewidth}
+      \includegraphics[keepaspectratio, width=\linewidth ]{generated_pictures/history_statuses_example_nonrecoverable.pdf}
+    \end{minipage}
+  }
   \caption{Some statistics for the Example configuration}
   \label{FIG:EXAMPLE}
 \end{figure}
