@@ -1,0 +1,5 @@
+Change the last QuickCheck example in appendix
+Functional Safety in introduction
+APPENDIX C
+APPENDIX D
+abstract
