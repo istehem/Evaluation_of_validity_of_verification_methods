@@ -7,11 +7,11 @@ about tweaking the generators.
 Sometimes the model needs to be corrected because of ambiguities in AUTOSAR or
 errors in the model. Quite often it was the C-code that had the errors and
 needed to be corrected.
-Easier when you do white box testing, because then you can really check the code
-and compare with the requirements.
+Easier when you do white box testing, when the source code is known,
+because then you can really check the code and compare with the requirements.
 
 We achieved fair coverage of the c-code, around 90\%, and the Erlang code,
-around \%. The problem was the requirements where we achieved around 50\%. It
+around \%. The problem was the requirements, where we achieved around 50\%. It
 would help if an QuickCheck model was implemented for the whole system as
 well. Many of the requirements had dependencies in other modules, and some
 requirements for the file structure, the configuration or even the generation of
