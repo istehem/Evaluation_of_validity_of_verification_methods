@@ -354,6 +354,7 @@ possible because we know that \lstinline!WdgM_MainFunction! is called
 periodically.
 
 \section{Coverage}
+\label{SEC:COVERAGE}
 \subsection{Erlang module}
 %% TODO: Dubbelkolla dessa värden.
 \newcommand{\linecoverage}{97.38\%}
@@ -575,18 +576,15 @@ code, see appendix \ref{SEC:QuickCheckIntro}, which could possible also be used
 for running such tests.
 
 \subsection{Confidence interval}
-
-%% how certain is the verification
-
-%% LoC
-%% right side of pipe:  without blank lines and comments
-%% *.c files: 3271 | 1736
-%% *.h files: 18964 | 10942
-%% total c-code: 22235 | 12678
-%% *.erl: 2006 | 1470
-%% *.hrl: 68 | 64
-%% total erlang: 2074 | 1534
-
+As seen in section \ref{SEC:COVERAGE}, total coverage of a module
+could be hard to reach, because the code is configuration
+dependent. This makes it also hard to predict how well tested a module
+is with the use of a confidence interval. One can at least say that
+the more complex a configuration is, the more test cases is needed to
+improve the coverage. For the Freescale configuration for example, it
+took approximately 400 test cases to achieve 90\% code coverage, while
+it only took around 200 test cases to achieve the maximum 38\%
+coverage the BSI configuration could supply.
 
 \subsection{Measurements of the state space}
 One way when trying the measure the state space is to collect
