@@ -2,6 +2,36 @@
 \label{APP:QUICKCHECK}
 \lstset{style=erlang}
 \label{SEC:QuickCheckIntro}
+
+\section{The General Idea}
+Lets say that one created a \emph{sort} function that takes a list $Xs$ of any
+sortable items and returns the sorted version $Ys$ of $Xs$. Then one can specify
+certain properties that must hold for to the sort function. For instance:
+
+\noindent The arity of $Y$ must be the same.
+\begin{equation}
+        |Xs| = |Ys|
+\end{equation}
+
+\noindent The elements of $Ys$ must actually be sorted.
+\begin{equation}
+    y_{i-1} \leq y_i, \forall y_i \in Ys, i \neq 0
+\end{equation}
+
+\noindent For all permutations $Pe(Xs)$ holds:
+\begin{equation}
+sort(Zs) = Ys, \forall Zs \in Pe(Xs)
+\end{equation}
+
+\noindent The sets $Xs$ and $Ys$ contains the same elements.
+\begin{equation}
+        x \in Xs \leftrightarrow x \in Ys
+\end{equation}
+Instead of specifying own test cases QuickCheck makes it possible to write such
+properties, automatically generates test cases and checks that the properties
+specified actually holds.
+
+\section{Testing C-code}
 Lets say that one created a \emph{Queue} module in C that has a
 function for creating a new queue as well as functions for inserting and retrieving elements from a queue structure.
 
