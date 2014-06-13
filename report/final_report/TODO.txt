@@ -3,3 +3,4 @@ Functional Safety in introduction
 APPENDIX C
 APPENDIX D
 abstract
+fixa referenser
