@@ -1,16 +1,9 @@
 
 #include <stdlib.h>
+#include "q_api.h"
 
 /*extern void* malloc(size_t sz);
 extern void* calloc(size_t n, size_t s);*/
-
-typedef struct Queue_t
-{
-   int size;
-   int head;
-   int tail;
-   int* buffer;
-} Queue;
 
 Queue* new(int n)
 {
@@ -40,4 +33,3 @@ int space(Queue* q)
 {
    return q->size - ((q->tail + q->size)- q->head) % q->size - 1;
 }
-
