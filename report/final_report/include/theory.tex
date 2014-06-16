@@ -1,6 +1,4 @@
 \section{Formal Methods and Verification}
-%Boken 12.1 sid 309 310
-%% TODO: Add references
 %% TODO: varför är formal methods i kursiv?
 It is almost impossible to write specification in a natural language
 and not make room for different interpretations and
@@ -10,24 +8,22 @@ system with formal notation gives the ability of automating test cases
 for the system, since it is precisely defined.  Formal methods can be
 used everywhere in the development life cycle and not only when
 writing specification for the whole system.
-\cite[p.272]{COURSEBOOK:safety-critical}.
+\cite[p.272]{COURSEBOOK:safety-critical}
 
 In the ISO standard ISO~26262, see section \ref{SEC:ISO26262},
 something called semi-formal notation is also mentioned. The
 difference being that formal notation needs both semantics and syntax
 to be well defined but semi-formal notation needs only the definition
-of semantics \cite{ISO26262:car}.
+of semantics. \cite{ISO26262:car}
 
-%% TODO: presentera citatet
-%% TODO: varför fet stil på "Verification"
-''{\bf Verification} is the process of determining whether the output
-of a life cycle phase fulfills the requirements specified by the
-previous phase''. Formal verification is the verification of a system
+To determine whether the output of a life cycle phase fulfills the
+requirements specified by a previous phase, \emph{verification} is
+needed. Formal verification is the verification of a system
 using formal methods.  The exact meaning of verification is however
-confusing \cite{thomas_arts}. The definition may differ in comparison
+confusing. The definition may differ in comparison
 of academic or industrial use. Even in different phases of the safety
-life cycle verification is conducted in various forms
-\cite[8:9.2]{ISO26262}.
+life cycle verification is conducted in various forms.
+\cite{thomas_arts}\cite[8:9.2]{ISO26262}\cite[p.309]{COURSEBOOK:safety-critical}
 
 \section{Industrial Standards}
 
@@ -35,30 +31,28 @@ life cycle verification is conducted in various forms
 \label{SEC:ISO26262}
 IEC 61508 adopts a four level system for categorizing the severity of
 hazards. It also adopts a six level system for classifying the
-frequency of a hazard \cite{COURSEBOOK:safety-critical}. There are
-four risk classes which are given the values 1-4 where 1 corresponds
-to the most serious accidents and 4 to the least serious. Based on
-this, IEC 61508 has a four level classification of safety integrity
-levels called SIL, ranged from 1, being the least critical, to 4,
-being the most critical \cite{IEC61508}\cite{Advances:IEC61508}. Each
-of the safety integrity levels has a criteria of maximum frequency of
+frequency of a hazard. There are four risk classes which are given the
+values 1-4 where 1 corresponds to the most serious accidents and 4 to
+the least serious. Based on this, IEC 61508 has a four level
+classification of safety integrity levels called SIL, ranged from 1,
+being the least critical, to 4, being the most critical. Each of the
+safety integrity levels has a criteria of maximum frequency of
 failures which a system built on that SIL must satisfy. In other
 words, a SIL is a level of measure of the reliability of a safety
-function \cite{Advances:SIL4}.  Due to the fact that the failure of a
-safety function can lead to a hazardous event, the safety integrity of
-a specific safety function must be of such a level to ensure that the
-failure frequency is sufficiently low or that the consequences of the
-hazardous event are modified to meet a tolerable risk. To ensure
-safety, functions with SIL 4 need to be tested and documented the
-most.
+function.  Due to the fact that the failure of a safety function can
+lead to a hazardous event, the safety integrity of a specific safety
+function must be of such a level to ensure that the failure frequency
+is sufficiently low or that the consequences of the hazardous event
+are modified to meet a tolerable risk. To ensure safety, functions
+with SIL 4 need to be tested and documented the most.
+\cite{COURSEBOOK:safety-critical}\cite{IEC61508}\cite{Advances:IEC61508}\cite{Advances:SIL4}
 
 The automotive functional safety standard, ISO~26262, has adopted a
 similar system of safety integrity levels, called automotive safety
 integrity levels or ASIL. As with IEC~61508 there are four integrity
 levels, ranged A-D, but there are no direct correlation between the
-two \cite{TI:safety_critical}.
+two. \cite{TI:safety_critical}
 
-%% TODO: Referenser
 ISO~26262 describes the full development process, from concept to
 production, with functional safety in mind. For software development,
 the standard has a reference model with different phases of the
@@ -76,7 +70,7 @@ software components. The third phase and the last development phase,
 in the model is the ``software unit design and implementation''. This
 phase contains the implementation of each module. If the
 implementation does not meet the specified safety, the product needs
-to go back to an earlier phase and be redesigned.
+to go back to an earlier phase and be redesigned. \cite[6:5.4]{ISO26262}\cite[p.8-9]{COURSEBOOK:safety-critical}
 
 \begin{figure}
   \includegraphics[keepaspectratio, width=\linewidth]{pictures/V}
@@ -84,9 +78,6 @@ to go back to an earlier phase and be redesigned.
   \label{FIG:ISO:phases}
 \end{figure}
 
-%% TODO: Ligger inte vi i fasen "verification of software safety
-%% requirement"? Isf behöver vi skriva lite mer om det?
-%% TODO: Referenser
 Each of these phases is tested thoroughly with the phases ``software
 unit testing'', ``software integration and testing'' and
 ``verification of software safety requirements''. The unit testing
@@ -97,17 +88,17 @@ implementation phase. The objective in the phase software integration
 and testing is to integrate the software units and demonstrate that
 the architectural design is correct. A demonstration that the software
 safety requirements is meet, is performed in the phase ``verification
-of software safety requirements''.
+of software safety requirements''. \cite[6:5.4]{ISO26262}
 
 \subsection{AUTOSAR (AUTomotive Open System ARchitecture)}
-%Källa http://www.autosar.org/
 The AUTOSAR platform has a layered software architecture. This means
 that the architecture is divided to a number of different layers, such
 as the application layer, runtime environment, the basic software
 layer, and the microcontroller. In the
 figure~\ref{FIG:AUTOSAR:architecture} the basic software layer is
 represented as four different parts; services, ECU abstraction,
-microcontroller abstraction, and complex drivers.
+microcontroller abstraction, and complex
+drivers. \cite{AUTOSAR:LayeredSoftwareArchitecture}
 
 \begin{figure}[!ht]
   \begin{center}
@@ -118,21 +109,18 @@ microcontroller abstraction, and complex drivers.
   \label{FIG:AUTOSAR:architecture}
 \end{figure}
 
-%% TODO: "applications such as sensors and actuators" stämmer detta?
-%% Är inte det hårdvara?
 %% TODO: vad menas med "onboard device abstraction"?
-%% TODO: Referenser
 The runtime environment is the operating system, and the
 microcontroller is the hardware. The software running in the
-application layer is applications such as sensors and actuators. One
-example of how the different parts in the basic software layer is
-integrated, is the watchdog, which consist of several parts as seen in
-figure~\ref{FIG:AUTOSAR:watchdog}. The microcontroller abstraction
-layer has the drivers for the watchdog; the interaction with the
-microcontroller. Then there is the watchdog interface at the ECU
-abstraction layer. The watchdog interface is the onboard device
-abstraction. Last is the watchdog manager (abbreviated WdgM) which
-runs as a system service in the service layer.
+application layer are for example software components for sensors and
+actuators. One example of how the different parts in the basic
+software layer is integrated, is the watchdog, which consist of
+several parts as seen in figure~\ref{FIG:AUTOSAR:watchdog}. The
+microcontroller abstraction layer has the drivers for the watchdog;
+the interaction with the microcontroller. Then there is the watchdog
+interface at the ECU abstraction layer. The watchdog interface is the
+onboard device abstraction. Last is the watchdog manager (abbreviated
+WdgM) which runs as a system service in the service layer. \cite{AUTOSAR:LayeredSoftwareArchitecture}
 
 \begin{figure}[!ht]
   \begin{center}
@@ -142,14 +130,12 @@ runs as a system service in the service layer.
   \label{FIG:AUTOSAR:watchdog}
 \end{figure}
 
-%% TODO: Referenser
 The watchdog have a number of dependencies to other services in the
 basic software layer. For example when an error is found by the
 watchdog, it could either be reported to the diagnostic event manager
 or the development error tracer depending on the type of error. These
-are two services that are used for error management.
+are two services that are used for error management. \cite{SPEC:AUTOSAR:WDGM}
 
-%% TODO: Referenser
 AUTOSAR's concept is to make it possible for vehicle manufacturers to
 buy modules from different software developers, which will still work
 together in unison. For a software developer to present a software
@@ -159,29 +145,26 @@ number of parameters that can be configured in order to fit a specific
 vehicle manufacture. In the watchdog manager for example, there is
 parameters that specify if the watchdog manager should report errors
 to the diagnostic event manager (DEM), or which type of supervision
-that should be executed and what to supervise.
+that should be executed and what to supervise. \cite{AUTOSAR:basic_info}\cite{AUTOSAR:LayeredSoftwareArchitecture}
 
-%% TODO: Referenser
 The current version of AUTOSAR, version 4, has been design with
 functional safety in mind. Essential concepts of ISO~26262 have been
-developed alongside AUTOSAR.
+developed alongside AUTOSAR. \cite{AUTOSAR:basic_info}
 
 \section{Verification Methods}
-%% TODO: Referenser
 The standard IEC~61508 propose two methods to formal verify a
 program. The key is to model the program into one of the following
-state transition models.
+state transition models. \cite[p. 127]{IEC61508}
 
 \begin{enumerate}
 \item \label{enum:FSM} Finite state machines/state transition diagrams
 \item Time Petri nets
 \end{enumerate}
 
-%% TODO: Referenser
 IEC~61508 emphasises that Time Petri nets are best suited for
 concurrent programs. Regarding the finite state machine method, the
 following criteria needs to be satisfied for the implemented state
-machine to be formal verified:
+machine to be formal verified \cite[p. 77-79]{IEC61508}\cite[p. 322]{COURSEBOOK:safety-critical}:
 
 \begin{description}
   \item[completeness] the system must have an action and new state for
@@ -197,21 +180,19 @@ If the state machine is correctly implemented it represents a correct
 model of the original program. If it does not exist any unwanted
 transitions or states, then the original program is formal verified.
 
-%% TODO: Referenser
 Since most program specifications are written in natural languages
 there may be lot of ambiguities. Techniques have been developed to
 reduce such cases, and these techniques are often referred to as semi
 formal verification, because they often lack the mathematical rigor
 associated with formal verification. These methods use textual,
 graphical or other notation; often several techniques are used in
-unity.
+unity. \cite[p. 91]{COURSEBOOK:safety-critical}
 
-%% TODO: Referenser
 The description of semi formal verification in IEC~61508 states:
 ''Semi-formal methods provide a means of developing a description of a
 system at some stage in its development, i.e. specification, design or
 coding. The description can in some cases be analyzed by machine or
-animated to display various aspects of the system behavior.''
+animated to display various aspects of the system behavior.'' \cite[p. 77]{IEC61508}
 
 
 \subsection{QuickCheck}
