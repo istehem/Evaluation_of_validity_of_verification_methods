@@ -1,89 +1,100 @@
 \section{Background}
 \subsection{The Development within automotive industry}
-In the recent decades there has been a dramatic growth of information
-and communication innovations within the automotive industry
-\cite{CRC:embedded_handbook}. Analog vehicles have been transformed
-into complex electromechanical systems
-\cite{Cambridge:controlsystems}. New features are implemented (for
-example due to user demands, traffic safety or environmental
-regulations) requiring more computational power and less energy
-consumption \cite{Springer:advanced_microsystems}\cite{ISO26262}. The
-average car has already 80 ECU's (electronic computation units) and to
-deal with the extra functionality, each ECU will need to become more
-complex \cite{Springer:advanced_microsystems}\cite{QUVIQ:COURSE}.
+In the recent decades there has been a dramatic growth of information and
+communication innovations within the automotive industry.  Analog vehicles have
+been transformed into complex electromechanical systems. New features are
+implemented (for example due to user demands, traffic safety or environmental
+regulations) requiring more computational power and less energy consumption.
+The average car has already 80 ECU's (electronic computation units) and to deal
+with the extra functionality, each ECU will need to become more
+complex.
+\cite{CRC:embedded_handbook}
+\cite{Cambridge:controlsystems}
+\cite{Springer:advanced_microsystems}
+\cite{Springer:advanced_microsystems}
+\cite{ISO26262}
+\cite{QUVIQ:COURSE}
 
 \subsection{Extent of software in modern vehicles}
 %% TODO: Försköna första stycket
-Developing a new car model costs up to one billion \euro, where
-electronics has reached a mean share of one third of the value,
-divided 20\% sensor value, 40\% hardware value and 40\% software value
-\cite{Wiley:internetworking}\cite{Clemens:tech_acceptance}. The share
-of software has been doubled the last 10 years.
+Developing a new car model costs up to one billion \euro, where electronics has
+reached a mean share of one third of the value, divided 20\% sensor value, 40\%
+hardware value and 40\% software value. The share of software has been doubled
+the last 10 years.
+\cite{Wiley:internetworking}
+\cite{Clemens:tech_acceptance}
 
 More and more functions will be implemented; Intelligent traffic
 systems which make the automotive vehicles communicate with the
 roadside management systems, infotainment systems will bring, among
 other, weather information through the Internet and emergency call
-support, traffic sign recognition, night vision and automated parking
-\cite{Springer:advanced_microsystems}\cite{VOLVO:convoys}
-\cite{Cambridge:controlsystems}\cite{Wiley:internetworking}.
+support, traffic sign recognition, night vision and automated parking.
+\cite{Springer:advanced_microsystems}
+\cite{VOLVO:convoys}
+\cite{Cambridge:controlsystems}
+\cite{Wiley:internetworking}
 
 The number of lines of code running in a vehicle is another example of how
-complex the automotive software is. The software running on a F-22 Raptor
-and the F-35 Strike Fighter, two of the attack planes in the US air force, has
-about 1.7 million lines of code and 5.7 million lines of code respectively
-\cite{IEEESpectrum:car_code}. The passenger plane Boeing 787 Dreamliner runs on
-6.5 million lines of code, where the average premium-class car has close to 100
-million lines of code.
+complex the automotive software is. The software running on a F-22 Raptor and
+the F-35 Strike Fighter, two of the attack planes in the US air force, has
+about 1.7 million lines of code and 5.7 million lines of code respectively. The
+passenger plane Boeing 787 Dreamliner runs on 6.5 million lines of code, where
+the average premium-class car has close to 100 million lines of code.
+\cite{IEEESpectrum:car_code}
 
 \subsection{Introduction of standards}
 Because of the high development costs, and the complexity of modern
 cars, car manufacturers, suppliers and other companies related to the
 automotive industry joined efforts in 2003 and created AUTOSAR, short
-for Automotive Open System Architecture \cite{AUTOSAR:basic_info}. The
+for Automotive Open System Architecture. The
 main purpose is to make it possible for car manufacturers to buy
 independent components from different software suppliers; the AUTOSAR
 motto is ``Cooperate on standards, compete on implementation''.
+\cite{AUTOSAR:basic_info}
 
 %% TODO: Överväg att byta "ISO 26262" i andra meningen mot något mer givande.
 Functional safety was introduced to the automotive industry with ISO
-26262 in late 2011 \cite{ISO26262}. ISO 26262 named ``Road vehicles --
+26262 in late 2011. ISO 26262 named ``Road vehicles --
 Functional safety'' is a general standard on how the implementation of
 functional safety in vehicle development should be carried out from
 beginning to end.
+\cite{ISO26262}
 
 This standard is built on top of another industrial standard, IEC
 61508, named ``Functional safety of electrical/electronic/programmable
 electronic safety-related systems'', which purpose is to ensure
-functional safety in computer based systems' overall life cycles
-\cite{IEC61508}\cite{ISO26262}.
+functional safety in computer based systems' overall life cycles.
+\cite{IEC61508}
+\cite{ISO26262}
 
 It is useful to distinguish between systems with different levels of
-dependability, and determine where the hazards exists
-\cite{COURSEBOOK:safety-critical}. When this risk analysis is
-completed, and appropriate reliability and availability requirements
-is assigned to the system, the system can be identified by a certain
-automotive safety integrity level (ASIL).  If this number is high,
-the system will experience a more rigorous design and testing than
-could be justified for a lesser demanding system. These levels are
-more defined in the standards IEC~61508 and ISO~26262.
-%taget ifrån wikipedia, bättre källa behövs. Dessvärre räcker det inte med våra
-%egna slutsatser.
+dependability, and determine where the hazards exists. When this risk analysis
+is completed, and appropriate reliability and availability requirements is
+assigned to the system, the system can be identified by a certain automotive
+safety integrity level (ASIL).  If this number is high, the system will
+experience a more rigorous design and testing than could be justified for a
+lesser demanding system. These levels are more defined in the standards
+IEC~61508 and ISO~26262.
+\cite{COURSEBOOK:safety-critical}
+
+%taget ifrån wikipedia, bättre källa behövs. Dessvärre räcker
+%det inte med våra egna slutsatser.
 The ASIL can be said to be the measurement of functional safety. Hence a
 product within the automotive industry can be claimed to be ''functional safe'' to a
 certain ASIL.
 
-
 \subsection{Testing}
-Functional safety demands testing, and testing accounts for around
-half of all software development costs
-\cite{ISO26262}\cite{QUICKCHECK:lightweight}\cite{QUICKCHECK:software}. Reducing
-the cost is motivated and can be done by automating the test
-generation process \cite{Testing:black_box}.
+Functional safety demands testing, and testing accounts for around half of all
+software development costs . Reducing the cost is motivated and can be done by
+automating the test generation process.
+\cite{ISO26262}
+\cite{QUICKCHECK:lightweight}
+\cite{QUICKCHECK:software}
+\cite{Testing:black_box}
 
 %% TODO: skriv att det kallas state-space explosion problem i stycket nedan.
 For simple devices it is possible to exhaustively test the functional
-safety of the system \cite{COURSEBOOK:safety-critical}. For example
+safety of the system. For example
 consider a system consisting of a small number of switches, where each
 switch has only two states; open and closed. Then the number of
 possible failures can be determined by the combination of all possible
@@ -92,7 +103,7 @@ in systems such as microprocessors or ECU's, the number of possible
 failure states is so large that it is considered infinite. This makes
 it impossible to exhaustively test the system, and therefore, make the
 detection of failures unreliable.
-
+\cite{COURSEBOOK:safety-critical}
 
 \section{Purpose}
 This thesis purpose is to automate the testing process of automotive

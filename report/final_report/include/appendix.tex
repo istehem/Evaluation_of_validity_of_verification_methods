@@ -58,10 +58,10 @@ instance:
 \begin{itemize}
 \item When creating a new queue, the C function should return an
 address to the memory where it have allocated space.
-\item The function \lstinline!put! should insert the element into the queue
+\item The function \emph{put} should insert the element into the queue
 and return the element.
 \item It should be possible to dequeue an element in the order it was
-inserted with the function \lstinline!get!.
+inserted with the function \emph{get}.
 \end{itemize}
 Such properties can be used when using QuickCheck.
 %Instead of specifying own test cases QuickCheck makes it possible to
@@ -91,7 +91,7 @@ get_next(S, _, _) ->
    S#state{queue = tl(S#state.queue)}.
 \end{lstlisting}
 
-The \lstinline!record! will contain information needed to successfully
+The \emph{record} will contain information needed to successfully
 test the states of the program. It has two variables;
 \emph{ptr} which is the pointer to the queue and
 \emph{queue} which is a list defining all inserted elements in the queue.
@@ -129,7 +129,7 @@ put_args(S) ->
 get_args(S) ->
    [S#state.ptr].
 \end{lstlisting}
-The functions \lstinline!nat()! and \lstinline!int()! are generators
+The functions \emph{nat()} and \emph{int()} are generators
 defined by QuickCheck to generate arbitrary natural numbers and integers.
 
 To test the functions \emph{put}, \emph{get} and \emph{new} defined in the C-code a QuickCheck
