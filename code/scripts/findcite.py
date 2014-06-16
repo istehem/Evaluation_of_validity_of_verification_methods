@@ -1,9 +1,10 @@
 import os
 import re
+import sys
 
 def genDict():
     d = dict()
-    for root, dirs, files in os.walk("./LexGen/Report"):
+    for root, dirs, files in os.walk(sys.argv[1]):
     #for root, dirs, files in os.walk("./Evaluation_of_validity_of_verification_methods/report/final_report"):
         for file in files:
             if file.endswith(".tex"):
