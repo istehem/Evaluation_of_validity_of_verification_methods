@@ -143,8 +143,8 @@ prop() ->
 \end{lstlisting}
 
 The function \emph{commands()} is a generator that looks
-for functions defining the API-calls, such as \lstinline!new!, \lstinline!put! and
-\lstinline!get!, in the Erlang module. The \emph{commands()} function then combines
+for functions defining the API-calls, such as \emph{new}, \emph{put} and
+\emph{get}, in the Erlang module. The \emph{commands()} function then combines
 every function $api_i$ defining an API-call with a function $arg_i$ which
 generates the arguments to $api_i$.
 
@@ -222,8 +222,8 @@ if we let the next state function depend on the C-program, then the
 model will be faulty if the C-program has incorrect behavior.
 
 Possible preconditions for queue example above could be that the
-functions \lstinline!put! and \lstinline!get! can only be called if
-the queue has first been created and \lstinline!new! can only be
+functions \emph{put} and \emph{get} can only be called if
+the queue has first been created and \emph{new} can only be
 called with a size greater than zero.
 \begin{lstlisting}
 new_pre(_S, [Size]) ->
