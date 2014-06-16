@@ -354,65 +354,443 @@ new values of the local statuses.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\setlength{\parindent}{0pt}
+%% \begin{comment}
 \chapter{Bugs in C-code}
-%% \section{-Some summary-}
-%%   A longer summary with AUTOSAR requirements which is violated
-%% \subsection{Severity:}\\
-%%   Why?
-%% \subsection{Steps to reproduce:}
-%%   \begin{lstlistings}
-%%     WdgM_Init
-%%   \end{lstlistings}
+\section{Failed reference supervision cycles is changed to early}
+When applying the requirements [WDGM203], [WDGM204], [WDGM300], [WDGM205], the counter for failed reference cycles has already been
+changed. The old value for the counter is needed.
+
+\subsection{Severity}
+Significant
+
+\subsection{Steps to reproduce}
+\begin{lstlisting}
+WdgM_Init(Configuration)
+WdgM_SetMode(0, 1)
+WdgM_MainFunction()
+WdgM_MainFunction()
+WdgM_MainFunction()
+WdgM_MainFunction()
+WdgM_MainFunction()
+\end{lstlisting}
+\paragraph{Expected results:}
+The global status should be \lstinline!WDGM_GLOBAL_STATUS_EXPIRED!.
+\paragraph{Actual results:}
+The global status is set to \lstinline!WDGM_GLOBAL_STATUS_FAILED!.
+
+\subsection{Further comments}
+There is possibly some additional unwanted behavior because of this,
+that one should be aware of.
+
+Because of the alive supervision results does not change appropriately
+with the local status of the supervised entity, there is a possibility
+where you don't reach the requirements [WDGM300] or [WDGM205], because
+the alive supervision result is still \lstinline!WDGM_INCORRECT! when it should be
+\lstinline!WDGM_CORRECT!, and the local status is \lstinline!WDGM_LOCAL_STATUS_FAILED!.
+
+When testing the additional configuration, which only contains alive
+supervision we found that the sequence:
+\begin{lstlisting}
+WdgM_Init(Configuration)
+WdgM_SetMode(0, 1)
+WdgM_MainFunction()
+WdgM_MainFunction()
+WdgM_CheckpointReached(0, 4)
+WdgM_CheckpointReached(0, 4)
+WdgM_MainFunction()
+WdgM_MainFunction()
+\end{lstlisting}
+gives a state where the local status for a supervised entity (with ID
+0) was\\\lstinline!WDGM_LOCAL_STATUS_FAILED! which is correct, but the alive
+supervision result for that checkpoint was \lstinline!WDGM_INCORRECT!, where it
+should have been\\\lstinline!WDGM_CORRECT!.
+
+We don't know if this is a reproducable behaviour after this bug is
+fixed, but it should be good to do an additional check.
+
+\section{CheckpointReached overwrites results from logical
+  supervision}
+If there are N graphs for internal logical supervision for a
+supervised entity, then you derive N results from internal logical
+supervision. The same goes for external logical supervision; if you
+got M graphs for external logical supervision for a supervised entity,
+you got M results.
+
+Then for that supervised entity, you got N+M results from logical
+supervision. This is specified in 7.2.3.2.
+CheckpointReached overwrites the results from earlier executions.
+
+\subsection{Severity}
+Medium
+
+\subsection{Steps to reproduce}
+\begin{lstlisting}
+WdgM_Init(Configuration)
+WdgM_SetMode(1, 1)
+WdgM_CheckpointReached(3, 23)
+WdgM_CheckpointReached(3, 19)
+WdgM_CheckpointReached(3, 23)
+WdgM_CheckpointReached(3, 20)
+\end{lstlisting}
+\paragraph{Expected result:}
+The results from logical supervision for the supervised entity should
+be set to \lstinline!WDGM_INCORRECT!, due to the external graph (3,23) fails.
+\paragraph{Actual result:}
+The results from logical supervision is set to \lstinline!WDGM_CORRECT!.
+
+\section{Possible wrong behaviour after two WdgM\_CheckpointReached calls}
+In logical supervision, if the activity flag for a graph is false (the
+logical graph has not been started), and a checkpoint that is not
+initial is reached through \lstinline!WdgM_CheckpointReached!, the logical
+supervision result for that supervised entity is set to
+\lstinline!WDGM_INCORRECT!, and the local status is set to
+\lstinline!WDGM_LOCAL_STATUS_EXPIRED!.
+
+However, if a correct checkpoint is reached after the faulty/incorrect
+checkpoint, \lstinline!WdgM_CheckpointReached! will set the logical supervision
+result and the local status to \lstinline!WDGM_CORRECT! and \lstinline!WDGM_LOCAL_STATUS_OK!,
+respectively.  The chapter 7.2.3 in AUTOSAR, WatchdogManager, states
+``Logical supervision checks if the code of supervised entities is
+executed in the correct sequence.''.  There is no requirements for this
+specific case, and AUTOSAR is unclear of what should happend. Still it
+would be nice to not overwrite the results of logical supervision.
+
+\subsection{Severity}
+Proposed change
+
+\subsection{Steps to reproduce}
+\begin{lstlisting}
+WdgM_Init(Configuration)
+WdgM_SetMode(0, 1)
+WdgM_CheckpointReached(2, 13)
+WdgM_CheckpointReached(2, 12)
+\end{lstlisting}
+\paragraph{Expected results:}
+The local status may have stayed in \lstinline!WDGM_LOCAL_STATUS_EXPIRED!.
+\paragraph{Actual results:}
+The local status is \lstinline!WDGM_LOCAL_STATUS_OK!.
+
+\subsection{Other remarks}
+The effect of the bug ``CheckpointReached overwrites results from
+logical supervision'' is that the results from different graphs are
+overwritten, while the effect of this bug is that the result from the
+same graph are overwritten.
+
+
+\section{DeInit changes the global status even if it shouldn't}
+The function \lstinline!WdgM_DeInit! sets the global status to
+\lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED! even if the global status was not in
+\lstinline!WDGM_GLOBAL_STATUS_OK!. The requirement that is violated is [WDGM286],
+and figure 4 (the global status state machine). This could have
+dangerous consequences.
+
+\subsection{Severity}
+Significant
+
+\subsection{Steps to reproduce}
+\begin{lstlisting}
+WdgM_Init(Configuration)
+WdgM_CheckpointReached(0, 1)
+WdgM_MainFunction()
+WdgM_DeInit()
+\end{lstlisting}
+\paragraph{Expected Results:}
+Global status should stay in \lstinline!WDGM_GLOBAL_STATUS_EXPIRED!.
+\paragraph{Actual Results:}
+Global status is set to \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!.
+
+\section{Supervised entities initialized to wrong value\\(WDGM\_INCORRECT)}
+\lstinline!WdgM_Init! initializes the results of supervision functions for all
+supervised entities to \lstinline!WDGM_INCORRECT!. This violates page 27 of
+AUTOSAR, claiming ``At Watchdog Manager initialization, all the Results
+are set to correct''.
+
+\subsection{Severity}
+Significant
+
+\subsection{Other remarks}
+This is a problem with the generated files, so a function call is not
+needed to reproduce this bug.
+
+\section{SetMode does not retain the state for supervised entitites}
+The AUTOSAR requirement [WDGM182] claims that ``each Supervised Entity
+that is activated in the new mode, the function \lstinline!WdgM_SetMode! shall
+retain the current state of the Supervised Entity.''
+
+\subsection{Severity}
+Significant
+
+\subsection{Steps to reproduce}
+\begin{lstlisting}
+WdgM_Init(Configuration)
+WdgM_SetMode(0, 1)
+WdgM_MainFunction()
+WdgM_MainFunction()
+WdgM_SetMode(0, 1)
+\end{lstlisting}
+\paragraph{Expected Results:}
+At least one supervised entity should be in \lstinline!WDGM_LOCAL_STATUS_FAILED!
+and have one supervision result set to \lstinline!WDGM_INCORRECT!.
+\paragraph{Actual Results:}
+All supervised entities was reseted.
+
+\section{Internal logical supervision should fail when a checkpoint is not an initial one}
+In internal logical supervision, if a checkpoint belonging to a
+internal graph is not an initial checkpoint, and the activity flag for
+that graph is false, then the function \lstinline!WdgM_CheckpointReached! should
+set the logical supervision for that supervised entity to
+\lstinline!WDGM_INCORRECT\lstinline!, according to the requirement [WDGM274].
+
+\subsection{Severity}
+Significant
+
+\subsection{Steps to reproduce}
+\begin{lstlisting}
+WdgM_Init(Configuration)
+WdgM_SetMode(0, 1)
+WdgM_CheckpointReached(2, 13)
+\end{lstlisting}
+\paragraph{Expected Results:}
+Logical supervision for supervised entity with ID 2 is supposed to be
+\lstinline!WDGM_INCORRECT!.
+\paragraph{Actual Results:}
+Logical supervision for supervised entity with ID 2 is after execution
+set to \lstinline!WDGM_CORRECT!.
+
+\section{External logical supervision should fail when a checkpoint is
+  not an initial one}
+In external logical supervision, if a checkpoint belonging to an
+external graph is not an initial checkpoint, and the activity flag for
+that graph is false, then the function \lstinline!WdgM_CheckpointReached! should
+set the logical supervision for that supervised entity to
+\lstinline!WDGM_INCORRECT!, according to the requirement [WDGM252].
+
+\subsection{Severity}
+Significant
+
+\subsection{Steps to reproduce}
+\begin{lstlisting}
+WdgM_Init(Configuration)
+WdgM_SetMode(0, 1)
+WdgM_CheckpointReached(1, 7)
+\end{lstlisting}
+\paragraph{Expected Results:}
+Logical supervision for supervised entity with ID 1 is supposed to be
+\lstinline!WDGM_INCORRECT!.
+\paragraph{Actual Results:}
+Logical supervision for supervised entity with ID 1 is after execution
+set to \lstinline!WDGM_CORRECT!.
+
+\section{Incorrect increment of the expired cycle counter}
+The counter for ``expired cycle counter'' is incremented when the
+\lstinline!WdgM_MainFunction! changes the global state from \lstinline!WDGM_GLOBAL_STATUS_OK!
+or\\\lstinline!WDGM_GLOBAL_STATUS_FAILED! to \lstinline!WDGM_GLOBAL_STATUS_EXPIRED! or
+\lstinline!WDGM_GLOBAL_STATUS_STOPPED!, violating [WDGM215],[WDGM216],[WDGM077],
+and [WDGM117]. This has the consequences that violates [WDGM219], and
+[WDGM220].  The expired cycle counter should not be incremented in the
+first round.
+
+\subsection{Severity}
+Significant
+
+\subsection{Steps to reproduce}
+\begin{lstlisting}
+WdgM_Init(Configuration)
+WdgM_SetMode(0, 1)
+WdgM_CheckpointReached(0, 1)
+WdgM_MainFunction()
+WdgM_MainFunction()
+WdgM_MainFunction()
+\end{lstlisting}
+\paragraph{Expected results:}
+The global status should be \lstinline!WDGM_GLOBAL_STATUS_EXPIRED! for one more round.
+\paragraph{Actual results:}
+The global status is \lstinline!WDGM_GLOBAL_STATUS_STOPPED!.
+
+\section{WdgM\_Init does not reset activity flags for graphs}
+\lstinline!WdgM_Init! should reset the activity flag for each graph (both
+external and internal) in logical supervision according to [WDGM296].
+
+\subsection{Severity}
+Medium
+
+\subsection{Steps to reproduce}
+\begin{lstlisting}
+WdgM_Init(Configuration)
+WdgM_SetMode(0, 1)
+WdgM_CheckpointReached(2, 12)
+WdgM_DeInit()
+WdgM_Init(Configuration)
+WdgM_SetMode(0, 1)
+WdgM_CheckpointReached(2, 12)
+\end{lstlisting}
+\paragraph{Expected results:}
+The logical supervision results for supervised entity with ID 2 should
+be \lstinline!WDGM_CORRECT!.
+\paragraph{Actual results:}
+The results for logical supervision is set to \lstinline!WDGM_INCORRECT!.
+
+\section{WdgM.h has wrong case of an include file}
+In WdgM.h the file WdgM\_Pbcfg.h is (incorrectly) included as
+``WdgM\_PbCfg.h'', notice the uppercase C in the filename.
+
+\subsection{Severity}
+Uncritical
+
+\section{WdgMSupervisionCycle configuration parameter in wrong
+  container}
+The configuration parameter WdgMSupervisionCycle should be in each
+WdgMMode-container, and not in WdgMGeneral according to requirement
+[WDGM330\_Conf]. This makes it impossible for \lstinline!WdgM_Init! to check the
+requirement [WDGM010]. I think there should be a check against this
+in the generator (picea\_wdgm\_scg.exe).
+
+\subsection{Severity}
+Medium
+
+\subsection{Integration impact}
+The WdgMSupervisionCycle parameter is added in the WdgMMode container
+(as optional) and will override the parameter located in
+WdgMGeneral. An error will be thrown if the WdgMSupervisionCycle
+parameter is missing in both the WdgMMode and WdgMGeneral.
+
+
+\section{WdgM initiates the global status to\\
+  WDGM\_GLOBAL\_STATUS\_OK}
+WdgM initiates the global status to \lstinline!WDGM_GLOBAL_STATUS_OK!.
+This violates figure 4 in AUTOSAR (page 34) and possibly [WDGM285].
+
+\subsection{Severity}
+Medium
+
+\subsection{Steps to reproduce}
+\begin{lstlisting}
+WdgM_DeInit()
+\end{lstlisting}
+\paragraph{Expected result:}
+Global status should be in \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!.
+\paragraph{Actual result:}
+Global status is set to \lstinline!WDGM_GLOBAL_STATUS_OK!.
+
+%% \end{comment}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Ambiguities in AUTOSAR}
-\subsection*{Bad transition}
-[WDGM285] claims that ``if \lstinline!WdgM_Init! was successfully called, change
-global supervision status to \lstinline!WDGM_GLOBAL_STATUS_OK!''.
+% \subsection*{Bad transition}
+% Stated by [WDGM285], ``if \lstinline!WdgM_Init! was successfully called, change
+% global supervision status to \lstinline!WDGM_GLOBAL_STATUS_OK!''.
 
-[WDGM139] claims that ``if a call to \lstinline!WdgIf_SetMode! fails,
-the function shall assume a global supervision failure and set the
-global supervision status to \lstinline!WDGM_GLOBAL_STATUS_STOPPED!'',
-with a reference to the transition between
-\lstinline!WDGM_GLOBAL_STATUS_OK! and stopped.
+% [WDGM139] claims that ``if a call to \lstinline!WdgIf_SetMode! fails,
+% the function shall assume a global supervision failure and set the
+% global supervision status to \lstinline!WDGM_GLOBAL_STATUS_STOPPED!'',
+% with a reference to the transition between
+% \lstinline!WDGM_GLOBAL_STATUS_OK! and stopped.
 
-What if it were not successfully called?
+% What if it were not successfully called?
 
-If \lstinline!WdgIf_SetMode! is not successfully called, how can
-\lstinline!WdgM_Init! be successfully, and get the global status
-\lstinline!WDGM_GLOBAL_STATUS_OK!?
+% If \lstinline!WdgIf_SetMode! is not successfully called, how can
+% \lstinline!WdgM_Init! be successfully, and get the global status
+% \lstinline!WDGM_GLOBAL_STATUS_OK!?
 
 
-\subsection*{Incorrect reference}
-[WDGM329] could be the same as [WDGM273]
-The only difference is a parenthesis referencing to Initial/Final?
+\section{Incorrect reference}
+\subsection{Requirement description}
+\paragraph{[WDGM273]} If the function
+\lstinline!WdgM_CheckpointReached! determines that the result of the
+Logical Supervision for the given Checkpoint is true, and the
+Checkpoint is the \colorbox{yellow}{initial} one
+(\colorbox{yellow}{WdgMInternalCheckpointInitialRef}), then shall set
+the Activity Flag of the Graph corresponding to the Checkpoint to
+\colorbox{yellow}{true}. (BSW09221, BSW09222)
 
-\subsection*{Optional or mandatory}
-[WDGM344] and [WDGM258] is the same, with one difference: one is optional, the
-other mandatory.
+\paragraph{[WDGM329]} If the function
+\lstinline!WdgM_CheckpointReached! determines that the result of the
+Logical Supervision for the given Checkpoint is true, and the
+Checkpoint is the \colorbox{yellow}{initial} one
+(\colorbox{yellow}{WdgMInternalCheckpointFinalRef}), then shall set
+the Activity Flag of the Graph corresponding to the Checkpoint to
+\colorbox{yellow}{true}. ()
 
-\subsection*{Logical supervision results}
+\subsection{Problem description}
+Both requirements \textbf{[WDGM273]} and \textbf{[WDGM329]} refers to
+a ``initial'' checkpoint, but one of the requirements (preferably
+\textbf{[WDGM329]}) should instead refer to a ``final'' checkpoint. It
+should in that case also set the activity flag of the corresponding
+graph to false.
+
+\section{Optional or mandatory}
+\subsection{Requirement description}
+\paragraph{[WDGM344]} If development error detection for the Watchdog
+Manager module is enabled, then the function \lstinline!WdgM_GetGlobalStatus!
+shall check whether the parameter Status is a NULL pointer
+(NULL\_PTR). If Status is a NULL pointer, then the function shall raise
+the development error \lstinline!WDGM_E_INV_POINTER! (i.e. invalid pointer) and
+return.  ()
+
+There are \colorbox{yellow}{optional} checks that are executed if and
+only if WdgMDevErrorDetect is enabled.
+\paragraph{[WDGM258]} If the configuration parameter WdgMDevErrorDetect
+[WDGM301\_Conf] is enabled, the routine shall check if NULL pointers
+are passed for OUT parameters. In case of an error the service shall
+not be executed, the error shall be reported to the Development Error
+Tracer with the error code \lstinline!WDGM_E_INV_POINTER! and the routine shall
+return the value \lstinline!E_NOT_OK!.  (BSW00323)
+
+\subsection{Problem description}
+The requirements \textbf{[WDGM344]} and \textbf{[WDGM258]} describes
+the same actions, with one difference: one is optional, the other mandatory.
+
+\section{Logical supervision results}
+\subsection{Problem description}
 AUTOSAR does not specify if it is possible to overwrite logical supervision
 results from the same supervised entity.
+
 I.e.
 \begin{lstlisting}
-WdgM_CheckpointReached(SEx, Bad_CP)  -> incorrect result for SEx
-WdgM_CheckpointReached(SEx, Good_CP) -> Correct result for SEx
+  WdgM_CheckpointReached(SEx, Bad_CP)  -> incorrect result for SEx
+  WdgM_CheckpointReached(SEx, Good_CP) -> Correct result for SEx
 \end{lstlisting}
 
-\subsection*{Wrong spelling}
-[WDGM344\_CONF] WdgMInternallCheckpointFinalRef has incorrect
-spelling.
+\section{Incorrect spelling}
+\subsection{Requirement description}
+\begin{tabular}{| l | l |} \hline
+SWS Item & \textbf{[WDGM344\_CONF]}\\\hline
+Name     & \colorbox{yellow}{WdgMInternallCheckpointFinalRef}\\\hline
+Description & This is the reference to the final Checkpoint(s) for
+this Supervised Entity.\\\hline
+\end{tabular}
 
-[WDGM315] ``set its Results of Active, Deadline and Logical Supervision'',
-what is ``Active supervision''? Should be alive supervision.
+\paragraph{[WDGM315]} If the current global status is
+\lstinline!WDGM_GLOBAL_STATUS_OK! or
+\lstinline!WDGM_GLOBAL_STATUS_FAILED! then for each Supervised Entity
+that is deactivated in the new mode (passed to function
+\lstinline!WdgM_SetMode! as parameter), the function
+\lstinline!WdgM_SetMode! shall change the state of the Supervised
+Entity to\\\lstinline!WDGM_LOCAL_STATUS_DEACTIVATED!; It shall set its
+Results of \colorbox{yellow}{Active}, Deadline and Logical Supervision
+to correct; It shall also clear its failed reference cycle counter to
+0.
 
-\subsection*{Retain state}
-[WDGM182] if \lstinline!WdgM_SetMode! is called, and a supervised
-entity which was activated in the previous mode, also is active in the
-new mode, then retain the state for the supervised entity.
+\subsection{Problem description}
+Requirement \textbf{[WDGM344\_CONF]} has miss spelled its name
+\textit{WdgMInternallCheckpointFinalRef}. This differs from references
+in other requirements, for example in \textbf{[WDGM329]}.
 
+\section{Retain state}
+\subsection{Requirement description}
+\paragraph{[WDGM182]} If the current global status is
+\lstinline!WDGM_GLOBAL_STATUS_OK! or
+\lstinline!WDGM_GLOBAL_STATUS_FAILED! then for each Supervised Entity
+that is activated in the new mode (passed to function
+\lstinline!WdgM_SetMode! as parameter), the function
+\lstinline!WdgM_SetMode! shall \colorbox{yellow}{retain the current
+state of the Supervised Entity}.  Switching to the mode where a
+Supervised Entity is deactivated clears also errors that had resulted
+with the \lstinline!WDGM_GLOBAL_STATUS_FAILED!  status. ()
+
+\subsection{Problem description}
 The problem is that it is unclear what the supervised entity state
 should contain. We know that the status, the results of alive,
 deadline and logical supervision and some counters should be part of
@@ -420,23 +798,23 @@ this state. Should the supervision functions be part of the state?
 
 This could be problematic because then there is a need to map out
 which supervision function should be retained (exists in the new mode
-as well as the old mode), which should be discarded (does not exist
-in the new mode) and which should be created (exists in the new mode
-but not the old).
+as well as the old mode), which should be discarded (does not exist in
+the new mode) and which should be created (exists in the new mode but
+not the old).
 
 If it is not part of the state, then all supervisions functions should
-be discarded and the new supervision functions should be added.
-This could also be problematic because, what if there exist a
-supervision function which has the status \lstinline!WDGM_INCORRECT!
-and the only thing that keeps the supervised entity from setting the
-status \lstinline!WDGM_LOCAL_STATUS_EXPIRED! is a call to
+be discarded and the new supervision functions should be added.  This
+could also be problematic because, what if there exist a supervision
+function which has the status \lstinline!WDGM_INCORRECT!  and the only
+thing that keeps the supervised entity from setting the status\\
+\lstinline!WDGM_LOCAL_STATUS_EXPIRED! is a call to
 \lstinline!WdgM_MainFunction!. Then a call to \lstinline!WdgM_SetMode!
 with the same mode could reset all supervision functions and the
 expired state would not happen.
 
 Another question arises; should internal logical supervision functions
-count?
-They are mode independent, but if the supervised entity is
-deactivated, the internal logical supervision should not be able to do anything.
+count? They are mode independent, but if the supervised entity is
+deactivated, the internal logical supervision should not be able to do
+anything.
 
 %% \subsection*{Definition of time in deadline supervision}
