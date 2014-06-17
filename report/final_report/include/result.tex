@@ -93,7 +93,7 @@ The watchdog manager's state machine is shown in figure
 \ref{FIG:GLOBALSTATUSES}. Its transitions depend on the changes of the
 supervision functions variables, and the current state. If the
 behavior of the watchdog manager is correct, it will stay in either
-the state \lstinline!WDGM_GLOBAL_STA!-\lstinline!TUS_OK! or
+the state \lstinline!WDGM_GLOBAL_STATUS_OK! or
 \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!. There are however lots of
 reasons for the status to change from the correct state. It depends on
 the arguments of the API-calls but also the order of the commands that
@@ -182,7 +182,7 @@ reaches a state when those other requirements must hold.
 
 Figure \ref{FIG:COMMANDS_BSI} shows how many times a certain command
 was generated versus the length of the command sequence that was
-generated. E.g. the function \lstinline!WdgM_Checkpoi!-\lstinline!ntReached! was
+generated. E.g. the function \lstinline!WdgM_CheckpointReached! was
 generated in average a little more than 40\% of all calls. This is
 because, in any other configuration, the supervision functions demand
 that a certain number of checkpoints is reached before the next main
@@ -349,7 +349,7 @@ commands. The behavior of these commands will therefor not vary much.
 global and local statuses of the supervised entities. It should not be
 possible to change the mode if the watchdog manager is in either
 \lstinline!WDGM_GLOBAL_STATUS_EXPIRED! or
-\lstinline!WDGM_GLOBAL_STA!-\lstinline!TUS_STOPPED!.
+\lstinline!WDGM_GLOBAL_STATUS_STOPPED!.
 
 The two remaining API-calls that needs to be discussed in details are
 the main function and the checkpoint reached function. As can be seen
@@ -359,7 +359,7 @@ called the most.
 
 \subsubsection{\lstinline!WdgM_MainFunction!}
 The \lstinline!WdgM_MainFunction! handles alive supervision
-calculations, and the function\\\lstinline!WdgM_CheckpointReached!
+calculations, and the function \lstinline!WdgM_CheckpointReached!
 handles the increasing of the alive counters, a certain number of
 calls to \lstinline!WdgM_CheckpointReached! must be done before each
 \lstinline!WdgM_MainFunction!. It does not end there. Each checkpoint
