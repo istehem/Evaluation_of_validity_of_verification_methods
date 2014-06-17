@@ -26,30 +26,31 @@ verify the model, Parasoft C/C++test defines policies on work flow as
 well as coding.
 
 \subsection{SPIN}
-SPIN is used to trace logical design errors in distributed software
-\cite{SPIN:manual}. It supports a high level language, called Promela,
+SPIN is used to trace logical design errors in distributed
+software. It supports a high level language, called Promela,
 to specify system descriptions. Promela is an acronym for PROcess MEta
 LAnguage, and is a verification model language. The system properties
 that should be checked are written in logical temporal language
 (LTL), and SPIN reports errors such as deadlocks, race conditions and
 incompleteness between these properties and the system model. It also
-supports embedded C code as part of the model specifications. It
+supports embedded C-code as part of the model specifications. It
 supports random, interactive and guided simulation, with both partial
 and exhaustive proof techniques.
+\cite{SPIN:manual}
 
 \subsection{Parasoft C/C++test}
 Parasoft C/C++test is a commercial integrated development testing
-solution for C and C++ \cite{PARASOFT:datasheet}. It automates code
+solution for C and C++. It automates code
 analysis, and enforces code policies depending on given rules. The
 solution is part software, part practical rules for team
 collaboration.  It can detect certain run-time errors such as memory
 access errors, null pointer referencing, buffer overflows, division by
 zero and the use of uninitialized memory or variables. It can create
 and execute unit tests and collect code coverage from application
-executions.
+executions. \cite{PARASOFT:datasheet}
 
 Parasoft claims that it should be possible to satisfy some of the ASIL
-requirements using their solution \cite{PARASOFT:ASIL}.
+requirements using their solution. \cite{PARASOFT:ASIL}
 
 \section{Specification}
 In AUTOSAR, specifications for each module is given in text
@@ -69,7 +70,7 @@ modules up for discussion. Since the goal was to get a proof of
 concept; examining if it was possible to get an ASIL-classification
 and achieve functional safety using QuickCheck, it seemed preferable
 to choose a less complicated module. It was also desirable to have the
-actual C code and not just library files, because then ambiguities in
+actual C-code and not just library files, because then ambiguities in
 AUTOSAR could be checked in a more efficient way.
 
 \section{The Watchdog Mangar (WdgM)}
@@ -92,12 +93,12 @@ The module that was chosen, was already unit tested and run actively
 in lab environment.
 
 %% TODO: eventuellt skriva om delar i stycket, framför allt i slutet.
-The implementation of the properties was done to be able to test API
-calls, also described in appendix~\ref{APP:QUICKCHECK}, against the
-C-code. QuickCheck then checked that the postconditions held,
+The implementation of the properties was done to be able to test
+API-calls, also described in appendix~\ref{APP:QUICKCHECK}, against
+the C-code. QuickCheck then checked that the postconditions held,
 according to figure \ref{FIG:api_calls}. The postconditions were
 written to test that AUTOSAR requirements held. In other words that
-the API calls were called correctly.
+the API-calls were called correctly.
 
 \begin{figure}[!ht]
   \begin{center}
@@ -137,12 +138,12 @@ available.
 The implementation of the AUTOSAR module in Erlang was done in an
 iterative way. Every piece of code were not required to be implemented
 before tests could be run. This is because a module in AUTOSAR consist
-of a number of API calls. It was enough to implement some of the
-specifications for one API call before tests could be run. Of course
+of a number of API-calls. It was enough to implement some of the
+specifications for one API-call before tests could be run. Of course
 this tested only the implemented part of the C-code. Early tests may
-not have fully tested the implemented API call because some branches
+not have fully tested the implemented API-call because some branches
 in the C-code will never have been reached before other unimplemented
-API calls.
+API-calls.
 
 \subsection{Conflicts and Bugs}
 \label{SUBSEC:CONFLICTS}
@@ -153,11 +154,11 @@ the Erlang and C-implementation. This was expected because every
 programmer makes mistakes.  The question was whether the fault was in
 the C-code or the Erlang code. Then the API was thoroughly read and a
 conclusion was made based on this. Either a bug in the C-code was
-found or the Erlang-code needed to be corrected. There were however
+found or the Erlang code needed to be corrected. There were however
 cases when the API was ambiguous. In those cases the C-interpretation
 was chosen as correct and the ambiguous specification written down.
 
-Bugs in the C-code was found early, even though it already run
+Bugs in the C-code were found early, even though it already run
 actively in lab environments.
 
 If a bug in the C-code was discovered how should the work be
@@ -167,15 +168,15 @@ further tests. Some alternatives were discussed.
 
 \begin{enumerate}
   \item Fix the C-code, in other words change the source
-    code. Knowledge about the structure in the C code is needed.
+    code. Knowledge about the structure in the C-code is needed.
     \label{ENUMERATE:FixCCode}
-  \item Mocking, in other words simulate different C code output. The
+  \item Mocking, in other words simulate different C-code output. The
     pitfall is if that each mocked function eliminates all bugs in the
     function. Not only a selected subset; at most one bug per function
     can then be found.
   \item Change the Erlang module to a faulty behavior to follow the C
     implementation. The problem is that other configurations or
-    updated versions of the C code will show up as faulty when using
+    updated versions of the C-code will show up as faulty when using
     the same Erlang model, and it could be hard to discover secondary
     failures.
 \end{enumerate}
@@ -189,8 +190,7 @@ those cases the implementation in the C-code was followed.
 
 \subsection{Advantage of having the Actual C-code}
 When it did not exist a clear interpretation of the AUTOSAR
-specification, a great method for understanding was to examine the C
-code.
+specification, a great method for understanding was to examine the C-code.
 QuickCheck can be used to test libraries when only the compiled
 source code is available, but this make the ambiguities harder to
 discover. A third model would then be needed to justify whether the C
@@ -245,7 +245,7 @@ testing was negative because invalid command sequences and arguments
 were generated.
 
 Figure \ref{FIG:ONERUN} shows an example of how the status of the
-watchdog manager changed during the execution of API calls. After a
+watchdog manager changed during the execution of API-calls. After a
 number of commands the absorbing state \emph{stopped} was reached.
 
 \begin{figure}
@@ -260,14 +260,14 @@ number of commands the absorbing state \emph{stopped} was reached.
 The next step was to tweak the generators that were used by QuickCheck
 to construct valid API-calls. This was done to find better test cases,
 i.e. there were a number of branches in the C-code that needed a
-specific sequence of API calls with correct arguments, to be
+specific sequence of API-calls with correct arguments, to be
 reached. For example, it was unreasonable to test functions often when
 the initialization function \lstinline!WdgM_Init! has not yet been
 called.
 
 Thanks to QuickCheck's weight feature, it was simple to change the
-ratio of the generation of certain API calls; by matching the state
-and the function name of the API call, one can change the probability
+ratio of the generation of certain API-calls; by matching the state
+and the function name of the API-call, one can change the probability
 of generation of that call.
 
 For example the initialization function \lstinline!WdgM_Init! should
@@ -281,7 +281,7 @@ weight(S,  'WdgM_Init') ->
   end;
 \end{lstlisting}
 It was a good idea not to lower some ratios to much, because then
-certain API sequences would not be generated, and bugs could have been
+certain API-sequences would not be generated, and bugs could have been
 missed.
 
 The tweaking of the generators were implemented in a iterative way by
@@ -298,7 +298,7 @@ figure \ref{fig:workflow}.
       \begin{enumerate}
       \item Construct a model for an AUTOSAR module in Erlang
       \item Run QuickCheck for this model and compare the results with the output from
-        the C code. \label{compare}
+        the C-code. \label{compare}
       \item Tweak the generators for the test cases \label{generators}
       \item Evaluate the results
         \begin{enumerate}
@@ -355,10 +355,10 @@ cases, seemed in some sense to be configuration dependent. Better test
 cases were generated if the generators were tweaked according to a
 specific configuration, see chapter \ref{CHAPTER:RESULTS}.
 
-\section{Calling the API commands}
+\section{Calling the API-commands}
 \label{SEC:CALLING_COMMANDS}
-API calls were executed by QuickCheck using the \emph{run\_commands/1}
-function according to appendix \ref{SEC:QuickCheckIntro}. The runtime
+API-calls were executed by QuickCheck using the \emph{run\_commands/1}
+function according to appendix \ref{SEC:QuickCheckIntro}. The run-time
 environment module (RTE) is however responsible for the scheduling of
 the main function, which according to AUTOSAR, should be executed in a
 given time interval. Since the RTE was not available when testing the
@@ -373,7 +373,7 @@ consists of two checkpoints. One start checkpoint, one stop checkpoint
 and a maximum time it should take to reach the stop checkpoint after
 the start checkpoint was reached. The AUTOSAR specification was
 however lacking of a clear definition of how time should be
-handled. The C code just used ticks, not actual time stamps, which
+handled. The C-code just used ticks, not actual time stamps, which
 was incremented every time the main function was called. It was in
 other words assumed that the RTE was able to execute the main function
 correctly and a fixed amount of ticks would always represent the same

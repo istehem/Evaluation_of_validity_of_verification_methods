@@ -93,7 +93,7 @@ of software safety requirements''. \cite[6:5.4]{ISO26262}
 \subsection{AUTOSAR (AUTomotive Open System ARchitecture)}
 The AUTOSAR platform has a layered software architecture. This means
 that the architecture is divided to a number of different layers, such
-as the application layer, runtime environment, the basic software
+as the application layer, run-time environment, the basic software
 layer, and the microcontroller. In the
 figure~\ref{FIG:AUTOSAR:architecture} the basic software layer is
 represented as four different parts; services, ECU abstraction,
@@ -154,7 +154,7 @@ developed alongside AUTOSAR. \cite{AUTOSAR:basic_info}
 \section{Verification Methods}
 The standard IEC~61508 propose two methods to formal verify a
 program. The key is to model the program into one of the following
-state transition models. \cite[p. 127]{IEC61508}
+state transition models. \cite[p.127]{IEC61508}
 
 \begin{enumerate}
 \item \label{enum:FSM} Finite state machines/state transition diagrams
@@ -164,7 +164,7 @@ state transition models. \cite[p. 127]{IEC61508}
 IEC~61508 emphasises that Time Petri nets are best suited for
 concurrent programs. Regarding the finite state machine method, the
 following criteria needs to be satisfied for the implemented state
-machine to be formal verified \cite[p. 77-79]{IEC61508}\cite[p. 322]{COURSEBOOK:safety-critical}:
+machine to be formal verified \cite[p.77-79]{IEC61508}\cite[p.322]{COURSEBOOK:safety-critical}:
 
 \begin{description}
   \item[completeness] the system must have an action and new state for
@@ -186,13 +186,13 @@ reduce such cases, and these techniques are often referred to as semi
 formal verification, because they often lack the mathematical rigor
 associated with formal verification. These methods use textual,
 graphical or other notation; often several techniques are used in
-unity. \cite[p. 91]{COURSEBOOK:safety-critical}
+unity. \cite[p.91]{COURSEBOOK:safety-critical}
 
 The description of semi formal verification in IEC~61508 states:
 ''Semi-formal methods provide a means of developing a description of a
 system at some stage in its development, i.e. specification, design or
 coding. The description can in some cases be analyzed by machine or
-animated to display various aspects of the system behavior.'' \cite[p. 77]{IEC61508}
+animated to display various aspects of the system behavior.'' \cite[p.77]{IEC61508}
 
 
 \subsection{QuickCheck}
@@ -200,7 +200,7 @@ animated to display various aspects of the system behavior.'' \cite[p. 77]{IEC61
 QuickCheck was invented by Koen Claessen and John Hughes, as a testing
 module for Haskell in 2000. In 2006 John Hughes founded the company
 Quviq together with Thomas Arts \cite{QUVIQ:about}. Quviq offers a
-commercial version of QuickCheck for Erlang. The main difference,
+commercial version of QuickCheck for Erlang. One of the main differences,
 except from the programming language, is that the commercial version
 of QuickCheck has a C-testing interface. Hence it possible to test
 C-code in Erlang with the help of QuickCheck. All test code is written
@@ -212,4 +212,4 @@ QuickCheck tests a program that has its specification implemented as
 properties that must hold for the program
 \cite{QUICKCHECK:manual}. QuickCheck provides guided random test
 generation. This means that the samples can be weighted to cover
-certain parts of the state-space with more likelihood.
+certain parts of the state space with more likelihood.

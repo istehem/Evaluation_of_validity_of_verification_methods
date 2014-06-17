@@ -10,8 +10,8 @@ needed to be corrected.
 Easier when you do white box testing, when the source code is known,
 because then you can really check the code and compare with the requirements.
 
-We achieved fair coverage of the c-code, around 90\%, and the Erlang code,
-around \%. The problem was the requirements, where we achieved around 50\%. It
+We achieved fair coverage of the C-code, around 85\%, and the Erlang code,
+around 97\%. The problem was the requirements, where we achieved around 50\%. It
 would help if an QuickCheck model was implemented for the whole system as
 well. Many of the requirements had dependencies in other modules, and some
 requirements for the file structure, the configuration or even the generation of
@@ -25,7 +25,7 @@ safety of modules.
 %% - statistik på quickcheck körningar.
 
 Stripped of comments and blank lines, the implemented Erlang model is
-almost 1300 lines of code. This is to be compared with the c-code
+almost 1300 lines of code. This is to be compared with the C-code
 which is over 14500 lines of code.
 %% cat src/* inc/* generated_cfg/*.[c,h] stub/* rte/* gcc/* | grep -vP
 %% ^[[:space:]]?'/\*' | grep -vP ^[[:space:]]?'\*' | grep -vP

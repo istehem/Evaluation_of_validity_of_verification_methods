@@ -77,11 +77,11 @@ lesser demanding system. These levels are more defined in the standards
 IEC~61508 and ISO~26262.
 \cite{COURSEBOOK:safety-critical}
 
-%taget ifrån wikipedia, bättre källa behövs. Dessvärre räcker
-%det inte med våra egna slutsatser.
-The ASIL can be said to be the measurement of functional safety. Hence a
-product within the automotive industry can be claimed to be ''functional safe'' to a
-certain ASIL.
+The concept of safety integrity levels exists because the implications
+of failure vary between applications. The safety integrity levels
+reflect the importance of correct behavior, and exists to ensure
+functional safety of the applications.
+\cite[p.3,70]{COURSEBOOK:safety-critical}
 
 \subsection{Testing}
 Functional safety demands testing, and testing accounts for around half of all
@@ -92,7 +92,6 @@ automating the test generation process.
 \cite{QUICKCHECK:software}
 \cite{Testing:black_box}
 
-%% TODO: skriv att det kallas combinatorial explosion problem i stycket nedan.
 For simple devices it is possible to exhaustively test the functional
 safety of the system. For example
 consider a system consisting of a small number of switches, where each
@@ -102,7 +101,8 @@ failure states of each individual switch. The complexity issue is that
 in systems such as microprocessors or ECU's, the number of possible
 failure states is so large that it is considered infinite. This makes
 it impossible to exhaustively test the system, and therefore, make the
-detection of failures unreliable.
+detection of failures unreliable. This is called the combinatorial
+explosion problem.
 \cite{COURSEBOOK:safety-critical}
 
 \section{Purpose}

@@ -1,6 +1,1 @@
-Change the last QuickCheck example in appendix
-Functional Safety in introduction
-APPENDIX C
-APPENDIX D
-abstract
-fixa referenser
+Section 3.2 & 3.3 is a bit short and unnecessary?
