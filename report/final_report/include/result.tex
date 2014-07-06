@@ -28,7 +28,7 @@ is not reached. The complexity of finding such cases grows with the
 complexity of the configuration. However, properties are continuously
 tested as long the absorbing state is not reached. Eventually, even
 when trying to make use of positive testing, the absorbing state will
-be reached if the configuration is not to simple. This is because the
+be reached if the configuration is not too simple. This is because the
 order of commands will influence if the behavior is correct or
 not. Even if it is possible to prioritize certain commands the random
 factor of QuickCheck will eventually cause an invalid behavior. See
@@ -49,7 +49,7 @@ coverage.
 Since there are different supervisions of checkpoints that can be
 configured at the same time, the supervision functions must be
 prioritized when generating command sequences and arguments. A
-checkpoint that is generated to many times can for example cause the
+checkpoint that is generated too many times can for example cause the
 alive supervision to fail because it goes outside of its bound. The
 same can happen if it is not generated enough. If a checkpoint is
 generated only because it needs to be inside of its alive supervision
@@ -72,7 +72,7 @@ a checkpoint that violates logical supervision rules.
 \subsection{Tweaking the generators}
 The generators did not need to be tweaked much when performing
 negative testing since if the commands are uniformly random generated
-by QuickCheck a invalid behavior will quickly arise. However, with a
+by QuickCheck an invalid behavior will quickly arise. However, with a
 small probability of generation, null pointers were also passed as
 arguments to the API-commands to see how the system behaved. Turning
 of the configuration parameter \lstinline!WdgMDevErrorDetect! caused
@@ -213,7 +213,7 @@ also one of the configurations that is actively used in lab
 environments. The state machine for the global status is totally
 covered by running QuickCheck, see table
 \ref{TABLE:STATUSES_FREESCALE} and figure
-\ref{FIG:STATUSES_FREESCALE}. Locking at table \ref{TABLE:STATUSES_FREESCALE}
+\ref{FIG:STATUSES_FREESCALE}. Looking at table \ref{TABLE:STATUSES_FREESCALE}
 one can see that some transitions are done very seldom. This is due to a lot of
 things must be fulfilled for those transitions to occur, which also highly depend on
 the configuration supplied. Due to the randomness factor of QuickCheck such cases are
@@ -467,9 +467,9 @@ achieve 100\% code coverage depends on certain limitations. Some lines
 can not be covered when the configuration parameter
 \lstinline!WdgMDevErrorDetect! is true. On the other hand, if it is
 false, then the C-model will fail with a segmentation fault and the
-Erlang model will not be covered any way. There are also a number of
-implementation specific lines, which an other C-code model might
-reach but the one that we had. There is also places that depended on
+Erlang model will not be covered anyway. There are also a number of
+implementation specific lines, which another C-code model might
+reach but not the one that we had. There is also places that depended on
 the configuration to be more simple. A good idea is to supply
 configurations that only has specific supervision functions
 configured. Then it should be possible to prioritize only that
@@ -561,7 +561,7 @@ different interpretations. After the two implementations of the model,
 compare those using QuickCheck. If there are no bugs, then the
 original model was translated into C-code correctly.
 
-The proposed work flow would require a lot of work which, is beyond the scope of
+The proposed work flow would require a lot of work, which is beyond the scope of
 this thesis. For example the C-code needs to be rewritten.
 
 \subsubsection{Development error detection}
