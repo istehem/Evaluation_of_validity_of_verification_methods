@@ -88,39 +88,6 @@ generated and failed, QuickCheck tries to remove commands in the
 sequence in order to find the minimal sequence. This makes it easier
 to find where in the code the failure arouse from.
 
-\section{State Machine}
-The watchdog manager's state machine is shown in figure
-\ref{FIG:GLOBALSTATUSES}. Its transitions depend on the changes of the
-supervision functions variables, and the current state. If the
-behavior of the watchdog manager is correct, it will stay in either
-the state \lstinline!WDGM_GLOBAL_STATUS_OK! or
-\lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!. There are however lots of
-reasons for the status to change from the correct state. It depends on
-the arguments of the API-calls but also the order of the commands that
-are called and which AUTOSAR configuration that is supplied. The
-configuration is important because it specifies how much faulty
-behavior the watchdog should tolerate. It could also disable some
-states and state transition or make some transition more likely to
-happen. The effect can for instance come from the number of
-checkpoints supplied in the configuration. A correct behavior of the
-watchdog manager depends on that checkpoints are reached with correct
-timing and does so in the right order.
-
-Besides the transition between the deactivated state and the OK state,
-the only function that can give rise to state transitions for the
-global status is the main function. In a working ECU, the main
-function should continuously be called by the run-time environment
-(RTE), in a configured time interval. Note that the timing is not used
-when using QuickCheck, see section \ref{SEC:CALLING_COMMANDS}.
-
-\begin{figure}[h!]
-  \begin{center}
-    \includegraphics{pictures/globalstatuses.jpg}
-  \end{center}
-  \caption{State diagram that shows possible transitions between states}
-  \label{FIG:GLOBALSTATUSES}
-\end{figure}
-
 \section{Configurations}
 The watchdog manager (WdgM) was tested using three different
 configurations. The configurations were of different complexity. One
