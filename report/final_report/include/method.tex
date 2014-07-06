@@ -89,6 +89,7 @@ can be described as a state machine. The global status was considered
 very important, since it specifies correct and incorrect behaviour of
 the watchdog manager.
 
+\subsection{The state machine}
 The watchdog manager's global status state machine is shown in figure
 \ref{FIG:GLOBALSTATUSES}. Its transitions depend on the changes of the
 supervision functions variables, and the current state. If the
@@ -121,6 +122,54 @@ when using QuickCheck, see section \ref{SEC:CALLING_COMMANDS}.
   \label{FIG:GLOBALSTATUSES}
 \end{figure}
 
+\subsection{Important Functions}
+The most interesting API-calls is the ones that modifies the internal
+state of the watchdog manager, see appendix \ref{APP:API_CALLS},
+namely \lstinline!WdgM_Init!, \lstinline!WdgM_DeInit!,
+\lstinline!WdgM_SetMode!, \lstinline!WdgM_MainFunction!, and
+\lstinline!WdgM_CheckpointReached!. The reason for this is that they
+will influence the result of following API-calls.
+
+The Init and DeInit functions can just change the global status
+between two states and should only change the state of the watchdog
+when the watchdog is in either \lstinline!WDGM_GLOBAL_STATUS_OK! or
+\lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!, according to figure
+\ref{FIG:GLOBALSTATUSES}. If this happens they will change the
+internal state of the watchdog independently of previous called
+commands. The behavior of these commands will therefor not vary much.
+
+\lstinline!WdgM_SetMode! changes the mode, but should retain the
+global and local statuses of the supervised entities. It should not be
+possible to change the mode if the watchdog manager is in either
+\lstinline!WDGM_GLOBAL_STATUS_EXPIRED! or
+\lstinline!WDGM_GLOBAL_STATUS_STOPPED!.
+
+The two remaining API-calls that needs to be discussed in details are
+the main function and the checkpoint reached function. As can be seen
+in figures \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and
+\ref{FIG:COMMANDS_EXAMPLE}, they are also the two commands that are
+called the most.
+
+\subsubsection{\lstinline!WdgM_MainFunction!}
+The \lstinline!WdgM_MainFunction! handles alive supervision
+calculations, and the function \lstinline!WdgM_CheckpointReached!
+handles the increasing of the alive counters, a certain number of
+calls to \lstinline!WdgM_CheckpointReached! must be done before each
+\lstinline!WdgM_MainFunction!. It does not end there. Each checkpoint
+may have some logical supervision, so the order of the called
+checkpoints is important as well. It is also possible to set deadline
+supervision for a supervised entity. Both deadline supervision and
+logical supervision is handled by \lstinline!WdgM_CheckpointReached!.
+
+\subsubsection{\lstinline!WdgM_CheckpointReached!}
+Deadline supervision demands that a configured amount of time must
+have elapsed since the start checkpoint was visited. Because AUTOSAR
+does not specify how the handling of time should be implemented, see
+sections \ref{SEC:CALLING_COMMANDS} and
+\ref{SEC:FUNCTIONAL_SAFETY_TIME}, we implemented the model as the
+C-code, with the use of \lstinline!WdgM_MainFunction!. This is
+possible because we know that \lstinline!WdgM_MainFunction! is called
+periodically.
 
 
 \section{Implementation}
