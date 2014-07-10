@@ -28,7 +28,7 @@ is not reached. The complexity of finding such cases grows with the
 complexity of the configuration. However, properties are continuously
 tested as long the absorbing state is not reached. Eventually, even
 when trying to make use of positive testing, the absorbing state will
-be reached if the configuration is not to simple. This is because the
+be reached if the configuration is not too simple. This is because the
 order of commands will influence if the behavior is correct or
 not. Even if it is possible to prioritize certain commands the random
 factor of QuickCheck will eventually cause an invalid behavior. See
@@ -49,7 +49,7 @@ coverage.
 Since there are different supervisions of checkpoints that can be
 configured at the same time, the supervision functions must be
 prioritized when generating command sequences and arguments. A
-checkpoint that is generated to many times can for example cause the
+checkpoint that is generated too many times can for example cause the
 alive supervision to fail because it goes outside of its bound. The
 same can happen if it is not generated enough. If a checkpoint is
 generated only because it needs to be inside of its alive supervision
@@ -72,7 +72,7 @@ a checkpoint that violates logical supervision rules.
 \subsection{Tweaking the generators}
 The generators did not need to be tweaked much when performing
 negative testing since if the commands are uniformly random generated
-by QuickCheck a invalid behavior will quickly arise. However, with a
+by QuickCheck an invalid behavior will quickly arise. However, with a
 small probability of generation, null pointers were also passed as
 arguments to the API-commands to see how the system behaved. Turning
 of the configuration parameter \lstinline!WdgMDevErrorDetect! caused
@@ -87,39 +87,6 @@ process is called shrinking. After a command sequence have been
 generated and failed, QuickCheck tries to remove commands in the
 sequence in order to find the minimal sequence. This makes it easier
 to find where in the code the failure arouse from.
-
-\section{State Machine}
-The watchdog manager's state machine is shown in figure
-\ref{FIG:GLOBALSTATUSES}. Its transitions depend on the changes of the
-supervision functions variables, and the current state. If the
-behavior of the watchdog manager is correct, it will stay in either
-the state \lstinline!WDGM_GLOBAL_STATUS_OK! or
-\lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!. There are however lots of
-reasons for the status to change from the correct state. It depends on
-the arguments of the API-calls but also the order of the commands that
-are called and which AUTOSAR configuration that is supplied. The
-configuration is important because it specifies how much faulty
-behavior the watchdog should tolerate. It could also disable some
-states and state transition or make some transition more likely to
-happen. The effect can for instance come from the number of
-checkpoints supplied in the configuration. A correct behavior of the
-watchdog manager depends on that checkpoints are reached with correct
-timing and does so in the right order.
-
-Besides the transition between the deactivated state and the OK state,
-the only function that can give rise to state transitions for the
-global status is the main function. In a working ECU, the main
-function should continuously be called by the run-time environment
-(RTE), in a configured time interval. Note that the timing is not used
-when using QuickCheck, see section \ref{SEC:CALLING_COMMANDS}.
-
-\begin{figure}[h!]
-  \begin{center}
-    \includegraphics{pictures/globalstatuses.jpg}
-  \end{center}
-  \caption{State diagram that shows possible transitions between states}
-  \label{FIG:GLOBALSTATUSES}
-\end{figure}
 
 \section{Configurations}
 The watchdog manager (WdgM) was tested using three different
@@ -184,12 +151,11 @@ Figure \ref{FIG:COMMANDS_BSI} shows how many times a certain command
 was generated versus the length of the command sequence that was
 generated. E.g. the function \lstinline!WdgM_CheckpointReached! was
 generated in average a little more than 40\% of all calls. This is
-because, in any other configuration, the supervision functions demand
-that a certain number of checkpoints is reached before the next main
-function is called\footnote{This is however not completely true, but
-it gives the general idea.}. There is also a dependency the other way
-around; the main function has to be called a certain number of times
-before \lstinline!WdgM_CheckpointReached! is called on a certain
+because, in any other configuration, the supervision functions often
+demand that a certain number of checkpoints is reached before the next
+main function is called. There is also a dependency the other way
+around; the main function often has to be called a certain number of
+times before \lstinline!WdgM_CheckpointReached! is called on a certain
 supervised entity. This is why the main function also has quite high
 proportions. Other functions that stands out is
 \lstinline!WdgM_SetMode! and \lstinline!WdgM_Init!.
@@ -213,7 +179,7 @@ also one of the configurations that is actively used in lab
 environments. The state machine for the global status is totally
 covered by running QuickCheck, see table
 \ref{TABLE:STATUSES_FREESCALE} and figure
-\ref{FIG:STATUSES_FREESCALE}. Locking at table \ref{TABLE:STATUSES_FREESCALE}
+\ref{FIG:STATUSES_FREESCALE}. Looking at table \ref{TABLE:STATUSES_FREESCALE}
 one can see that some transitions are done very seldom. This is due to a lot of
 things must be fulfilled for those transitions to occur, which also highly depend on
 the configuration supplied. Due to the randomness factor of QuickCheck such cases are
@@ -307,14 +273,15 @@ correct the discovered bugs. However this is time consuming because
 the support line has often already much to do, and the releases
 doesn't come that often.  Another way is to mock the faulty
 API-call. In other words simulate the output of the C-code, but then
-you will only find one bug per function, strictly limiting the probability
-to find bugs. There is a QuickCheck Erlang module for the purpose of
-mocking C-code, see appendix \ref{APP:SEC:OTHERMODULES}. Then there is
-two equally good methods. Either the Erlang model needs to have the
-fault implemented, or the C-code needs to be fixed. There are pros and
-cons with both methods. If the Erlang model introduce bugs, there may
-be secondary failures which are not discovered. This could also happen
-when correcting the C-code, but then more knowledge of the module is
+you will only find one bug per function, strictly limiting the
+probability to find bugs. There is a QuickCheck Erlang module for the
+purpose of mocking C-code, see appendix
+\ref{APP:SEC:OTHERMODULES}. Then there is two equally good
+methods. Either the Erlang model needs to have the fault implemented,
+or the C-code needs to be fixed. There are pros and cons with both
+methods. If the Erlang model introduce bugs, there may be secondary
+failures which are not discovered. This could also happen when
+correcting the C-code, but then more knowledge of the module is
 needed, and some of the secondary failures can easier be avoided. It
 also takes more time to get the extra knowledge of the C-code.
 
@@ -327,56 +294,6 @@ The distribution of API-calls seems, according to figure
 \ref{FIG:COMMANDS_EXAMPLE}, to be the same for all configuration. The
 arguments to the API-calls is however different, even though it is not
 seen in those plots.
-
-\subsection{Important Functions}
-The most interesting API-calls is the ones that
-modifies the internal state of the watchdog manager, see appendix
-\ref{APP:API_CALLS}, namely \lstinline!WdgM_Init!,
-\lstinline!WdgM_DeInit!, \lstinline!WdgM_SetMode!,
-\lstinline!WdgM_MainFunction!, and
-\lstinline!WdgM_CheckpointReached!. The reason for this is that they
-will influence the result of following API-calls.
-
-The Init and DeInit functions can just change the global status
-between two states and should only change the state of the watchdog
-when the watchdog is in either \lstinline!WDGM_GLOBAL_STATUS_OK! or
-\lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!, according to figure
-\ref{FIG:GLOBALSTATUSES}. If this happens they will change the
-internal state of the watchdog independently of previous called
-commands. The behavior of these commands will therefor not vary much.
-
-\lstinline!WdgM_SetMode! changes the mode, but should retain the
-global and local statuses of the supervised entities. It should not be
-possible to change the mode if the watchdog manager is in either
-\lstinline!WDGM_GLOBAL_STATUS_EXPIRED! or
-\lstinline!WDGM_GLOBAL_STATUS_STOPPED!.
-
-The two remaining API-calls that needs to be discussed in details are
-the main function and the checkpoint reached function. As can be seen
-in figures \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and
-\ref{FIG:COMMANDS_EXAMPLE}, they are also the two commands that are
-called the most.
-
-\subsubsection{\lstinline!WdgM_MainFunction!}
-The \lstinline!WdgM_MainFunction! handles alive supervision
-calculations, and the function \lstinline!WdgM_CheckpointReached!
-handles the increasing of the alive counters, a certain number of
-calls to \lstinline!WdgM_CheckpointReached! must be done before each
-\lstinline!WdgM_MainFunction!. It does not end there. Each checkpoint
-may have some logical supervision, so the order of the called
-checkpoints is important as well. It is also possible to set deadline
-supervision for a supervised entity. Both deadline supervision and
-logical supervision is handled by \lstinline!WdgM_CheckpointReached!.
-
-\subsubsection{\lstinline!WdgM_CheckpointReached!}
-Deadline supervision demands that a configured amount of time must
-have elapsed since the start checkpoint was visited. Because AUTOSAR
-does not specify how the handling of time should be implemented, see
-sections \ref{SEC:CALLING_COMMANDS} and
-\ref{SEC:FUNCTIONAL_SAFETY_TIME}, we implemented the model as the
-C-code, with the use of \lstinline!WdgM_MainFunction!. This is
-possible because we know that \lstinline!WdgM_MainFunction! is called
-periodically.
 
 \section{Coverage}
 \label{SEC:COVERAGE}
@@ -467,9 +384,9 @@ achieve 100\% code coverage depends on certain limitations. Some lines
 can not be covered when the configuration parameter
 \lstinline!WdgMDevErrorDetect! is true. On the other hand, if it is
 false, then the C-model will fail with a segmentation fault and the
-Erlang model will not be covered any way. There are also a number of
-implementation specific lines, which an other C-code model might
-reach but the one that we had. There is also places that depended on
+Erlang model will not be covered anyway. There are also a number of
+implementation specific lines, which another C-code model might
+reach but not the one that we had. There is also places that depended on
 the configuration to be more simple. A good idea is to supply
 configurations that only has specific supervision functions
 configured. Then it should be possible to prioritize only that
@@ -561,7 +478,7 @@ different interpretations. After the two implementations of the model,
 compare those using QuickCheck. If there are no bugs, then the
 original model was translated into C-code correctly.
 
-The proposed work flow would require a lot of work which, is beyond the scope of
+The proposed work flow would require a lot of work, which is beyond the scope of
 this thesis. For example the C-code needs to be rewritten.
 
 \subsubsection{Development error detection}
