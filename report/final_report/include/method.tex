@@ -320,19 +320,19 @@ states was needed to evaluate tests.
 When the module was fully implemented in Erlang code there had to be
 some assurance of that every piece of code in the C implementation was
 actually tested.  Code coverage for the Erlang implementation was
-measured using the Erlang module \emph{cover}. The coverage were only measured
-on the modules listed in \ref{TABLE:MODULES} since they are the only modules
-that defines the Erlang version of the watchdog manager.
+measured using the Erlang module \emph{cover}. The coverage were only
+measured on the modules listed in \ref{TABLE:MODULES} since they are
+the only modules that defines the Erlang version of the watchdog
+manager.
 
-To be able to measure
-the code coverage of the C-code the commercial tool Bullseye Coverage
-was used. When using those tools it was easy to see that the result
-was not good enough. The main problem seemed to be that the WdgM was
-put in an absorbing state and because of that the following commands
-interesting; they did not change the state. The reason for that an
-absorbing state was reached was the availing of negative testing. The
-testing was negative because invalid command sequences and arguments
-were generated.
+To be able to measure the code coverage of the C-code the commercial
+tool Bullseye Coverage was used. When using those tools it was easy to
+see that the result was not good enough. The main problem seemed to be
+that the WdgM was put in an absorbing state and because of that the
+following commands interesting; they did not change the state. The
+reason for that an absorbing state was reached was the availing of
+negative testing. The testing was negative because invalid command
+sequences and arguments were generated.
 
 Figure \ref{FIG:ONERUN} shows an example of how the status of the
 watchdog manager changed during the execution of API-calls. After a
@@ -472,14 +472,18 @@ approach in the Erlang module. More about this can be found in section
 \ref{SEC:FUNCTIONAL_SAFETY_TIME}.
 
 \section{Model State}
-The model state was constructed as minimal as possible. Even though it
-was tempting to use a more efficient data structure, a simple Erlang
-record was used to represent the model state. Using more efficient
-data structures could for instance speed up the execution of
-tests. The main reason for using a record was to make it easy to
-follow the model state when using \emph{eqc\_statem:show\_states/1},
-see appendix \ref{APP:QUICKCHECK}. The efficiency of the test model
-was considered less relevant than the readability of the model state.
-The idea was to make it easy to find the actual bug, when conflicts
-arouse between the C-code and the Erlang module. Running the actual
-tests was also not considered time or memory critical.
+The model state was constructed as minimal as possible. It is easier
+to get the model correct if the model state is kept simple. A complex
+structure means more data needs to be searched through when a bug is
+found.  Even though it was tempting to use a more efficient data
+structure, a simple Erlang record was used to represent the model
+state. Using more efficient data structures could for instance speed
+up the execution of tests. The main reason for using a record was to
+make it easy to follow the model state and make it possible to use
+QuickCheck's function \emph{eqc\_statem:show\_states/1}, see appendix
+\ref{APP:QUICKCHECK}, for showing the state between command
+sequences. The efficiency of the test model was considered less
+relevant than the readability of the model state.  The idea was to
+make it easy to find the actual bug, when conflicts arouse between the
+C-code and the Erlang module. Running the actual tests was also not
+considered time or memory critical.
