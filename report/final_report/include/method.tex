@@ -235,7 +235,7 @@ not have fully tested the implemented API-call because some branches
 in the C-code will never have been reached before other unimplemented
 API-calls.
 
-\subsection{Conflicts and Bugs}
+\section{Conflicts and Bugs}
 \label{SUBSEC:CONFLICTS}
 %% TODO: Skriv om stycket "every programmer makes mistakes". Det borde
 %% isf läggas till om ambiguites i AUTOSAR tidigare.
@@ -246,15 +246,30 @@ the C-code or the Erlang code. Then the API was thoroughly read and a
 conclusion was made based on this. Either a bug in the C-code was
 found or the Erlang code needed to be corrected. There were however
 cases when the API was ambiguous. In those cases the C-interpretation
-was chosen as correct and the ambiguous specification written down.
+was chosen as correct and the ambiguous specification was documented.
 
-Bugs in the C-code were found early, even though it already run
-actively in lab environments.
+There is a number of possible ways to handle bugs when QuickCheck
+encounters them. The problem is that QuickCheck generates arbitrary
+command sequences, it cannot ``save'' an error and proceed to find the
+next error. Either the C-code or the model needs to be adjusted.  The
+best way, with the model in mind, would often be to let a third party
+correct the discovered bugs. However this is time consuming because
+the support line has often already much to do, and the releases
+doesn't come that often.  Another way is to mock the faulty
+API-call. In other words simulate the output of the C-code, but then
+you will only find one bug per function, strictly limiting the
+probability to find bugs. There is a QuickCheck Erlang module for the
+purpose of mocking C-code, see appendix
+\ref{APP:SEC:OTHERMODULES}. Then there is two equally good
+methods. Either the Erlang model needs to have the fault implemented,
+or the C-code needs to be fixed. There are pros and cons with both
+methods. If the Erlang model introduce bugs, there may be secondary
+failures which are not discovered. This could also happen when
+correcting the C-code, but then more knowledge of the module is
+needed, and some of the secondary failures can easier be avoided. It
+also takes more time to get the extra knowledge of the C-code.
 
-If a bug in the C-code was discovered how should the work be
-continued? Since QuickCheck terminates as soon as it finds a counter
-example, a method for resolving conflicts was needed to be able to run
-further tests. Some alternatives were discussed.
+The alternatives listed below were discussed.
 
 \begin{enumerate}
   \item Fix the C-code, in other words change the source
@@ -271,12 +286,16 @@ further tests. Some alternatives were discussed.
     failures.
 \end{enumerate}
 
-Item \ref{ENUMERATE:FixCCode} was chosen because this was the most dynamic
-and allowed further bugs to be found, see section \ref{sec:handlebugs}.
+We choose to correct the C-code, item \ref{ENUMERATE:FixCCode},
+because then we had direct feedback and could discover where in the
+code the bugs were introduced. Also this was the most dynamic of the alternatives and allowed further bugs to be found.
 
 When thoroughly reading the AUTOSAR API not only ambiguous rules were
 found but also rules that contradicted each other were recognized. In
 those cases the implementation in the C-code was followed.
+
+Bugs in the C-code were found early, even though it already run
+actively in lab environments.
 
 \subsection{Advantage of having the Actual C-code}
 When it did not exist a clear interpretation of the AUTOSAR
