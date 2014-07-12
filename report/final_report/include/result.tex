@@ -80,14 +80,6 @@ segmentation faults when passing null pointers. This does not follow
 the requirements for functional safety, see section
 \ref{SEC:DEVERRORDETECT}.
 
-\subsection{Collapsing states}
-%% TODO: Utfyllnad
-QuickCheck automatically collapse the states when a test fails. This
-process is called shrinking. After a command sequence have been
-generated and failed, QuickCheck tries to remove commands in the
-sequence in order to find the minimal sequence. This makes it easier
-to find where in the code the failure arouse from.
-
 \section{Configurations}
 The watchdog manager (WdgM) was tested using three different
 configurations. The configurations were of different complexity. One

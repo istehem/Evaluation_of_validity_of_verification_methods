@@ -487,3 +487,15 @@ relevant than the readability of the model state.  The idea was to
 make it easy to find the actual bug, when conflicts arouse between the
 C-code and the Erlang module. Running the actual tests was also not
 considered time or memory critical.
+
+\section{Minimizing counter examples}
+After a generated command sequence fails, QuickCheck automatically
+tries to minimize the command sequence needed to prove that there is a
+difference between model and code; a so called counter example. This
+process is called shrinking. This makes it easier to find where in the
+code the failure arouse from. For example, a sequence of 30 commands
+could be shrunk to 5, if all those 5 commands is needed for the
+counter example, and none of the 25 other commands is needed. This is
+very useful, because it is easier to delouse a small number of command
+sequences than a large number with lots of unnecessary commands (for
+the counter example).
