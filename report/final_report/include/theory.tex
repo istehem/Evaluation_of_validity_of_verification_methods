@@ -18,16 +18,16 @@ The purpose of property based testing is to establish formal validation results
 through testing. Property based testing assumes that the specified property
 captures everything of interest in the program. This because of the property
 based testing only validates the property. The property must hold whenever the
-program is executed.
+program is executed. \cite{Fink:1997:PTN:263244.263267}
 
 A problem with testing is to figure out when enough testing has been carried
 out.  Property based testing solves this by performing an iterative strategy. A
-test is negative if it violates the property and positive results if a series of
+test is negative if it violates the property. The test is positive if a series of
 tests produces no errors and the test is '''complete''' under some coverage
 metric. A test is '''incomplete''' if a series of tests passes but it is not
 complete under the coverage metric. The iterative process comes from
 continuously modifying the property and selecting test cases which eventually
-makes the testing '''complete'''. \cite{Fink:1997:PTN:263244.263267}
+makes the test '''complete'''. \cite{Fink:1997:PTN:263244.263267}
 
 Programs often consist of several independent properties, for example: array
 bounds, race conditions and authentication. Such properties can be put together
