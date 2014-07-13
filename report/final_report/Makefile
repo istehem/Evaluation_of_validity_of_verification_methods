@@ -12,8 +12,8 @@ once:
 
 pdf:
 	"$(LATEX_CMD)" report
-	-makeglossaries report
-	-bibtex report
+	makeglossaries report
+	bibtex report
 	"$(LATEX_CMD)" report
 	"$(LATEX_CMD)" report
 
