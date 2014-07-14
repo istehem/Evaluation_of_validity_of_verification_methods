@@ -1,39 +1,43 @@
 \section{Software Testing}
-There are a lot different testing methods and the testing also varies in
-different faces of the development life cycle. Software testing can be divided
-into four different categories: correctness testing, performance testing,
-reliability testing and security testing. This thesis focuses of correctness
-testing. Correctness testing needs a set of rules, which defines the behaviour
-of the software. \cite{mellon}
+There are a lot different testing methods and the testing also varies
+in different faces of the development life cycle. Software testing can
+be divided into four different categories: correctness testing,
+performance testing, reliability testing and security testing. This
+thesis focuses of correctness testing. Correctness testing needs a set
+of rules, which defines the behavior of the software. \cite{mellon}
 
 \subsection{Random Testing}
-When using random testing test cases are simply selected at random.  Random
-testing has been shown to be cost efficient for a lot of programs.  Subtle error
-can be found at low cost and random testing combined with other testing methods
-may result in powerful and cost-effective testing solutions. \cite{mellon}
-
+When using random testing, test cases are simply selected at random.
+Random testing has been shown to be cost efficient for a lot of
+programs. Subtle errors can be found at low cost and random testing
+combined with other testing methods may result in powerful and
+cost-effective testing solutions. \cite{mellon}
 
 \subsection{Property Based Testing}
-The purpose of property based testing is to establish formal validation results
-through testing. Property based testing assumes that the specified property
-captures everything of interest in the program. This because of the property
-based testing only validates the property. The property must hold whenever the
-program is executed. \cite{Fink:1997:PTN:263244.263267}
+The purpose of property based testing is to establish formal
+validation results through testing. Property based testing assumes
+that the specified property captures everything of interest in the
+program. This because of the property based testing only validates the
+property. The property must hold whenever the program is
+executed. \cite{Fink:1997:PTN:263244.263267}
 
-A problem with testing is to figure out when enough testing has been carried
-out.  Property based testing solves this by performing an iterative strategy. A
-test is negative if it violates the property. The test is positive if a series of
-tests produces no errors and the test is '''complete''' under some coverage
-metric. A test is '''incomplete''' if a series of tests passes but it is not
-complete under the coverage metric. The iterative process comes from
-continuously modifying the property and selecting test cases which eventually
-makes the test '''complete'''. \cite{Fink:1997:PTN:263244.263267}
+A problem with testing is to figure out when enough testing has been
+carried out. Property based testing solves this by performing an
+iterative strategy. A test is negative if it violates the
+property. The test is positive if a series of tests produces no errors
+and the test is ``complete'' under some coverage metric. A test is
+``incomplete'' if a series of tests passes but it is not complete
+under the coverage metric. The iterative process comes from
+continuously modifying the property and selecting test cases which
+eventually makes the test
+``complete''. \cite{Fink:1997:PTN:263244.263267}
 
-Programs often consist of several independent properties, for example: array
-bounds, race conditions and authentication. Such properties can be put together
-as one property that should hold for the hole program. Hence property based
-testing is very likely an iterative process, where properties are put together
-until the test becomes '''complete'''. \cite{Fink:1997:PTN:263244.263267}
+Programs often consist of several independent properties, for example:
+array bounds, race conditions and authentication. Such properties can
+be put together as one property that should hold for the hole
+program. Hence property based testing is very likely an iterative
+process, where properties are put together until the test becomes
+``complete''. \cite{Fink:1997:PTN:263244.263267}
 
 \subsection{Model Based Testing}
 
