@@ -418,12 +418,12 @@ means they must agree on the same model.
 One way of doing this is to interpret AUTOSAR in a model based
 language like SPIN and check that the model, after transforming it
 into formal syntax, is valid. The model in itself should then not
-contain any bugs.
+contain any bugs. This can also be done using QuickCheck.
 
-This can also be done using QuickCheck but, in a functional safety
-point of view, it seems pointless to test the actual C-code before
-there is assurance for that the model actually is correct according to
-formal syntax.
+The model for the system must, in a functional safety
+point of view, be implemented before the C-code is written. It seems
+pointless to test the actual C-code before there is assurance for that
+the model actually is correct according to formal syntax.
 
 C in itself is also a formal language but C is not good fitted to
 formally defining the actual requirements of AUTOSAR. This is for
