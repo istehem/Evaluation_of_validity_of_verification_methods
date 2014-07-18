@@ -256,11 +256,11 @@ best way, with the model in mind, would often be to let a third party
 correct the discovered bugs. However this is time consuming because
 the support line has often already much to do, and the releases
 doesn't come that often.  Another way is to mock the faulty
-API-call. In other words simulate the output of the C-code, but then
-you will only find one bug per function, strictly limiting the
-probability to find bugs. There is a QuickCheck Erlang module for the
-purpose of mocking C-code, see appendix
-\ref{APP:SEC:OTHERMODULES}. Then there is two equally good
+API-call. In other words simulate the output of the C-code in order to
+circumvent or hide a API-function, but then you will only find one bug
+per function, strictly limiting the probability to find bugs. There is
+a QuickCheck Erlang module for the purpose of mocking C-code, see
+appendix \ref{APP:SEC:OTHERMODULES}. Then there is two equally good
 methods. Either the Erlang model needs to have the fault implemented,
 or the C-code needs to be fixed. There are pros and cons with both
 methods. If the Erlang model introduce bugs, there may be secondary
