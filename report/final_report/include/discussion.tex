@@ -10,12 +10,22 @@ needed to be corrected.
 Easier when you do white box testing, when the source code is known,
 because then you can really check the code and compare with the requirements.
 
-We achieved fair coverage of the C-code, around 85\%, and the Erlang code,
-around 97\%. The problem was the requirements, where we achieved around 50\%. It
-would help if a QuickCheck model was implemented for the whole system as
-well. Many of the requirements had dependencies in other modules, and some
-requirements for the file structure, the configuration or even the generation of
-files.
+The C-code coverage was measured differently from the Erlang code
+coverage, which used line coverage instead of condition/decision
+coverage. Recursion is often used in functional programming languages
+as Erlang, therefore it is not as suited for condition/decision
+coverage as C-code is. Erlang also comes with a coverage library,
+which makes it easy to use. On the other hand, measuring line coverage
+in a imperative language like C is a bit redundant since statements
+are executed sequentially. Therefore conditions/decision coverage
+seems more reasonable.
+
+We achieved fair coverage of the C-code, around 85\%, and the Erlang
+code, around 97\%. The problem was the requirements, where we achieved
+around 50\%. It would help if a QuickCheck model was implemented for
+the whole system as well. Many of the requirements had dependencies in
+other modules, and some requirements for the file structure, the
+configuration or even the generation of files.
 
 QuickCheck is good for overall testing, and can help with raising the functional
 safety of modules.
