@@ -37,7 +37,7 @@ figure \ref{FIG:STATUSES_BSI}, \ref{FIG:STATUSES_FREESCALE}, and
 before the absorbing state \lstinline!'WDGM_GLOBAL_STATUS_EXPIRED'! is
 reached.
 
-\subsection{Prioritized Testing}
+\subsection{Prioritized supervision algorithms}
 The supervision algorithms are important parts of the watchdog manager
 since they specify transitions, liveness and timing properties of the
 program. It was therefore chosen to prioritize different algorithms
@@ -54,17 +54,19 @@ alive supervision to fail because it goes outside of its bound. The
 same can happen if it is not generated enough. If a checkpoint is
 generated only because it needs to be inside of its alive supervision
 bound, then there is a chance that rules for deadline or logical
-supervision is violated. The easiest way to implement prioritized
-checkpoint generation is to start with logical supervision. This is
-because logical supervision follows certain graphs; transitions
-between checkpoints. Logical supervision maintains both internal
-graphs, inside of each supervised entity, and external graphs which is
-transitions between supervised entities. It is easy to get next
-possible checkpoints for all graphs, and then check whether one of
-those checkpoints also is configured for alive or deadline
-supervision. If it is, calculate the status for those supervision
-functions and then choose which checkpoint should be selected.
-If prioritized checkpoint generation is not implemented with logical
+supervision is violated. The easiest way to prioritize checkpoint
+generation is to start with logical supervision. This is because
+logical supervision follows certain graphs, where each vertex is
+represented by a checkpoint and each edge is a valid transition
+between two checkpoints. These graphs is defined by the logical
+supervision functions in the AUTOSAR configuration.  Logical
+supervision maintains both internal graphs, inside of each supervised
+entity, and external graphs which is transitions between supervised
+entities. It is easy to get next possible checkpoints for all graphs,
+and then check whether one of those checkpoints also is configured for
+alive or deadline supervision. If it is, calculate the status for
+those supervision functions and then choose which checkpoint should be
+selected.  If checkpoint generation is not prioritized with logical
 supervision as foundation, alive supervision or deadline supervision
 could be used. This is harder because it is more likely to end up with
 a checkpoint that violates logical supervision rules.
