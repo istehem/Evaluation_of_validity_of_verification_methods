@@ -26,7 +26,7 @@ carried out. Property based testing solves this by performing an
 iterative strategy. A test is negative if it violates the
 property. The test is positive if a series of tests produces no errors
 and the test is ``complete'' under some coverage metric. A test is
-``incomplete'' if a series of tests passes but it is not complete
+``incomplete'' if a series of tests passes, but is not complete
 under the coverage metric. The iterative process comes from
 continuously modifying the property and selecting test cases which
 eventually makes the test
@@ -34,7 +34,7 @@ eventually makes the test
 
 Programs often consist of several independent properties, for example:
 array bounds, race conditions and authentication. Such properties can
-be put together as one property that should hold for the hole
+be put together as one property that should hold for the whole
 program. Hence property based testing is very likely an iterative
 process, where properties are put together until the test becomes
 ``complete''. \cite{Fink:1997:PTN:263244.263267}
@@ -267,7 +267,7 @@ it. \cite{QUVIQ:about}\cite{QUICKCHECK:manual}
 
 QuickCheck uses property based testing, which means that system
 requirements are implemented and tested as properties. QuickCheck
-makes also use of random testing, but has guided random test
+also makes use of random testing, but has guided random test
 generation. This means that the samples can be weighted to cover
 certain parts of the state space with more likelihood.
 \cite{QUICKCHECK:manual}
