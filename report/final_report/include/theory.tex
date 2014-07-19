@@ -17,7 +17,7 @@ cost-effective testing solutions. \cite{mellon}
 The purpose of property based testing is to establish formal
 validation results through testing. Property based testing assumes
 that the specified property captures everything of interest in the
-program. This because of the property based testing only validates the
+program. This because of that property based testing only validates the
 property. The property must hold whenever the program is
 executed. \cite{Fink:1997:PTN:263244.263267}
 
@@ -252,20 +252,22 @@ animated to display various aspects of the system behavior.'' \cite[p.77]{IEC615
 
 
 \subsection{QuickCheck}
-%% TODO: dubbelkolla sista meningen, räcker med att ha byte koden + bibliotek?
 QuickCheck was invented by Koen Claessen and John Hughes, as a testing
 module for Haskell in 2000. In 2006 John Hughes founded the company
-Quviq together with Thomas Arts \cite{QUVIQ:about}. Quviq offers a
-commercial version of QuickCheck for Erlang. One of the main differences,
-except from the programming language, is that the commercial version
-of QuickCheck has a C-testing interface. Hence it possible to test
-C-code in Erlang with the help of QuickCheck. All test code is written
-in Erlang and checked against API calls to the C-code. It is not
-necessary to have the actual source code; it is enough to only have
-the compiled byte code and some library files of the program to test.
+Quviq together with Thomas Arts. Quviq offers a commercial version of
+QuickCheck for Erlang. One of the main differences, except from the
+programming language, is that the commercial version of QuickCheck has
+a C-testing interface. Hence it possible to test C-code in Erlang with
+the help of QuickCheck. All test code is written in Erlang and checked
+against API calls to the C-code, this is called model based
+testing. It is not necessary to have the actual source code; it is
+enough to only supply the compiled byte code and some library files of
+the program to be able to test
+it. \cite{QUVIQ:about}\cite{QUICKCHECK:manual}
 
-QuickCheck tests a program that has its specification implemented as
-properties that must hold for the program. QuickCheck provides guided
-random test generation. This means that the samples can be weighted to
-cover certain parts of the state space with more likelihood.
+QuickCheck uses property based testing, which means that system
+requirements are implemented and tested as properties. QuickCheck
+makes also use of random testing, but has guided random test
+generation. This means that the samples can be weighted to cover
+certain parts of the state space with more likelihood.
 \cite{QUICKCHECK:manual}
