@@ -1,14 +1,53 @@
 
-The model has been implemented in an iterative way. Function for function,
-requirement for requirement. This process is very easy with the use of
-QuickCheck.
-In the beginning there were alot of negative testing, because we didn't care
-about tweaking the generators.
-Sometimes the model needs to be corrected because of ambiguities in AUTOSAR or
-errors in the model. Quite often it was the C-code that had the errors and
-needed to be corrected.
-Easier when you do white box testing, when the source code is known,
-because then you can really check the code and compare with the requirements.
+The model has been implemented in an iterative way. Function for
+function, requirement for requirement. This process is very easy with
+the use of QuickCheck.  In the beginning there were alot of negative
+testing, because we didn't care about tweaking the generators.
+By limiting the state space for negative tests, we achieved a better
+ratio for positive testing when generating random tests. This was done
+by letting some command sequences weight more than others when
+QuickCheck generates the test cases. In
+figure~\ref{QUICKCHECK:TWEAKING} we show how the state space is
+minimized when QuickCheck has been tweaked.
+
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{minipage}[b]{0.6\linewidth}
+      \include{pictures/limited_state_space}
+    \end{minipage}
+  \end{center}
+  \caption{The state space when tweaking QuickCheck's generators.}
+  \label{QUICKCHECK:TWEAKING}
+\end{figure}
+The outer box in figure~\ref{QUICKCHECK:TWEAKING} represents the full
+state space, and the inner circle represents positive test cases. This
+means that all test cases outside of the circle represents negative
+test cases. When tweaking generators it mean we can limit some of the
+negative test state space, in order to have QuickCheck generate more
+interesting positive test cases. The black dots in the figure
+represents different generated test cases, and the gray dots
+represents test cases which will not be generated after the new
+limitations.
+
+As an example, it is unnecessary to test functions if the watchdog
+manager state machine has not been initialized with a call to the
+\lstinline!WdgM_Init! function. We can weight the generation
+of the \lstinline!WdgM_Init! function to be called with a higher ratio
+if the state machine is not initialized yet.
+
+\begin{lstlisting}[style=erlang, literate={_}{\_}1]
+weight(S,  'WdgM_Init') ->
+  case S#state.initialized of
+    true                           -> 1;
+    _                              -> 200
+  end;
+\end{lstlisting}
+
+Sometimes the model needs to be corrected because of ambiguities in
+AUTOSAR or errors in the model. Quite often it was the C-code that had
+the errors and needed to be corrected.  Easier when you do white box
+testing, when the source code is known, because then you can really
+check the code and compare with the requirements.
 
 The C-code coverage was measured differently from the Erlang code
 coverage, which used line coverage instead of condition/decision
@@ -27,8 +66,8 @@ the whole system as well. Many of the requirements had dependencies in
 other modules, and some requirements for the file structure, the
 configuration or even the generation of files.
 
-QuickCheck is good for overall testing, and can help with raising the functional
-safety of modules.
+QuickCheck is good for overall testing, and can help with raising the
+functional safety of modules.
 
 %% analys av resultat
 %% - coverage på modell och c-kod genom cover (erlang) och bullseye (c-kod)

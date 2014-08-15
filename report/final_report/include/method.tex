@@ -382,7 +382,7 @@ of generation of that call.
 For example the initialization function \lstinline!WdgM_Init! should
 have a high priority if it had not been called previously, and a low
 priority if it had been called previously.
-\begin{lstlisting}
+\begin{lstlisting}[style=erlang, literate={_}{\_}1]
 weight(S,  'WdgM_Init') ->
   case S#state.initialized of
     true                           -> 1;
