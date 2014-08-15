@@ -43,6 +43,10 @@ weight(S,  'WdgM_Init') ->
   end;
 \end{lstlisting}
 
+We want to do this because there is only some functions that actually
+changes the state of the watchdog manager; there is a lot of so called
+get-functions which only retrieves information.
+
 Sometimes the model needs to be corrected because of ambiguities in
 AUTOSAR or errors in the model. Quite often it was the C-code that had
 the errors and needed to be corrected.  Easier when you do white box
