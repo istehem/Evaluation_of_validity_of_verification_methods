@@ -4,18 +4,11 @@
 
 \begin{document}
 \section{Titlepage}
-<<<<<<< HEAD
-My name is X and this is Y. We will present our master
-thesis ``Evaluation of validity of verification methods''.
-
-It is about automating testing of software modules in AUTOSAR.
-=======
 Mitt namn är X och detta är Y. Vi ska presentera vårt exjobb
 ``Evaluation of validity of verification methods''.
 
-Det handlar om att automatisera testning av mjukvarumoduler med sikt
+Det handlar om att automatisera testning av mjukvarumoduler i AUTOSAR sikt
 på safety.
->>>>>>> f6aa6dcc2f75303ddf510129dfc9158fd7e9f8a3
 
 \section{Table of contents}
 Agenda.
@@ -33,7 +26,7 @@ Mer funktionalitet läggs till varje år.
 % in the future. Cars will be connected with each other, they will be
 % connected with roadside management systems and also with the Internet.
 
-Och säkerheten är väldig viktig.
+Och säkerheten är väldig viktigt.
 % Vehicles are already safety critical, because you don't want to crash
 % because of a software failure.
 
@@ -43,11 +36,6 @@ Man vill inte att bromsarna ska sluta fungera pga ett mjukvarufel i stereon.
 % share resources. For example, you don't want your brakes to stop
 % working because your stereo has a software malfunction.
 
-<<<<<<< HEAD
-\section{Glossary-2}
-Functional safety is a relative new concept in the automotive
-industry.
-=======
 Testning består av ungefär hälften av utvecklingskostnaderna.
 % Research has shown that testing accounts for around half of all
 % software development costs.
@@ -65,7 +53,6 @@ fallerar så ska inte hela systemet behöva fallera.
 
 % Functional safety is a relative new concept in the automotive
 % industry.
->>>>>>> f6aa6dcc2f75303ddf510129dfc9158fd7e9f8a3
 
 % It defines the development process from idea to product.
 
@@ -92,78 +79,116 @@ ASIL nivå.
 % reliable.
 
 % We also aim to examine if it is possible to reach a higher ASIL classification.
-
 \section{Watchdog manager}
-Since AUTOSAR consists of many module specifications, we had to start
-somewhere and choose one specification.
+Som AUTOSAR modul, så valde vi watchdog manager att forska på.
+Detta var för att det är en säkerhetskritisk modul, som varken är för
+komplex eller för simpel.
 
-We choose the watchdog manager because it is a safety critical module,
-which is not to complex and also not to simple.
-
-The watchdog is a hardware component that is used to detect and
-recover from computer malfunctions.
-
-The watchdog manager configures and supervises all watchdogs in the
-system.
+%Since AUTOSAR consists of many module specifications, we had to start
+%somewhere and choose one specification.
+%
+%We choose the watchdog manager because it is a safety critical module,
+%which is not to complex and also not to simple.
+%
+%The watchdog is a hardware component that is used to detect and
+%recover from computer malfunctions.
+%
+%The watchdog manager configures and supervises all watchdogs in the
+%system.
 
 \section{Glossary-4}
-A supervised entity is a critical section in a piece of code that
-needs to follow a certain behavior.
+Watchdogen övervakar kritiska stycken i olika delar av systemet. Dessa
+delar kallas för supervised entities. Dessa entities innehåller
+kontrollpunkter, checkpoints, som raporteras tillbaka till watchdogen.
 
-A checkpoint is a point in the control flow of a supervised entity
-where the activity is reported to the Watchdog manager.
+% A supervised entity is a critical section in a piece of code that
+% needs to follow a certain behavior.
+
+% A checkpoint is a point in the control flow of a supervised entity
+% where the activity is reported to the Watchdog manager.
 
 \section{Functions in WdgM}
-AUTOSAR specifies eleven API calls for the watchdog manager.
+Det finns elva funktioner specificerade för watchdogen i AUTOSAR.
+Vi kan dela in dessa i två grupper, getters och setters.
+% AUTOSAR specifies eleven API calls for the watchdog manager.
 
-These can be divided into two groups; get-functions, and functions
-that changes the state of the watchdog manager.
+% These can be divided into two groups; get-functions, and functions
+% that changes the state of the watchdog manager.
 
-The get functions shall of course follow certain requirements, but the
-will not change the state since their only task is to retrieve
-information about the state.
+Get-funktionerna ändrar inte på någonting, utan hämtar bara
+information om watchdogen.
+Set-funktionerna däremot ändrar watchdogens state.
 
-Then there is the set functions that changes the state of the Watchdog
-manager.
+Init, Deinit, perform reset, setmode och
+mainfunction och checkpointreached.
 
-The Init function must be called first, because it initializes the
-watchdog manager. It takes a configuration as argument.
+All supervision sker i mainfunction och checkpointreached.
 
-the DeInit function is the opposite of Init; it deactivates the
-watchdog manager.
+% The get functions shall of course follow certain requirements, but the
+% will not change the state since their only task is to retrieve
+% information about the state.
 
-PerformReset causes an external hardware reset on all configured
-hardware watchdogs.
+% Then there is the set functions that changes the state of the Watchdog
+% manager.
 
-SetMode changes the mode of the watchdog manager. Different things can
-be configured in different modes.
+% The Init function must be called first, because it initializes the
+% watchdog manager. It takes a configuration as argument.
 
-The most interesting things happen in the MainFunction and
-CheckpointReached. These two functions handles the supervision mechanisms.
-The MainFunction is called in an interval by the run time environment.
-It switches the global status.
+% the DeInit function is the opposite of Init; it deactivates the
+% watchdog manager.
 
-CheckpointReached is called when the system reaches a critical point a
-so called checkpoint.
+% PerformReset causes an external hardware reset on all configured
+% hardware watchdogs.
+
+% SetMode changes the mode of the watchdog manager. Different things can
+% be configured in different modes.
+
+% The most interesting things happen in the MainFunction and
+% CheckpointReached. These two functions handles the supervision mechanisms.
+% The MainFunction is called in an interval by the run time environment.
+% It switches the global status.
+
+% CheckpointReached is called when the system reaches a critical point a
+% so called checkpoint.
+
 
 \section{Supervision mechanisms}
-To maintain supervision of components there are three different
-mechanisms used by the Watchdog manager.
+Supervision sker genom tre olika mekanismer.
 
-Alive supervision verifies that checkpoints is called periodically.
+Alive supervision som kontrollerar att checkpoints kallas periodiskt.
 
-Deadline supervision verifies that checkpoints is called within a time
-limit.
+Deadline supervision som kontrollerar att checkpoints nås inom en viss
+tid.
 
-Logical supervision verifies that checkpoints is reached in certain sequences.
+Logical supervision kontrollerar att checkpoints sker i en specifik
+ordning. Det finns två typer av logical supervision; intern och
+extern. Intern fungerar inom en supervised entity, medan extern är
+övergången mellan två supervised entities.
+
+En checkpoint kan vara konfigurerad för flera olika supervision
+mekanismer samtidigt.
+
+% To maintain supervision of components there are three different
+% mechanisms used by the Watchdog manager.
+
+% Alive supervision verifies that checkpoints is called periodically.
+
+% Deadline supervision verifies that checkpoints is called within a time
+% limit.
+
+% Logical supervision verifies that checkpoints is reached in certain sequences.
 
 \section{The state machine}
-The behavior of the watchdog manager depends on its global status
-which is calculated from the statuses of the supervised
-entities. Those statuses is called local statuses.
+Watchdogens beteende beror på dess globala status, som beräknas från
+entiteternas lokala status. De lokala statusarna är beroende av de
+konfigurerade mekanismerna.
 
-A supervised entity's local status is calculated with the help of the
-supervision mechanisms mentioned.
+% The behavior of the watchdog manager depends on its global status
+% which is calculated from the statuses of the supervised
+% entities. Those statuses is called local statuses.
+
+% A supervised entity's local status is calculated with the help of the
+% supervision mechanisms mentioned.
 
 \section{Global statuses}
 The state machine begins with the global status deactivated (as seen
