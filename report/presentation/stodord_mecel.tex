@@ -1,0 +1,320 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\begin{document}
+\section{Titlepage}
+My name is X and this is Y. We will present our master thesis
+``Evaluation of validity of verification methods''.
+
+It is about automating testing of automotive software modules.
+
+\section{Table of contents}
+This is our agenda, we will start with an Introduction.
+
+\section{Background}
+Vehicles become more and more complex. Today there are around 80
+electronic control units, running millions of lines of code needed for
+brakes, infotainment systems, steering, windscreen wipers and so on.
+
+More functionality is added every year. Things like automated parking,
+night vision, traffic sign recognision will be mandatory in new cars
+in the future. Cars will be connected with each other, they will be
+connected with roadside management systems and also with the Internet.
+
+Vehicles are already safety critical, because you don't want to crash
+because of a software failure.
+
+Already different components share a limited number of
+resources. Adding more functionality means even more components will
+share resources. For example, you don't want your brakes to stop
+working because your stereo has a software malfunction.
+
+Research has shown that testing accounts for around half of all
+software development costs.
+
+\section{Glossary-1}
+Before we move on we have some key words you will need to comprehend.
+
+AUTOSAR is a standard for implementing vehicle software components,
+which consists of around 80 module specifications.
+
+AUTOSAR's concept is to make it possible for vehicle manufacturers to
+buy components from different software companies, which will still
+work together in unison.
+
+\section{Glossary-2}
+Functional safety is a relative new concept in the automotive
+industry.
+
+It defines the development process from idea to product.
+
+Every step in the process must fulfill certain requirements.
+
+The main idea is if a component in the system fails, then the whole
+system should not fail.
+
+\section{Glossary-3}
+ASIL refers to the classification of functional safety.
+
+A software function with a higher ASIL classification need to
+experience more rigorous testing.
+
+\section{Objectives}
+Our objectives are to automate the testing of AUTOSAR modules. The
+goal is to reduce the costs of testing and make the code more
+reliable.
+
+We also aim to examine if it is possible to reach a higher ASIL classification.
+
+\section{Watchdog manager}
+Since AUTOSAR consists of many module specifications, we had to start
+somewhere and choose one specification.
+
+We choose the watchdog manager because it is a safety critical module,
+which is not to complex and also not to simple.
+
+The watchdog is a hardware component that is used to detect and
+recover from computer malfunctions.
+
+The watchdog manager configures and supervises all watchdogs in the
+system.
+
+The watchdog manager can be configured in a number of ways to suit
+different needs.
+
+\section{Glossary-4}
+A supervised entity is a critical section in a piece of code that
+needs to follow a certain behavior.
+
+A checkpoint is a point in the control flow of a supervised entity
+where the activity is reported to the Watchdog manager.
+
+\section{Functions in WdgM}
+AUTOSAR specifies eleven API calls for the watchdog manager.
+
+These can be divided into two groups; get-functions, and functions
+that changes the state of the watchdog manager.
+
+The get functions shall of course follow certain requirements, but the
+will not change the state since their only task is to retrieve
+information about the state.
+
+Then there is the set functions that changes the state of the Watchdog
+manager.
+
+The Init function must be called first, because it initializes the
+watchdog manager. It takes a configuration as argument.
+
+the DeInit function is the opposite of Init; it deactivates the
+watchdog manager.
+
+PerformReset causes an external hardware reset on all configured
+hardware watchdogs.
+
+SetMode changes the mode of the watchdog manager. Different things can
+be configured in different modes.
+
+The most interesting things happen in the MainFunction and
+CheckpointReached. These two functions handles the supervision mechanisms.
+The MainFunction is called in an interval by the run time environment.
+It switches the global status.
+
+CheckpointReached is called when the system reaches a critical point a
+so called checkpoint.
+
+\section{Supervision mechanisms}
+To maintain supervision of components there are three different
+mechanisms used by the Watchdog manager.
+
+Alive supervision verifies that checkpoints is called periodically.
+
+Deadline supervision verifies that checkpoints is called within a time
+limit.
+
+Logical supervision verifies that checkpoints is reached in certain sequences.
+
+\section{The state machine}
+The behavior of the watchdog manager depends on its global status
+which is calculated from the statuses of the supervised
+entities. Those statuses is called local statuses.
+
+A supervised entity's local status is calculated with the help of the
+supervision mechanisms mentioned.
+
+\section{Global statuses}
+The state machine begins with the global status deactivated (as seen
+in this picture).
+
+When the initialization function is called the global status changes
+to OK.
+It will stay in OK as long as the behavior of the watchdog manager,
+according to the local statuses, is correct.
+
+In case of a failure, the global status changes to failed, expired or
+stopped depending on the configuration and the failure.
+
+The watchdog manager can recover when the global status is failed.
+
+The global status stopped is an absorbing state and the Watchdog
+manager can not recover from this state by itself. What is needed is
+an external hardware reset. When in the absorbing state no supervision
+mechanisms is executed.
+
+The expired state is a way for the watchdog manager to postpone error
+reaction.
+
+\section{Generating C byte code}
+The watchdog manager can be configured in a number of different
+ways. Therefor the configuration must be supplied before the C code
+can be compiled. Dependencies to other modules must also be included.
+
+\section{Glossary-5}
+We have used QuickCheck for automating tests. QuickCheck is a model
+based testing tool which generates arbitrary sequences of API calls.
+
+\section{QuickCheck}
+Because QuickCheck is model based, AUTOSAR specifications first need
+to be translated into a model written the Erlang programming language,
+thus readable by QuickCheck.
+
+QuickCheck calls each generated API call and compares the result from
+the C code with the result from the Erlang code.
+
+\section{Configurations}
+As we said before, the watchdog manager can be configured in different
+ways. Therefor we tested the watchdog manager using three different
+configurations. Using different configurations make the testing more
+reliable.
+
+These three configurations are called the BSI, the Example and the
+Freescale configuration.
+
+The BSI configuration is a highly simplified configuration. For
+example it has no supervision mechanisms configured, which make it
+impossible to reach an incorrect global state.
+Because of this, everything cant be tested using this configuration.
+
+The example configuration is very complex, which means a lot of things
+can be tested. It also means that a lot of things can cause an invalid
+behavior of the Watchdog manager and put the watchdog manager in an
+absorbing failure state.
+
+The Freescale configuration is a realistic configuration, which is
+used in lab environments at Mecel. Using this configuration, all
+transitions in the state machine was reached.
+
+\section{Testing}
+We have implemented both positive and negative testing, where positive
+testing tries to only generate correct command sequences with correct
+arguments. The Watchdog manager is supposed to stay in the global
+status OK or DEACTIVATED.
+
+The requirements of the Watchdog manager must hold even if command
+sequences or arguments to API calls are invalid to achieve functional
+safety. Negative testing tries to ensure this. We have performed this
+by passing null pointers and other invalid arguments.
+
+The con with negative testing is that it is very easy to get to an
+absorbing state. All commands that is generated after reaching an
+absorbing state will not test anything.
+
+\section{Bug handling}
+When encountering a bug there were a question that arose. How should
+we continue?
+
+A problem with QuickCheck is that it generates the command sequences
+before the actual execution of tests. This make it impossible to
+``skip'' a bug and continue to search for others.
+
+The best way would be to report the bug, and let a third party fix
+it. However this may be time consuming and it will probably take weeks
+before the bug is patched and we can continue testing.
+
+Letting a third party fix the bug will ensure that they agree on that
+this actually is a bug. They will also be able to fix the bug
+independently of our Erlang implementation.
+
+Another method is to change the Erlang model to follow the C code,
+hence making the bug to appear in Erlang as well.
+
+Doing this we wont be able to find secondary failures, or use
+different configurations or other versions of the module.
+
+Fixing the C code ourselves makes it easy to adapt the same techniques
+that we used in the Erlang implementation and translate them into C
+code.
+This increases the risk of ending up with the same bugs in both C code
+and Erlang. Such bugs will not be discovered by QuickCheck since both
+implementations will agree on the same incorrect model.
+
+\section{Bugs we found}
+A lot of bugs were found in the C-code, even bugs that was considered safety
+critical.  Bugs that were considered safety critical were mainly bugs in the
+supervision algorithms.  Most of the bugs were easy to fix but some needed a
+lot of C code to be rewritten.
+
+Even bugs in the generated code were found. Such bugs corrupted mainly the
+initial state of the watchdog manager.
+
+A lot of errors and ambiguity's etcetera were found in the AUTOSAR
+specification. Errors like misspelling of configuration parameter etcetera are
+not very likely to cause errors in implementations but still doesn't make the
+standard very trustworthy. Worst are however ambiguities in the specification,
+there were situations when we could not tell who was faulty. Our Erlang
+implementation or the C code? In those cases we choose to follow the C
+implementation.
+
+\section{Coverage \& Statistics}
+The reason we don't achieve 100\% code coverage depends on certain limitations.
+Some lines can not be covered when the configuration parameter
+\emph{WdgMDevErrorDetect} is true. On the other hand, if it is
+false, then the C model will fail with a segmentation fault and the
+Erlang model will not be covered any way.
+
+The missing coverage in the C-code are for example checks for null
+pointers, some of which never evaluated to false. Many checks seems to be
+redundant and impossible to evaluate to true, if one excludes the possibility
+of hardware failures or other failures which may corrupt the memory of the
+watchdog manager.
+
+\section{Functional safety}
+The configuration holds a dangerous parameter that is called
+DevErrorDetect. This parameter will allow the Watchdog manager to
+check for development errors like null pointers. If the parameter is
+turned of and a function is called with invalid data, then the whole
+system will crash.
+
+This parameter is actually turned off before the code is sent to
+production. This does not follow the need for functional safety, since
+the main idea with functional safety is if a component in the system
+fails, then the whole system should not fail.
+
+\section{Future work}
+If several AUTOSAR modules is translated into Erlang code, they can be
+combined and QuickCheck can then test the dependencies of the whole
+connected system.
+
+One can also try to test more configurations in order to gain even
+better test results.
+
+\section{Conclusions}
+QuickCheck can be used in some extent to implement functional
+safety. The problem is that AUTOSAR is written with informal syntax
+and therefor must first be translated into formal syntax. Also
+functional safety is a process that stretches from idea to product,
+and not only at the software development level.
+
+One needs to be aware that it may be difficult to reach the whole
+state space if the configuration is to complex or not complex
+enough. There may also be configuration parameters that is not safe
+for the reliability of the system to turn off.
+
+It is important to measure the tested state space, but it is equally
+important to measure the code coverage. These two are semi independent
+of each other. One can have almost 100\% code coverage without covering
+the full state space.
+
+\section{Questions?}
+
+\end{document}
