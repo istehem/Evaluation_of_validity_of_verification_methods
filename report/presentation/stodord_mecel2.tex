@@ -191,26 +191,39 @@ konfigurerade mekanismerna.
 % supervision mechanisms mentioned.
 
 \section{Global statuses}
-The state machine begins with the global status deactivated (as seen
-in this picture).
+Watchdogens tillståndsmaskin börjar i deactivated, och efter ett
+korrekt anrop till init-funktionen så ändras den globala statusen till
+OK.
+Där kommer den att stanna sålänge alla lokala statusar är korrekt.
 
-When the initialization function is called the global status changes
-to OK.
-It will stay in OK as long as the behavior of the watchdog manager,
-according to the local statuses, is correct.
+Om watchdogen upptäcker ett fel, kommer den globala statusen
+antingen ändras till failure, expired eller stopped, beroende på
+felet.
 
-In case of a failure, the global status changes to failed, expired or
-stopped depending on the configuration and the failure.
+Watchdogen kan komma tillbaka från failure statusen, men inte från de
+andra två.
 
-The watchdog manager can recover when the global status is failed.
+% The state machine begins with the global status deactivated (as seen
+% in this picture).
 
-The global status stopped is an absorbing state and the Watchdog
-manager can not recover from this state by itself. What is needed is
-an external hardware reset. When in the absorbing state no supervision
-mechanisms is executed.
+% When the initialization function is called the global status changes
+% to OK.
+% It will stay in OK as long as the behavior of the watchdog manager,
+% according to the local statuses, is correct.
 
-The expired state is a way for the watchdog manager to postpone error
-reaction.
+% In case of a failure, the global status changes to failed, expired or
+% stopped depending on the configuration and the failure.
+
+% The watchdog manager can recover when the global status is failed.
+
+% The global status stopped is an absorbing state and the Watchdog
+% manager can not recover from this state by itself. What is needed is
+% an external hardware reset. When in the absorbing state no supervision
+% mechanisms is executed.
+
+% The expired state is a way for the watchdog manager to postpone error
+% reaction.
+
 
 \section{Generating C byte code}
 Models that are dependent of the WdgM, was stubbed. Explain what that means.
