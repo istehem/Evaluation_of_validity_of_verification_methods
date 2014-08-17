@@ -392,6 +392,13 @@
 %------------------------------------------------
 % \subsection{Erlang implementation of AUTOSAR}
 %------------------------------------------------
+\begin{frame}
+  \frametitle{How QuickCheck works}
+  \centerline{
+    \includegraphics[keepaspectratio, width=0.7\linewidth]{api_calls}
+  }
+\end{frame}
+
 \newcommand\Fontvi{\fontsize{6}{7.2}\selectfont}
 \begin{frame}[fragile]
         \frametitle{QuickCheck Properties}
@@ -409,12 +416,17 @@ getmode_post(S, [Is_Null], {R, Mode}) ->
         \end{lstlisting}
 \end{frame}
 
-
-\begin{frame}
-  \frametitle{How QuickCheck works}
-  \centerline{
-    \includegraphics[keepaspectratio, width=0.7\linewidth]{api_calls}
-  }
+\begin{frame}[fragile]
+        \frametitle{Generating test cases}
+           Generators
+        \Fontvi
+        \begin{lstlisting}[style=erlang]
+weight(S,  init) ->
+  case S#state.initialized of
+    true                           -> 1;
+    _                              -> 200
+  end;
+           \end{lstlisting}
 \end{frame}
 
 %------------------------------------------------
@@ -560,7 +572,7 @@ getmode_post(S, [Is_Null], {R, Mode}) ->
       \item Condition/Decision coverage of C code (81\%)
       \item State space coverage (100\% of valid transitions, 0\% of
         invalid transitions)
-      \item Requirements coverage (~$\frac{2}{3}$ of total)
+      \item Requirements coverage ($\approx 60\%$)
     \end{itemize}
   \end{block}
   \begin{block}{Statistics}
@@ -580,6 +592,20 @@ getmode_post(S, [Is_Null], {R, Mode}) ->
 \end{frame}
 
 %================================================
+\section{Our Testing Tool}
+%================================================
+\begin{frame}
+  \frametitle{Our Testing Tool}
+  \begin{itemize}
+        \item Automatically generates relevant test cases
+        \item Combines requirements and tests them together
+        \item Configuration independence
+        \item Designed for integration with other modules
+  \end{itemize}
+  \end{frame}
+
+
+%================================================
 \section{Future work}
 %================================================
 \begin{frame}[fragile]
@@ -595,12 +621,10 @@ getmode_post(S, [Is_Null], {R, Mode}) ->
 \begin{frame}
   \frametitle{Conclusions}
   QuickCheck and functional safety.
-
   AUTOSAR as a standard.
-
   Complexity of configurations.
-
   Measurements of state space, and code coverages.
+  Implementation time for finding bugs
 \end{frame}
 
 %================================================

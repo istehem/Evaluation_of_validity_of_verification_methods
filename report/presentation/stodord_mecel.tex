@@ -243,11 +243,6 @@ systemets beteende med modellen. Således verifierar man att systemet och modell
 %is constructed and during the execution of the system the behavior of the system is
 %compared against the model. Hence verifying that the model and the system agrees.
 
-\section{Properties}
-Quickcheck uses properties that can verify that AUTOSAR requirements are not
-violated.
-
-An example can be written shown.
 
 \section{How Quickcheck works}
 Because QuickCheck is model based, AUTOSAR specifications first need
@@ -258,7 +253,13 @@ QuickCheck calls each generated API call and compares the result from
 the C code with the result from the Erlang code. This is done by verify that
 properties are always valid.
 
-\subsection{Generation of Test cases}
+\section{Properties}
+Quickcheck uses properties that can verify that AUTOSAR requirements are not
+violated.
+
+An example can be written shown.
+
+\section{Generation of Test cases}
 Quickcheck automatically generates test cases. However it is possible to tweak
 how Quichcheck generates the test cases. For instance, it may be of interest to
 figure out how the system behaves if only the right parameters are passed to
@@ -373,6 +374,13 @@ production. This does not follow the need for functional safety, since
 the main idea with functional safety is if a component in the system
 fails, then the whole system should not fail.
 
+\section{The testing tool}
+We have constructed a testing tool, for the WdgM, that is configuration
+independent. Hence it is possible to test the model, using our tool, with an
+arbitrary configuration. Doing just so may however not fully test the code,
+since different configuration changes the behavior of the system. One may need
+to change generators for the test cases.
+
 \section{Future work}
 If several AUTOSAR modules is translated into Erlang code, they can be
 combined and QuickCheck can then test the dependencies of the whole
@@ -380,13 +388,6 @@ connected system.
 
 One can also try to test more configurations in order to gain even
 better test results.
-
-\section{The testing tool}
-We have constructed a testing tool, for the WdgM, that is configuration
-independent. Hence it is possible to test the model, using our tool, with an
-arbitrary configuration. Doing just so may however not fully test the code,
-since different configuration changes the behavior of the system. One may need
-to change generators for the test cases.
 
 
 \section{Conclusions}
