@@ -70,8 +70,8 @@ Ju högre ASIL, desto mer testning kommer komponenten att genomgå.
 % experience more rigorous testing.
 
 \section{Objectives}
-Automatisera testning av AUTOSAR moduler. Reducera kostnaden och göra
-kod mer tillförlitlig. Också att undersöka om det går att nå en högre
+Automatisera testning av AUTOSAR moduler. Göra
+kod mer tillförlitlig men också att undersöka om det går att nå en högre
 ASIL nivå.
 
 % Our objectives are to automate the testing of AUTOSAR modules. The
@@ -80,7 +80,7 @@ ASIL nivå.
 
 % We also aim to examine if it is possible to reach a higher ASIL classification.
 \section{Watchdog manager}
-Som AUTOSAR modul, så valde vi watchdog manager att forska på.
+AUTOSAR modulen vi valde att, applicera testerna på, var watchdog manager:n.
 Detta var för att det är en säkerhetskritisk modul, som varken är för
 komplex eller för simpel.
 
@@ -99,7 +99,7 @@ komplex eller för simpel.
 \section{Glossary-4}
 Watchdogen övervakar kritiska stycken i olika delar av systemet. Dessa
 delar kallas för supervised entities. Dessa entities innehåller
-kontrollpunkter, checkpoints, som raporteras tillbaka till watchdogen.
+kontrollpunkter, checkpoints, som rapporteras tillbaka till watchdogen.
 
 % A supervised entity is a critical section in a piece of code that
 % needs to follow a certain behavior.
@@ -117,12 +117,12 @@ Vi kan dela in dessa i två grupper, getters och setters.
 
 Get-funktionerna ändrar inte på någonting, utan hämtar bara
 information om watchdogen.
-Set-funktionerna däremot ändrar watchdogens state.
+Set-funktionerna däremot ändrar watchdogens tillstånd.
 
 Init, Deinit, perform reset, setmode och
 mainfunction och checkpointreached.
 
-All supervision sker i mainfunction och checkpointreached.
+All övervakning sker i mainfunction och checkpointreached.
 
 % The get functions shall of course follow certain requirements, but the
 % will not change the state since their only task is to retrieve
@@ -153,11 +153,11 @@ All supervision sker i mainfunction och checkpointreached.
 
 
 \section{Supervision mechanisms}
-Supervision sker genom tre olika mekanismer.
+Övervakningen, av supervised entities, sker genom tre olika mekanismer.
 
-Alive supervision som kontrollerar att checkpoints kallas periodiskt.
+Alive supervision kontrollerar att checkpoints kallas periodiskt.
 
-Deadline supervision som kontrollerar att checkpoints nås inom en viss
+Deadline supervision kontrollerar att checkpoints nås inom en viss
 tid.
 
 Logical supervision kontrollerar att checkpoints sker i en specifik
@@ -180,7 +180,7 @@ mekanismer samtidigt.
 
 \section{The state machine}
 Watchdogens beteende beror på dess globala status, som beräknas från
-entiteternas lokala status. De lokala statusarna är beroende av de
+entiteternas lokala status. De lokala statusarna räknas ut med hjälp av de
 konfigurerade mekanismerna.
 
 % The behavior of the watchdog manager depends on its global status
@@ -194,13 +194,13 @@ konfigurerade mekanismerna.
 Watchdogens tillståndsmaskin börjar i deactivated, och efter ett
 korrekt anrop till init-funktionen så ändras den globala statusen till
 OK.
-Där kommer den att stanna sålänge alla lokala statusar är korrekt.
+Där kommer den att stanna sålänge alla lokala statusar är korrekta.
 
 Om watchdogen upptäcker ett fel, kommer den globala statusen
-antingen ändras till failure, expired eller stopped, beroende på
-felet.
+antingen ändras till failed, expired eller stopped, beroende på
+felet. Där stopped är det absorberande tillståndet.
 
-Watchdogen kan komma tillbaka från failure statusen, men inte från de
+Watchdogen kan komma tillbaka från failed statusen, men inte från de
 andra två.
 
 % The state machine begins with the global status deactivated (as seen
@@ -223,7 +223,6 @@ andra två.
 
 % The expired state is a way for the watchdog manager to postpone error
 % reaction.
-
 
 \section{Generating C byte code}
 Models that are dependent of the WdgM, was stubbed. Explain what that means.
