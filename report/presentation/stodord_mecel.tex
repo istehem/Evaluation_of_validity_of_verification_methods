@@ -4,78 +4,97 @@
 
 \begin{document}
 \section{Titlepage}
-My name is X and this is Y. We will present our master
-thesis ``Evaluation of validity of verification methods''.
+Mitt namn är X och detta är Y. Vi ska presentera vårt exjobb
+``Evaluation of validity of verification methods''.
 
-It is about automating testing of software modules in AUTOSAR.
+Det handlar om att automatisera testning av mjukvarumoduler i AUTOSAR sikt
+på safety.
 
 \section{Table of contents}
-This is our agenda, we will start with an Introduction.
+Agenda.
 
 \section{Background}
-Vehicles become more and more complex. Today there are around 80
-electronic control units, running millions of lines of code needed for
-brakes, infotainment systems, steering, windscreen wipers and so on.
+Fordon mer och mer komplexa. Runt 80 ECUs. Millioner rader kod.
 
-More functionality is added every year. Things like automated parking,
-night vision, traffic sign recognision will be mandatory in new cars
-in the future. Cars will be connected with each other, they will be
-connected with roadside management systems and also with the Internet.
+% Vehicles become more and more complex. Today there are around 80
+% electronic control units, running millions of lines of code needed for
+% brakes, infotainment systems, steering, windscreen wipers and so on.
 
-Vehicles are already safety critical, because you don't want to crash
-because of a software failure.
+Mer funktionalitet läggs till varje år.
+% More functionality is added every year. Things like automated parking,
+% night vision, traffic sign recognision will be mandatory in new cars
+% in the future. Cars will be connected with each other, they will be
+% connected with roadside management systems and also with the Internet.
 
-Already different components share a limited number of
-resources. Adding more functionality means even more components will
-share resources. For example, you don't want your brakes to stop
-working because your stereo has a software malfunction.
+Och säkerheten är väldig viktigt.
+% Vehicles are already safety critical, because you don't want to crash
+% because of a software failure.
 
-Research has shown that testing accounts for around half of all
-software development costs.
+Man vill inte att bromsarna ska sluta fungera pga ett mjukvarufel i stereon.
+% Already different components share a limited number of
+% resources. Adding more functionality means even more components will
+% share resources. For example, you don't want your brakes to stop
+% working because your stereo has a software malfunction.
+
+Testning består av ungefär hälften av utvecklingskostnaderna.
+% Research has shown that testing accounts for around half of all
+% software development costs.
 
 \section{Glossary-2}
-Functional safety is a relative new concept in the automotive
-industry.
+Fråga om alla är insatta i functional safety.
 
-It defines the development process from idea to product.
+Functional safety är ett relativt nytt konsept, som infattar hela
+utvecklingsprocessen från ide till produkt. Varje steg måste uppfylla
+vissa kriterier för att komma vidare i processen.
+Huvudtanken bakom functional safety är att om en komponent i systemet
+fallerar så ska inte hela systemet behöva fallera.
 
-Every step in the process must fulfill certain requirements.
+% Before we move on we have some key words you will need to comprehend.
 
-The main idea is if a component in the system fails, then the whole
-system should not fail.
+% Functional safety is a relative new concept in the automotive
+% industry.
+
+% It defines the development process from idea to product.
+
+% Every step in the process must fulfill certain requirements.
+
+% The main idea is if a component in the system fails, then the whole
+% system should not fail.
 
 \section{Glossary-3}
-ASIL refers to the classification of functional safety.
+Automotive safety integrity level. En klassifiering av functional safety.
+Ju högre ASIL, desto mer testning kommer komponenten att genomgå.
+% ASIL refers to the classification of functional safety.
 
-A software function with a higher ASIL classification need to
-experience more rigorous testing.
+% A software function with a higher ASIL classification need to
+% experience more rigorous testing.
 
 \section{Objectives}
-Our objectives are to automate the testing of AUTOSAR modules. The
-goal is to reduce the costs of testing and make the code more
-reliable.
+Automatisera testning av AUTOSAR moduler. Reducera kostnaden och göra
+kod mer tillförlitlig. Också att undersöka om det går att nå en högre
+ASIL nivå.
 
-We also aim to examine if it is possible to reach a higher ASIL classification.
+% Our objectives are to automate the testing of AUTOSAR modules. The
+% goal is to reduce the costs of testing and make the code more
+% reliable.
 
+% We also aim to examine if it is possible to reach a higher ASIL classification.
 \section{Watchdog manager}
 Som AUTOSAR modul, så valde vi watchdog manager att forska på.
 Detta var för att det är en säkerhetskritisk modul, som varken är för
 komplex eller för simpel.
 
-% Since AUTOSAR consists of many module specifications, we had to start
-% somewhere and choose one specification.
-
-% We choose the watchdog manager because it is a safety critical module,
-% which is not to complex and also not to simple.
-
-% The watchdog is a hardware component that is used to detect and
-% recover from computer malfunctions.
-
-% The watchdog manager configures and supervises all watchdogs in the
-% system.
-
-% The watchdog manager can be configured in a number of ways to suit
-% different needs.
+%Since AUTOSAR consists of many module specifications, we had to start
+%somewhere and choose one specification.
+%
+%We choose the watchdog manager because it is a safety critical module,
+%which is not to complex and also not to simple.
+%
+%The watchdog is a hardware component that is used to detect and
+%recover from computer malfunctions.
+%
+%The watchdog manager configures and supervises all watchdogs in the
+%system.
 
 \section{Glossary-4}
 Watchdogen övervakar kritiska stycken i olika delar av systemet. Dessa
@@ -131,6 +150,7 @@ All supervision sker i mainfunction och checkpointreached.
 
 % CheckpointReached is called when the system reaches a critical point a
 % so called checkpoint.
+
 
 \section{Supervision mechanisms}
 Supervision sker genom tre olika mekanismer.
@@ -203,6 +223,7 @@ andra två.
 
 % The expired state is a way for the watchdog manager to postpone error
 % reaction.
+
 
 \section{Generating C byte code}
 Models that are dependent of the WdgM, was stubbed. Explain what that means.
