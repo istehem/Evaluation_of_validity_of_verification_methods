@@ -229,25 +229,27 @@ Models that are dependent of the WdgM, was stubbed. Explain what that means.
 
 \section{Glossary-5}
 We have used QuickCheck for automating tests. QuickCheck is a model
-based testing tool which generates arbitrary sequences of API calls.
-
+based testing tool.
 
 \section{QuickCheck}
-Quickcheck is built on the programming language Erlang and is a model based
-testing tool.
+Quichcheck bygger på programmeringsspråket Erlang.
 
 \subsection{Model Based Testing}
-A model based testing means that a model of the system, that one wants to test,
-is constructed and during the execution of the system the behavior of the system is
-compared against the model. Hence verifying that the model and the system agrees.
+Med modellbaserad testing menas att systemet, vilket man vill testa, jämnförs med
+en modell, man skapat för att beskriva systemet. Under exikveringen av systemet jämnförs
+systemets beteende med modellen. Således verifierar man att systemet och modellen överensstämmer.
 
-\subsection{Properties}
+%A model based testing means that a model of the system, that one wants to test,
+%is constructed and during the execution of the system the behavior of the system is
+%compared against the model. Hence verifying that the model and the system agrees.
+
+\section{Properties}
 Quickcheck uses properties that can verify that AUTOSAR requirements are not
 violated.
 
 An example can be written shown.
 
-\subsection{}
+\section{How Quickcheck works}
 Because QuickCheck is model based, AUTOSAR specifications first need
 to be translated into a model written the Erlang programming language,
 thus readable by QuickCheck.

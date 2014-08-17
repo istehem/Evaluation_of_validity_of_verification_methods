@@ -380,6 +380,9 @@
 \end{frame}
 
 \againframe<5>{glossary}
+\begin{frame}
+        \frametitle{QuickCheck}
+\end{frame}
 
 % \begin{frame}
 %   \frametitle{QuickCheck}
@@ -389,6 +392,23 @@
 %------------------------------------------------
 % \subsection{Erlang implementation of AUTOSAR}
 %------------------------------------------------
+\newcommand\Fontvi{\fontsize{6}{7.2}\selectfont}
+\begin{frame}[fragile]
+        \frametitle{QuickCheck Properties}
+Quickcheck uses properties that can verify that AUTOSAR requirements are not
+violated.
+        \Fontvi
+        \begin{lstlisting}[style=erlang]
+getmode_post(S, [Is_Null], {R, Mode}) ->
+  DevErrorDetect = S#state.originalCfg#wdgmgeneral.dev_error_detect,
+  case R of
+    0 -> Mode == S#state.currentMode; %% [WDGM170]
+    1 -> DevErrorDetect andalso (Is_Null orelse %% [WDGM254]
+                                 not S#state.initialized) %% [WDGM253]
+  end.
+        \end{lstlisting}
+\end{frame}
+
 
 \begin{frame}
   \frametitle{How QuickCheck works}
