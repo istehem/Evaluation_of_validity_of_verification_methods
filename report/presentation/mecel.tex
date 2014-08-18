@@ -115,7 +115,7 @@
   \begin{block}{Background}
     \begin{itemize}
         \item Circa 80 ECUs
-        \item Close to hundred million lines of code
+        \item Millions of lines of code
         \item Vehicles become more and more complex
         \item More functionality
         \item Safety critical
@@ -130,7 +130,7 @@
     \item<1->[Functional Safety (according to ISO~26262)]
     \item<2->[ASIL (Automotive Safety Integrity Level)]
     \item<3->[Supervised entity (Critical section)]
-    \item<3->[Checkpoint (Point in this critical section)]
+    \item<3->[Checkpoint (Point in these critical sections)]
     \item<4->[QuickCheck (A commercial testing tool)]
   \end{description}
 \end{frame}
@@ -379,8 +379,12 @@
 \end{frame}
 
 \againframe<4>{glossary}
+
 \begin{frame}
-        \frametitle{QuickCheck}
+  \frametitle{QuickCheck}
+  \begin{itemize}
+    \item Model based testing tool
+  \end{itemize}
 \end{frame}
 
 % \begin{frame}
@@ -407,9 +411,9 @@
   \begin{block}{Post condition example}
     \Fontvi
     \begin{lstlisting}[style=erlang]
-getmode_post(S, [Is_Null], {R, Mode}) ->
+getmode_post(S, [Is_Null], {Return_Value, Mode}) ->
   DevErrorDetect = S#state.originalCfg#wdgmgeneral.dev_error_detect,
-  case R of
+  case Return_Value of
     0 -> Mode == S#state.currentMode; %% [WDGM170]
     1 -> DevErrorDetect andalso (Is_Null orelse %% [WDGM254]
                                  not S#state.initialized) %% [WDGM253]
@@ -512,11 +516,11 @@ weight(S,  init) ->
 \begin{frame}
   \frametitle{Bugs we found}
   \begin{block}{C code}
-    10-15
+    $\approx 10$
   \end{block}
 
   \begin{block}{Generated C code}
-    1-3
+    $\approx 2$
   \end{block}
 
   \begin{block}{AUTOSAR complications}
