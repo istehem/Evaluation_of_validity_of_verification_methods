@@ -55,15 +55,25 @@ automatically and systematically generates test cases from a model of the
 system. \cite{Schieferdecker:ModelbasedTesting}
 
 \subsection{Model Checking}
-Model checking is a technique to verify software and hardware. A formal model
-$M$, defining the system, is contracted and is compared against a property $P$. If
-$M$ contains a fault so that $M$ does not satisfy $P$, due to the fault in $M$, a
-counter example is generated, which is an example, showing how the fault in $M$
-gives rise to a violation of $P$. \cite{MODEL_CHECKING:Donaldson}
+Model checking exhaustively checks the whole state space of a model that is
+constructed for a system. Only the model of the system is checked and there are
+no actual test performed on the system. Instead the model is verified.  Model
+checking uses properties, which generally can be classified into either
+\emph{liveness} and \emph{safety}. Without formality \emph{liveness} means that eventually
+some wanted behavior will happen and with \emph{safety} means that unwanted
+behaviour will never happen. \cite{MODELCHECKING:SOFTWARE}
 
 Model checking systems can be built on a finite state automata.  For instance the
 verification tool SPIN, see \ref{SEC:EXISTING_TOOLS}, has such a model checking
 system. \cite{HOLZMANN:SPIN}
+
+\subsection{Model Checking vs Testing}
+For larger system when the state space is very large it is more reasonable to
+use testing since it is infeasible to test the whole state space. It is however
+possible to extract certain parts of the system, which are considered important,
+and construct a model for those parts, which could be formally verified using
+model checking. \cite{MODELCHECKING:CLARKE}
+
 
 \section{Formal Methods and Verification}
 %% TODO: varför är formal methods i kursiv?
