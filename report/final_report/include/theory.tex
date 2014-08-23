@@ -7,11 +7,18 @@ thesis focuses of correctness testing. Correctness testing needs a set
 of rules, which defines the behavior of the software. \cite{mellon}
 
 \subsection{Random Testing}
-When using random testing, test cases are simply selected at random.
-Random testing has been shown to be cost efficient for a lot of
-programs. Subtle errors can be found at low cost and random testing
-combined with other testing methods may result in powerful and
-cost-effective testing solutions. \cite{mellon}
+When using random testing, test cases are simply selected at random
+from the input domain. Random testing has been shown to be cost
+efficient for a lot of programs. Subtle errors can be found at low
+cost and random testing combined with other testing methods may result
+in powerful and cost-effective testing solutions. \cite{mellon}
+
+Random testing usually provides low code coverage because test cases
+are uniformly distributed. As an example, to test an if-statement which
+compares equality of an 32-bits integer variable to a certain value,
+one needs to generate that value. This has a probability of
+$\frac{1}{2^{32}}$ to be generated in uniformly random testing.
+\cite{RandomTesting:Microsoft}
 
 \subsection{Property Based Testing}
 The purpose of property based testing is to establish formal
