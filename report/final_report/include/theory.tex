@@ -20,6 +20,16 @@ one needs to generate that value. If test cases are uniformly
 chosen, the likelihood of generating such a value is $P = \frac{1}{2^{32}}$.
 \cite{RandomTesting:Microsoft}
 
+However, in white box testing, code knowledge can be added to the
+generation of test cases, narrowing the input domain and greatly
+decreasing the number of test cases. Sub domains of the input region
+can be chosen to represent both valid conditions, as well as invalid
+conditions. In the example above, one sub domain can contain the
+32-bit integer variable, and another could contain all $2^{32}-1$
+other integers. Then only one test case is needed from each sub
+domain.
+\cite{RandomTesting:Revisited}
+
 \subsection{Property Based Testing}
 The purpose of property based testing is to establish formal
 validation results through testing. Property based testing assumes
@@ -47,19 +57,22 @@ process, where properties are put together until the test becomes
 ``complete''. \cite{Fink:1997:PTN:263244.263267}
 
 \subsection{Model Based Testing}
-Model based testing uses a model of a system to select test inputs that
-tries to find test cases that explores the behavior of the system. The output
-from the system can then be compared against the model. The advent of model
-based testing has given rise to new techniques that efficiently analyses
-system models with respect to the behaviour of the systems requirements. Such
-techniques can for instance find counter examples, when system requirements
-are violated. The meaning of counter examples are concrete and minimalistic
-cases when a system has an incorrect behavior with respect to its requirements.
+Model based testing uses a model of a system to select test inputs
+that tries to find test cases that explores the behavior of the
+system. The output from the system can then be compared against the
+model. The advent of model based testing has given rise to new
+techniques that efficiently analyses system models with respect to the
+behaviour of the systems requirements. Such techniques can for
+instance find counter examples, when system requirements are
+violated. The meaning of counter examples are concrete and
+minimalistic cases when a system has an incorrect behavior with
+respect to its requirements.
 \cite{Meinke:ModelbasedTesting}
 
-Model based testing makes it possible to manually select algorithms that
-automatically and systematically generates test cases from a model of the
-system. \cite{Schieferdecker:ModelbasedTesting}
+Model based testing makes it possible to manually select algorithms
+that automatically and systematically generates test cases from a
+model of the system.
+\cite{Schieferdecker:ModelbasedTesting}
 
 \subsection{Model Checking}
 Model checking exhaustively checks the whole state space of a model that is
