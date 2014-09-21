@@ -14,24 +14,24 @@ cost and random testing combined with other testing methods may result
 in powerful and cost-effective testing solutions. \cite{mellon}
 
 Random testing usually provides low code coverage because test cases
-are uniformly distributed. To test an if-statement, which
-compares equality of an 32-bits integer variable $v \in \mathbb{N}_{32}$
-to a fixed value $v_{comp} \in \mathbb{N}_{32}$,
-its needed to generate $v_{comp}$. Otherwise the if-statement will not evaluate to true.
+are uniformly distributed. As an example: To test an if-statement, which
+compares equality of an 32-bits integer variable $v \in \mathbb{Z}_{32}$
+to a fixed value $v_{comp} \in \mathbb{Z}_{32}$,
+one must generate $v_{comp}$. Otherwise the if-statement will not evaluate to true.
 If test cases are uniformly
 chosen, the likelihood of generating $v_{comp}$ is $P = \frac{1}{2^{32}}$.
 \cite{RandomTesting:Microsoft}
 
 In white box testing, code knowledge can be added to the
 generation of test cases. This can be done by narrowing the input domain
-and thereby drastically be able to increase the number of test cases.
+and thereby make it possible to drastically increase the number of needed test cases.
 Sub domains, subsets of the input domain, can be chosen to represent both valid
 conditions, as well as invalid conditions. In the example above, one sub domain
 can consist of only the value $v_{comp}$. Another sub domain can be defined as
-$\mathbb{N}_{32}$\textbackslash$\{v_{comp}\}$, hence every other 32 bit integer.
+$\mathbb{Z}_{32}$\textbackslash$\{v_{comp}\}$, hence every other 32 bit integer.
 Now only one test case is needed from each of the two sub
 domains. The test case from $\{v_{comp}\}$ will make the if-statement evaluate to
-true and the test case form $\mathbb{N}_{32}$\textbackslash$\{v_{comp}\}$ will
+true and the test case form $\mathbb{Z}_{32}$\textbackslash$\{v_{comp}\}$ will
 make it evaluate to false.
 \cite{RandomTesting:Revisited}
 
