@@ -393,10 +393,13 @@ certain configuration parameters are set.
 
 \section{Functional Safety analysis}
 The V-model used by ISO~26262 requires that a certain work flow is
-taken into consideration during the whole development process. It is
-therefor hard to analyze code that is written without the standard in
-consideration and then examine if it fulfills that standards
-requirements.
+taken into consideration during the whole development process. % It is
+% therefor hard to analyze code that is written without the standard in
+% consideration and then examine if it fulfills that standards
+% requirements.
+It is therefor hard to analyze code that is written without the standard in
+consideration and then examine if it fulfills the requirements of the given
+standard.
 
 Since one important part of the functional safety concept is that it
 must be taken in consideration during the whole development process,
@@ -432,11 +435,13 @@ formally defining the actual requirements of AUTOSAR. This is for
 instance because of its low level nature.
 
 In this thesis a defined AUTOSAR model already existed, written in
-C-code, and then an other model was later implemented in Erlang and
-compared against the first model. A better work flow, with functional
-safety in mind, had been to define AUTOSAR in a model based language
-and check that this model holds. Then implement the actual C-code
-following the formal notation of the previous constructed
+C-code. The AUTOSAR model was implemented in Erlang and
+compared against the first model. % In this thesis a defined AUTOSAR model
+% already existed, written in C-code, and then an other model was later
+% implemented in Erlang and compared against the first model.
+A better work flow, with functional safety in mind, had been to define AUTOSAR
+in a model based language and check that this model holds. Then implement the
+actual C-code following the formal notation of the previous constructed
 model. Implementing the C-code would be easier because then there are
 no room for different interpretations. After the C-code is
 implemented, write the model in Erlang following the formal model
@@ -469,15 +474,22 @@ start. If the final checkpoint is not reached within the configured time
 marginal, then the deadline supervision for the supervised entity with the given
 checkpoint will fail. Because it is known that \lstinline!WdgM_MainFunction! should
 be called periodically, it could be used for the measurements of time. For each
-call of \lstinline!WdgM_MainFunction! tick a ``time'' counter.
+call to \lstinline!WdgM_MainFunction! a counter could be incremented to keep
+track of the cycles.%  For each
+% call of \lstinline!WdgM_MainFunction! tick a ``time'' counter.
 
 
 \subsection{Fulfilled ISO~26262 requirements}
 ISO~26262 mention several requirements that QuickCheck will be able to
-fulfill. Aside from general requirements like that a ''safety plan'' should be
-available, there are tests in which the hardware should be taken in
-consideration. This is beyond the scope of this thesis and can also not be
-tested using QuickCheck. There are also tests that needs several modules
+fulfill. Aside from general requirements, e.g. that a ``safety plan'' should be
+available, there are also verification in which the hardware should be taken into
+consideration. This is beyond the scope of this thesis. %  Aside from general
+%  requirements like that a ``safety plan'' should be
+% available, there are tests in which the hardware should be taken in
+% consideration.
+This is beyond the scope of this thesis.% This is beyond the scope of this thesis and can also not be
+% tested using QuickCheck.
+There are also tests that needs several modules
 implemented to make any sense. Such tests have not been executed, since only the
 watchdog manager module has been tested, but should be possible to run after
 implementing more modules in Erlang code. QuickCheck has a module for

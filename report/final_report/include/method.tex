@@ -289,22 +289,31 @@ The alternatives listed below were discussed.
 
 We choose to correct the C-code, item \ref{ENUMERATE:FixCCode},
 because then we had direct feedback and could discover where in the
-code the bugs were introduced. Also this was the most dynamic of the alternatives and allowed further bugs to be found.
+code the bugs were introduced. Also this was the most dynamic of the
+alternatives and allowed further bugs to be found.
 
 When thoroughly reading the AUTOSAR API not only ambiguous rules were
 found but also rules that contradicted each other were recognized. In
 those cases the implementation in the C-code was followed.
 
-Bugs in the C-code were found early, even though it already run
-actively in lab environments.
+Although the C-code was used actively in lab environments, bugs were found early
+in the process.
+% Bugs in the C-code were found early, even though it already run
+% actively in lab environments.
 
 \subsection{Advantage of having the Actual C-code}
-When it did not exist a clear interpretation of the AUTOSAR
-specification, a great method for understanding was to examine the C-code.
+A great method for understanding the AUTOSAR specification, when a clear
+interpretation of it did not exist, was to examine the C-code.
+% When it did not exist a clear interpretation of the AUTOSAR
+% specification, a great method for understanding was to examine the C-code.
 QuickCheck can be used to test libraries when only the compiled
-source code is available, but this make the ambiguities harder to
-discover. A third model would then be needed to justify whether the C
+source code is available. However, this make the ambiguities harder to
+discover, because a third model would be needed to justify whether the C
 model or the Erlang model would be correct.
+% QuickCheck can be used to test libraries when only the compiled
+% source code is available, but this make the ambiguities harder to
+% discover. A third model would then be needed to justify whether the C
+% model or the Erlang model would be correct.
 
 \section{Implementation structure}
 The final implementation consisted of several Erlang modules. Table
@@ -346,12 +355,15 @@ the only modules that defines the Erlang version of the watchdog
 manager.
 
 To be able to measure the code coverage of the C-code the commercial
-tool Bullseye Coverage was used. When using those tools it was easy to
-see that the result was not good enough. The main problem seemed to be
-that the WdgM was put in an absorbing state and because of that the
-following commands interesting; they did not change the state. The
-reason for that an absorbing state was reached was the availing of
-negative testing. The testing was negative because invalid command
+tool Bullseye Coverage was used. When using these tools it was easy to
+see that the result was not good enough.
+The main problem was that WdgM was put in an absorbing state. All commands
+that were executed after that, was not able to change the state of the WdgM.
+% The main problem seemed to be that the WdgM was put in an absorbing state and
+% because of that the commands that followed were not interesting; they did not
+% change the state.
+The reason for that an absorbing state was reached was the
+availing of negative testing. The testing was negative because invalid command
 sequences and arguments were generated.
 
 Figure \ref{FIG:ONERUN} shows an example of how the status of the
