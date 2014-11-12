@@ -82,7 +82,7 @@ model of the system.
 \subsection{Model Checking}
 Model checking exhaustively checks the whole state space of a model that is
 constructed for a system. Only the model of the system is checked and there are
-no actual test performed on the system. Instead the model is verified.  Model
+no actual tests performed on the system. Instead the model is verified.  Model
 checking uses properties, which generally can be classified into either
 \emph{liveness} and \emph{safety}. Without formality \emph{liveness} means that eventually
 some wanted behavior will happen and with \emph{safety} means that unwanted
@@ -93,8 +93,8 @@ verification tool SPIN, see \ref{SEC:EXISTING_TOOLS}, has such a model checking
 system. \cite{HOLZMANN:SPIN}
 
 \subsection{Model Checking vs Testing}
-For larger system when the state space is very large it is more reasonable to
-use testing since it is infeasible to test the whole state space. It is however
+For larger system, when the state space is very large, it is more reasonable to
+use testing since it is infeasible to test the whole state space. It is, however,
 possible to extract certain parts of the system, which are considered important,
 and construct a model for those parts, which could be formally verified using
 model checking. \cite{MODELCHECKING:CLARKE}
@@ -102,7 +102,7 @@ model checking. \cite{MODELCHECKING:CLARKE}
 
 \section{Formal Methods and Verification}
 %% TODO: varför är formal methods i kursiv?
-It is almost impossible to write specification in a natural language
+It is almost impossible to write a specification in a natural language
 and not make room for different interpretations and
 misunderstandings. Hence \emph{Formal Methods} are introduced which
 are based on formal languages that have precise rules. Describing a
@@ -167,7 +167,7 @@ requirements''. This phase specifies the software requirements needed
 to ensure the stability of the system. They are derived from the
 system design specification. This is part of the integration between
 software and hardware. The second phase is the ``software
-architectural design''. It represent the interaction between all
+architectural design''. It represents the interaction between all
 software components. The third phase and the last development phase,
 in the model is the ``software unit design and implementation''. This
 phase contains the implementation of each module. If the
@@ -214,9 +214,9 @@ drivers. \cite{AUTOSAR:LayeredSoftwareArchitecture}
 %% TODO: vad menas med "onboard device abstraction"?
 The runtime environment is the operating system, and the
 microcontroller is the hardware. The software running in the
-application layer are for example software components for sensors and
+application layer is for example software components for sensors and
 actuators. One example of how the different parts in the basic
-software layer is integrated, is the watchdog, which consist of
+software layer is integrated, is the watchdog, which consists of
 several parts as seen in figure~\ref{FIG:AUTOSAR:watchdog}. The
 microcontroller abstraction layer has the drivers for the watchdog;
 the interaction with the microcontroller. Then there is the watchdog
@@ -232,7 +232,7 @@ WdgM) which runs as a system service in the service layer. \cite{AUTOSAR:Layered
   \label{FIG:AUTOSAR:watchdog}
 \end{figure}
 
-The watchdog have a number of dependencies to other services in the
+The watchdog has a number of dependencies to other services in the
 basic software layer. For example when an error is found by the
 watchdog, it could either be reported to the diagnostic event manager
 or the development error tracer depending on the type of error. These
@@ -249,7 +249,7 @@ parameters that specify if the watchdog manager should report errors
 to the diagnostic event manager (DEM), or which type of supervision
 that should be executed and what to supervise. \cite{AUTOSAR:basic_info}\cite{AUTOSAR:LayeredSoftwareArchitecture}
 
-The current version of AUTOSAR, version 4, has been design with
+The current version of AUTOSAR, version 4, has been designed with
 functional safety in mind. Essential concepts of ISO~26262 have been
 developed alongside AUTOSAR. \cite{AUTOSAR:basic_info}
 
@@ -283,7 +283,7 @@ model of the original program. If it does not exist any unwanted
 transitions or states, then the original program is formal verified.
 
 Since most program specifications are written in natural languages
-there may be lot of ambiguities. Techniques have been developed to
+there may be a lot of ambiguities. Techniques have been developed to
 reduce such cases, and these techniques are often referred to as semi
 formal verification, because they often lack the mathematical rigor
 associated with formal verification. These methods use textual,
@@ -303,7 +303,7 @@ module for Haskell in 2000. In 2006 John Hughes founded the company
 Quviq together with Thomas Arts. Quviq offers a commercial version of
 QuickCheck for Erlang. One of the main differences, except from the
 programming language, is that the commercial version of QuickCheck has
-a C-testing interface. Hence it possible to test C-code in Erlang with
+a C-testing interface. Hence it is possible to test C-code in Erlang with
 the help of QuickCheck. All test code is written in Erlang and checked
 against API calls to the C-code, this is called model based
 testing. It is not necessary to have the actual source code; it is

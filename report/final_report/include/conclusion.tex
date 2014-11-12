@@ -1,25 +1,25 @@
 It is possible to achieve some functional safety using QuickCheck, at
 least within the software units. There are however a number of
-ISO~26262 requirements that is not possible to achieve with only a
-software testing tool. For example requirements that verifies the
+ISO~26262 requirements that are not possible to achieve with only a
+software testing tool. For example requirements that verify the
 hardware specifications or how the safety plan should be made. It is
 hard to use the ISO~26262 V-model if the software units do
 not follow system properties that has been verified by a system
-model. Because AUTOSAR is written with informal syntax, it can't be
+model. Because AUTOSAR is written with informal syntax, it cannot be
 used to verify the software units. This means one must translate the
 AUTOSAR requirements to formal syntax and verify that the formal
-requirements means the same as the informal requirements.
+requirements mean the same as the informal requirements.
 
 It is important to not only measure the state space, but also the code
 coverage. This can also be done with the use of QuickCheck. It is easy
 to measure Erlang coverages, and it is also easy to specify which
 compiler QuickCheck should use to perform C-code coverages.
 QuickCheck gathers information about the state space, which is
-outputted after a test has been run.
+output after a test has been run.
 
 Both negative and positive testing can be implemented with the use of
 QuickCheck. Negative testing can be time-consuming because the program
-quickly comes to an absorbing state. It is therefor important to tweak
+quickly comes to an absorbing state. It is therefore important to tweak
 the generators correctly.
 
 Integration tests can also easily be implemented, by connecting

@@ -4,8 +4,8 @@
 \label{SEC:QuickCheckIntro}
 
 \section{The General Idea}
-The general idea with QuickCheck, is here explained using an example.
-Lets say that one has a \emph{sort} function that takes a list $Xs$ of any
+The general idea with QuickCheck, is here explained by using an example.
+Let us say that one has a \emph{sort} function that takes a list $Xs$ of any
 sortable items and returns the sorted version $Ys$ of $Xs$. To verify the
 correctness of this function it is possible to look at certain properties
 that must hold for a correctly implemented sort function. For instance:
@@ -25,7 +25,7 @@ that must hold for a correctly implemented sort function. For instance:
 sort(Zs) = Ys, \forall Zs \in Pe(Xs)
 \end{equation}
 
-\noindent The sets $Xs$ and $Ys$ contains the same elements.
+\noindent The sets $Xs$ and $Ys$ contain the same elements.
 \begin{equation}
         x \in Xs \leftrightarrow x \in Ys
 \end{equation}
@@ -168,7 +168,7 @@ The module \emph{eqc} is the main QuickCheck module. This module defines a lot
 of macros that can be used when writing properties and also basic functions
 like \emph{quickcheck}.
 
-\subsection{eqc\_gen} The module is used for generation of test cases. The module
+\subsection{eqc\_gen} The module is used for generations of test cases. The module
 contains various functions and macros for this purpose. There are some
 predefined generators, for instance for integers and characters etcetera, but it
 is quite easy to construct a generator for almost any data type. Just to get the
@@ -314,7 +314,7 @@ manager. There are five different statuses.
 The different statuses are related to each other according to figure~\ref{APP:FIG:GLOBALSTATUS}.
 There is only a small number of functions that is allowed to change the global
 status; those are the main function, the initialization function and the
-de-initialization function. The main function decide the next global status by
+de-initialization function. The main function decides the next global status by
 checking the local statuses of the supervised entities and the current global
 status. The initialization function should only be able to change the global
 status from deactivated to ok, and the de-initialization function from ok to deactivated.
@@ -340,7 +340,7 @@ are four different local statuses. Init setmode mainfunction
     Alive supervision for the supervised function has failed.
   \item WDGM\_LOCAL\_STATUS\_EXPIRED\\
     A fault has been observed within the supervised function. The main function
-    will save the identification of the first supervised entity which reach this
+    will save the identification of the first supervised entity which reaches this
     state.
 \end{itemize}
 Figure \ref{APP:FIG:LOCALSTATUSES} describes the state machine for the local
@@ -360,7 +360,7 @@ status of all supervised entities to either WDGM\_LOCAL\_STATUS\_OK or
 WDGM\_LOCAL\_STATUS\_DEACTIVATED. It also changes the global status to
 WDGM\_GLOBAL\_STATUS\_OK.
 \subsection{WdgM\_DeInit}
-De initializes the watchdog manger.
+Deinitializes the watchdog manger.
 \subsection{WdgM\_GetVersionInfo}
 Returns the version info of the watchdog manager module.\footnote{The function shall not change the
 internal state of the watchdog manager and should be side effect free.}
@@ -810,7 +810,7 @@ to correct; It shall also clear its failed reference cycle counter to
 0.
 
 \subsection{Problem description}
-Requirement \textbf{[WDGM344\_CONF]} has miss spelled its name
+Requirement \textbf{[WDGM344\_CONF]} has miss-spelled its name
 \textit{WdgMInternallCheckpointFinalRef}. This differs from references
 in other requirements, for example in \textbf{[WDGM329]}.
 
@@ -821,8 +821,8 @@ in other requirements, for example in \textbf{[WDGM329]}.
 \lstinline!WDGM_GLOBAL_STATUS_FAILED! then for each Supervised Entity
 that is activated in the new mode (passed to function
 \lstinline!WdgM_SetMode! as parameter), the function
-\lstinline!WdgM_SetMode! shall \colorbox{yellow}{retain the current\\
-state of the Supervised Entity}.  Switching to the mode where a
+\lstinline!WdgM_SetMode! shall \colorbox{yellow}{retain the current state of
+the Supervised Entity}. Switching to the mode where a
 Supervised Entity is deactivated clears also errors that had resulted
 with the \lstinline!WDGM_GLOBAL_STATUS_FAILED!  status. ()
 

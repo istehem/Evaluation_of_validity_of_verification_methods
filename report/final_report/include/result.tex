@@ -53,12 +53,12 @@ checkpoint that is generated too many times can for example cause the
 alive supervision to fail because it goes outside of its bound. The
 same can happen if it is not generated enough. If a checkpoint is
 generated only because it needs to be inside of its alive supervision
-bound, then there is a chance that rules for deadline or logical
+bound, then there is a risk that rules for deadline or logical
 supervision is violated. The easiest way to prioritize checkpoint
 generation is to start with logical supervision. This is because
 logical supervision follows certain graphs, where each vertex is
 represented by a checkpoint and each edge is a valid transition
-between two checkpoints. These graphs is defined by the logical
+between two checkpoints. These graphs are defined by the logical
 supervision functions in the AUTOSAR configuration.  Logical
 supervision maintains both internal graphs, inside of each supervised
 entity, and external graphs which is transitions between supervised
@@ -99,12 +99,12 @@ good results.  Using this configuration the WdgM never visited the
 absorbing state according to figure \ref{FIG:GLOBALSTATUSES}. However,
 looking at the state transitions, as seen in figure
 \ref{FIG:STATUSES_BSI} and table \ref{TABLE:STATUSES_BSI}, only two
-states are visited. This happens because the configuration is to
+states are visited. This happens because the configuration is too
 simple, it is actually impossible to hit any other states than
 \lstinline!WDGM_GLOBAL_STATUS_OK! or
 \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!. There are no checkpoints
 or supervision functions configured for the \emph{BSI} configuration.
-It is easy to run tests using this configuration but it does not by it
+It is easy to run tests using this configuration, but it does not by it
 self, fully test the code because most of the specification
 requirements will never be tested. The untested requirements are
 mainly requirements for supervision functions that are, according to
@@ -151,12 +151,12 @@ main function is called. There is also a dependency the other way
 around; the main function often has to be called a certain number of
 times before \lstinline!WdgM_CheckpointReached! is called on a certain
 supervised entity. This is why the main function also has quite high
-proportions. Other functions that stands out is
+proportions. Other functions that stand out are
 \lstinline!WdgM_SetMode! and \lstinline!WdgM_Init!.
 \lstinline!WdgM_SetMode! is called because different modes can have
 different supervision functions and supervised entities. That is why
 we need to call this function often. It should retain the states of
-supervised entities that is activated in the new mode and should reset
+supervised entities that are activated in the new mode and should reset
 the local state if the entity is deactivated in the new mode. The
 function \lstinline!WdgM_Init! is in contrast called lesser and lesser
 times. This function is only needed when the global state is
@@ -217,7 +217,7 @@ hard to reach.
 \subsection{Example}
 The example configuration is somewhat more complex than the Freescale
 configuration. This is because it supports all functionality of an
-configuration. Because of the complexity, some transition is harder or
+configuration. Because of the complexity, some transitions are harder or
 even impossible to reach. Noticeable is that the transition from the
 state \lstinline!WDGM_GLOBAL_STATUS_FAILED! to the state
 \lstinline!WDGM_GLOBAL_STATUS_OK! according to figure
@@ -259,7 +259,7 @@ functions must fail once and then continue without failures.
 \section{Statistics}
 The distribution of API-calls seems, according to figure
 \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and
-\ref{FIG:COMMANDS_EXAMPLE}, to be the same for all configuration. The
+\ref{FIG:COMMANDS_EXAMPLE}, to be the same for all configurations. The
 arguments to the API-calls is however different, even though it is not
 seen in those plots.
 
@@ -347,14 +347,14 @@ wdgm\_next              & 37  & 37 & 100\%
 \end{center}
 \end{table}
 
-The total line coverage results is \linecoverage. The reason we don't
+The total line coverage results is \linecoverage. The reason we do not
 achieve 100\% code coverage depends on certain limitations. Some lines
 can not be covered when the configuration parameter
 \lstinline!WdgMDevErrorDetect! is true. On the other hand, if it is
 false, then the C-model will fail with a segmentation fault and the
-Erlang model will not be covered anyway. There are also a number of
+Erlang model will not be covered anyway. There is also a number of
 implementation specific lines, which another C-code model might
-reach but not the one that we had. There is also places that depended on
+reach but not the one that we had. There are also places that depended on
 the configuration to be more simple. A good idea is to supply
 configurations that only has specific supervision functions
 configured. Then it should be possible to prioritize only that
@@ -363,11 +363,11 @@ supervision function and get better coverages.
 \subsection{C-code}
 Bullseye Coverage was used to analyze the coverage of the C-code. The
 results show that the condition/decision coverage is {\bullseyecoverage}
-and all functions except for two is covered, see figure
+and all functions except for two are covered, see figure
 \ref{FIG:BULLSEYE}. The reason that there are functions which are not
 covered, is that one of the functions is deprecated and the other is a
-support function to that function. One of our limitations were to not
-implemented deprecated functions into Erlang code.  The missing
+support function to that function. One of our limitations was to not
+implement deprecated functions into Erlang code.  The missing
 condition/decision coverages in the C-code are for example checks for
 null pointers, some of which never evaluated to false. Many checks
 seems to be redundant and impossible to evaluate to true, if one
@@ -379,8 +379,8 @@ segmentation fault.
 
 The coverage statistics shown in figure \ref{FIG:BULLSEYE} is
 constructed using the three configurations mentioned. Using several configurations
-gave better results since some code is impossible to reach if not
-certain configuration parameters are set.
+gave better results since some code blocks were impossible to reach if not
+certain configuration parameters were set.
 
 \begin{figure}[!ht]
   \setlength\fboxsep{0pt}
@@ -397,7 +397,7 @@ taken into consideration during the whole development process. % It is
 % therefor hard to analyze code that is written without the standard in
 % consideration and then examine if it fulfills that standards
 % requirements.
-It is therefor hard to analyze code that is written without the standard in
+It is therefore hard to analyze code that is written without the standard in
 consideration and then examine if it fulfills the requirements of the given
 standard.
 
@@ -445,7 +445,7 @@ actual C-code following the formal notation of the previous constructed
 model. Implementing the C-code would be easier because then there are
 no room for different interpretations. After the C-code is
 implemented, write the model in Erlang following the formal model
-written in the model based language. Then there are again no room for
+written in the model based language. Then there is again no room for
 different interpretations. After the two implementations of the model,
 compare those using QuickCheck. If there are no bugs, then the
 original model was translated into C-code correctly.
@@ -480,14 +480,14 @@ track of the cycles.%  For each
 
 
 \subsection{Fulfilled ISO~26262 requirements}
-ISO~26262 mention several requirements that QuickCheck will be able to
+ISO~26262 mentions several requirements that QuickCheck will be able to
 fulfill. Aside from general requirements, e.g. that a ``safety plan'' should be
-available, there are also verification in which the hardware should be taken into
+available, there are also verifications in which the hardware should be taken into
 consideration. This is beyond the scope of this thesis. %  Aside from general
 %  requirements like that a ``safety plan'' should be
 % available, there are tests in which the hardware should be taken in
 % consideration.
-This is beyond the scope of this thesis.% This is beyond the scope of this thesis and can also not be
+% This is beyond the scope of this thesis and can also not be
 % tested using QuickCheck.
 There are also tests that needs several modules
 implemented to make any sense. Such tests have not been executed, since only the
@@ -510,14 +510,14 @@ coverage the BSI configuration could supply.
 \subsection{Measurements of the state space}
 One way when trying the measure the state space is to collect
 statistical data during the execution of the tests. It is hard to say
-much about the whole systems state space since it is very large, due
+much about the whole system's state space since it is very large, due
 to the combinatorial explosion problem. In the case of an AUTOSAR module the
 state space also varies on the configuration in use, since features
 and supervision features can be configured.  However looking at
 certain parts that are considered to be important for the system, much
 more can be said. For instance when examining the internal graphs of
 the watchdog manager, one can easily see that every node in those
-graphs are visited.
+graphs is visited.
 
 Measuring the code coverage can in itself tell if important parts of
 the state space are covered or not. This is possible because the parts
@@ -526,6 +526,6 @@ covered. These parts can however be dead or redundant code, in the
 worst case, if something unexpected happens to the hardware, which is
 beyond this thesis. Total code coverage is hard, or may be even
 impossible to reach.  Even if all lines of code in for example an
-algorithmic part of the watchdog manager are covered this algorithm
-may not be totally verified. This is because the state are dependent
+algorithmic part of the watchdog manager are covered, this algorithm
+may not be totally verified. This is because the states are dependent
 of actual values of variables.

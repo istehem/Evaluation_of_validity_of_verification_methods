@@ -2,7 +2,7 @@
 The model has been implemented in an iterative way. Function for
 function, requirement for requirement. This process is very easy with
 the use of QuickCheck.  In the beginning there were a lot of negative
-testing, because we didn't care about tweaking the generators.
+testing, because we did not care about tweaking the generators.
 By limiting the state space for negative tests, we achieved a better
 ratio for positive testing when generating random tests. This was done
 by letting some command sequences weight more than others when
@@ -21,12 +21,12 @@ minimized when QuickCheck has been tweaked.
 \end{figure}
 The outer box in figure~\ref{QUICKCHECK:TWEAKING} represents the full
 state space, and the inner circle represents positive test cases. This
-means that all test cases outside of the circle represents negative
-test cases. When tweaking generators it mean we can limit some of the
+means that all test cases outside of the circle represent negative
+test cases. When tweaking generators it means we can limit some of the
 negative test state space, in order to have QuickCheck generate more
 interesting positive test cases. The black dots in the figure
-represents different generated test cases, and the gray dots
-represents test cases which will not be generated after the new
+represent different generated test cases, and the gray dots
+represent test cases which will not be generated after the new
 limitations.
 
 As an example, it is unnecessary to test functions if the watchdog
@@ -43,9 +43,9 @@ weight(S,  'WdgM_Init') ->
   end;
 \end{lstlisting}
 
-We want to do this because there is only some functions that actually
-changes the state of the watchdog manager; there is a lot of so called
-get-functions which only retrieves information.
+We want to do this because there are only some functions that actually
+change the state of the watchdog manager; there is a lot of so called
+get-functions which only retrieve information.
 
 Sometimes the model needs to be corrected because of ambiguities in
 AUTOSAR or errors in the model. Quite often it was the C-code that had
@@ -59,7 +59,7 @@ coverage. Recursion is often used in functional programming languages
 as Erlang, therefore it is not as suited for condition/decision
 coverage as C-code is. Erlang also comes with a coverage library,
 which makes it easy to use. On the other hand, measuring line coverage
-in a imperative language like C is a bit redundant since statements
+in an imperative language like C is a bit redundant since statements
 are executed sequentially. Therefore conditions/decision coverage
 seems more reasonable.
 
@@ -86,9 +86,9 @@ which is over 14500 lines of code.
 
 
 \section{Future work}
-An interesting thing we wanted to do from the beginning was to implementing
+An interesting thing we wanted to do from the beginning was to implement
 another module, preferably one that has some kind of dependency with the
-watchdog manager. This is because then, it would be possible to testing towards
+watchdog manager. This is because then, it would be possible to test towards
 the phase ``system integration and testing'' in ISO~26262 and get even better
 results.
 

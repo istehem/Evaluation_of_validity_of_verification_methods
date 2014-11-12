@@ -3,7 +3,7 @@
 Software unit testing can be achieved by almost any tool.  The choice
 of verification tool was therefore not the most interesting when it
 comes to pure unit testing. One can of course take the simplicity to
-achieve good unit testing into account, but this was not goals of this
+achieve good unit testing into account, but this was not the goal of this
 project.
 
 %% TODO: Är det inte en del av Avgränsningarna och inte Metodik?
@@ -130,7 +130,7 @@ when using QuickCheck, see section \ref{SEC:CALLING_COMMANDS}.
 \end{figure}
 
 \subsection{Important Functions}
-The most interesting API-calls is the ones that modifies the internal
+The most interesting API-calls are the ones that modifies the internal
 state of the watchdog manager, see appendix \ref{APP:API_CALLS},
 namely \lstinline!WdgM_Init!, \lstinline!WdgM_DeInit!,
 \lstinline!WdgM_SetMode!, \lstinline!WdgM_MainFunction!, and
@@ -143,7 +143,7 @@ when the watchdog is in either \lstinline!WDGM_GLOBAL_STATUS_OK! or
 \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!, according to figure
 \ref{FIG:GLOBALSTATUSES}. If this happens they will change the
 internal state of the watchdog independently of previous called
-commands. The behavior of these commands will therefor not vary much.
+commands. The behavior of these commands will therefore not vary much.
 
 \lstinline!WdgM_SetMode! changes the mode, but should retain the
 global and local statuses of the supervised entities. It should not be
@@ -155,7 +155,8 @@ The two remaining API-calls that needs to be discussed in details are
 the main function and the checkpoint reached function. As can be seen
 in figures \ref{FIG:COMMANDS_BSI}, \ref{FIG:COMMANDS_FREESCALE} and
 \ref{FIG:COMMANDS_EXAMPLE}, they are also the two commands that are
-called the most.
+most called.
+%% called the most
 
 \subsubsection{\lstinline!WdgM_MainFunction!}
 The \lstinline!WdgM_MainFunction! handles alive supervision
@@ -180,7 +181,7 @@ periodically.
 
 
 \section{Implementation}
-The module that was chosen, was already unit tested and run actively
+The chosen module, was already unit tested and run actively
 in lab environment.
 
 %% TODO: eventuellt skriva om delar i stycket, framför allt i slutet.
@@ -221,7 +222,7 @@ the model was inspired by the C-code, it could have transmitted
 faults. Implementing the Erlang module independent of the
 C-implementation would also result in that ambiguities in the
 AUTOSAR specification would be easier to find. This since two
-different interpretation of the same specification would eventually be
+different interpretations of the same specification would eventually be
 available.
 
 \subsection{Iterative strategy}
@@ -256,12 +257,12 @@ next error. Either the C-code or the model needs to be adjusted.  The
 best way, with the model in mind, would often be to let a third party
 correct the discovered bugs. However this is time consuming because
 the support line has often already much to do, and the releases
-doesn't come that often.  Another way is to mock the faulty
+does not come that often.  Another way is to mock the faulty
 API-call. In other words simulate the output of the C-code in order to
 circumvent or hide a API-function, but then you will only find one bug
 per function, strictly limiting the probability to find bugs. There is
 a QuickCheck Erlang module for the purpose of mocking C-code, see
-appendix \ref{APP:SEC:OTHERMODULES}. Then there is two equally good
+appendix \ref{APP:SEC:OTHERMODULES}. Then there are two equally good
 methods. Either the Erlang model needs to have the fault implemented,
 or the C-code needs to be fixed. There are pros and cons with both
 methods. If the Erlang model introduce bugs, there may be secondary
@@ -307,7 +308,7 @@ interpretation of it did not exist, was to examine the C-code.
 % When it did not exist a clear interpretation of the AUTOSAR
 % specification, a great method for understanding was to examine the C-code.
 QuickCheck can be used to test libraries when only the compiled
-source code is available. However, this make the ambiguities harder to
+source code is available. However, this makes the ambiguities harder to
 discover, because a third model would be needed to justify whether the C
 model or the Erlang model would be correct.
 % QuickCheck can be used to test libraries when only the compiled
@@ -340,7 +341,7 @@ utilizes both wdgm\_checkpointreached and wdgm\_main.
 \end{table}
 
 \section{Evaluation of the Implementation}
-If tests come back positive, it does not really say much more than
+If tests return positive, it does not really say much more than
 that those tests evaluated to true. There was a need to evaluate what
 was actually tested. Coverage of the code and also coverage of visited
 states was needed to evaluate tests.
@@ -358,7 +359,7 @@ To be able to measure the code coverage of the C-code the commercial
 tool Bullseye Coverage was used. When using these tools it was easy to
 see that the result was not good enough.
 The main problem was that WdgM was put in an absorbing state. All commands
-that were executed after that, was not able to change the state of the WdgM.
+that were executed after that, were not able to change the state of the WdgM.
 % The main problem seemed to be that the WdgM was put in an absorbing state and
 % because of that the commands that followed were not interesting; they did not
 % change the state.
@@ -406,7 +407,7 @@ It was a good idea not to lower some ratios to much, because then
 certain API-sequences would not be generated, and bugs could have been
 missed.
 
-The tweaking of the generators were implemented in a iterative way by
+The tweaking of the generators were implemented in an iterative way by
 changing the probability properties of the generators and analyze the
 results and the coverage. After the analysis, the generators were
 tweaked even more to make the result and coverage even better.
@@ -446,14 +447,14 @@ confidence on the correctness of the code?
 
 \section{Configurations}
 When the code coverage was calculated it was recognized that every
-piece of code wasn't executed. The reason seemed to be that the
+piece of code was not executed. The reason seemed to be that the
 current configuration disallowed the execution of some parts of the
 code, even though the program behaved correctly. It was easy to run
 tests on several configurations, because the implementation of the
 Erlang module was made independent of configurations. This resulted in
 almost full coverage.
 
-Three configurations with different complexity was used. The first
+Three configurations with different complexity were used. The first
 one, an example configuration (this will further on be called the
 Example configuration), had many supervision functions configured for
 each mode, and followed a strict execution of the program.
@@ -484,8 +485,8 @@ function according to appendix \ref{SEC:QuickCheckIntro}. The run-time
 environment module (RTE) is however responsible for the scheduling of
 the main function, which according to AUTOSAR, should be executed in a
 given time interval. Since the RTE was not available when testing the
-watchdog manager the main function was called randomly and it was
-assumed that every time the main function was called a given amount of
+watchdog manager, the main function was called randomly and it was
+assumed that every time the main function was called, a given amount of
 time had passed.
 
 Except for the main function, only one internal algorithm that was
