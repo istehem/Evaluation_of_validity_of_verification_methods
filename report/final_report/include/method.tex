@@ -1,12 +1,14 @@
 \section{Existing verification tools}
 \label{SEC:EXISTING_TOOLS}
-Software unit testing can be achieved by almost any tool.  The choice
-of verification tool was therefore not the most interesting when it
-comes to pure unit testing. One can of course take the simplicity to
-achieve good unit testing into account, but this was not the goal of this
-project.
+Software unit testing can be achieved by using a lot of different tools. For
+example unit testing can be done with the help of static methods such as code
+reviews and static path analyzers, and dynamic methods such as automatic
+generation of test inputs or designing test cases to be used alongside the
+actual code. The choice of verification tool was therefore not the most
+essential when it comes to pure unit testing. One can of course take the
+simplicity to achieve good unit testing into account, but this was not the goal
+of this project. \cite{UnitTesting} \cite{ArtOfSoftwareTesting}
 
-%% TODO: Är det inte en del av Avgränsningarna och inte Metodik?
 Since the purpose was about benchmarking software the phase
 ``verification of software safety requirements'' will not influence
 the choice. To be able to test this phase, a greater amount of
@@ -123,7 +125,8 @@ when using QuickCheck, see section \ref{SEC:CALLING_COMMANDS}.
 
 \begin{figure}[h!]
   \begin{center}
-    \includegraphics{pictures/globalstatuses.jpg}
+    \include{pictures/globalstatuses}
+%    \includegraphics{pictures/globalstatuses.jpg}
   \end{center}
   \caption{State diagram that shows possible transitions between states}
   \label{FIG:GLOBALSTATUSES}
@@ -135,7 +138,7 @@ state of the watchdog manager, see appendix \ref{APP:API_CALLS},
 namely \lstinline!WdgM_Init!, \lstinline!WdgM_DeInit!,
 \lstinline!WdgM_SetMode!, \lstinline!WdgM_MainFunction!, and
 \lstinline!WdgM_CheckpointReached!. The reason for this is that they
-will influence the result of following API-calls.
+will influence the result of the following API-calls.
 
 The Init and DeInit functions can just change the global status
 between two states and should only change the state of the watchdog

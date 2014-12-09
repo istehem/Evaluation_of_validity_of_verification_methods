@@ -1,0 +1,91 @@
+\begin{tikzpicture}[scale=0.81,
+  >=triangle 60,
+  start chain=going below,
+  bend angle=45,
+  node distance=20mm and 20mm, 
+  %% BLOCKS
+  base/.style={draw, on chain, on grid, align=center, minimum height=4ex, fill=yellow!25},
+  init/.style={base, circle, fill=black},
+  proc/.style={base, rectangle, rounded corners, font={\tiny}},
+  test/.style={base, diamond, aspect=2},
+  % coord node style is used for placing corners of connecting lines
+  coord/.style={coordinate, on chain, on grid, node distance=6mm and 25mm},
+  % nmark node style is used for coordinate debugging marks
+  nmark/.style={draw, cyan, circle, font={\sffamily\bfseries}}]
+
+\node [init] (INIT) {};
+\node [proc] (DEACTIVATED) [below=of INIT] {WDGM\_GLOBAL\_STATUS\_DEACTIVATED\\};
+\node [proc] (OK) [below=of DEACTIVATED] {WDGM\_GLOBAL\_STATUS\_OK\\};
+\node [proc] (FAILED) [below right=of OK] {WDGM\_GLOBAL\_STATUS\_FAILED\\};
+\node [proc] (EXPIRED) [below right=of FAILED] {WDGM\_GLOBAL\_STATUS\_EXPIRED\\};
+\node [proc] (STOPPED) [below right=of EXPIRED] {WDGM\_GLOBAL\_STATUS\_STOPPED\\};
+
+%% INIT -> DEACTIVATED
+\draw [->] (INIT) -- (DEACTIVATED);
+
+%% OK <--> DEACTIVATED
+\node [coord] (doSouth) [left=3mm of DEACTIVATED.south] {};
+\node [coord] (doNorth) [left=3mm of OK.north] {};
+\draw [->] (doSouth) -- (doNorth);
+\node [coord] (odNorth) [right=3mm of OK.north] {};
+\node [coord] (odSouth) [right=3mm of DEACTIVATED.south] {};
+\draw [->] (odNorth) -- (odSouth);
+%% OK <--> FAILED
+\node [coord] (ofSouth) [left=10mm of OK.south east] {};
+\node [coord] (ofNorth) [left=10mm of FAILED.north east] {};
+\draw [->] (FAILED.north) -- (OK.south);
+\draw [->] (ofSouth) -- (ofNorth);
+%% EXPIRED -> STOPPED
+\node [coord] (esSouth) [right=5mm of EXPIRED.south] {};
+\node [coord] (esNorth) [right=5mm of STOPPED.north] {};
+\draw [->] (esSouth) -- (esNorth);
+%% Down to STOPPED
+\node [coord] (sNorth) [left=5mm of STOPPED.north east] {};
+\draw [->] (OK.east)      -| (sNorth);
+\draw [->] (FAILED.east)  -| (sNorth);
+\draw [->] (EXPIRED.east) -| (sNorth);
+
+
+%% OK -> OK
+\node [coord, below=2mm of OK.north west] (below OKNW) {};
+\node [coord, left=10mm of below OKNW] (leftOK) {};
+\node [coord, above=2mm of OK.south west] (above OKSW) {};
+\draw [->] (below OKNW) -- (leftOK) |- (above OKSW);
+%% FAILED -> FAILED
+\node [coord, right=2mm of FAILED.south] (right FAS) {};
+\node [coord, below=4mm of right FAS] (below RFAS) {};
+\node [coord, left=4mm of FAILED.south east] (left FASE) {};
+\draw [->] (right FAS) -- (below RFAS) -| (left FASE);
+%% EXPIRED -> EXPIRED
+\node [coord, right=2mm of EXPIRED.south west] (right EXSW) {};
+\node [coord, below=4mm of right EXSW] (below EXSW) {};
+\node [coord, left=4mm of EXPIRED.south] (left EXS) {};
+\draw [->] (right EXSW) -- (below EXSW) -| (left EXS);
+%% STOPPED -> STOPPED
+\node [coord, right=2mm of STOPPED.south] (right STS) {};
+\node [coord, below=4mm of right STS] (below RSTS) {};
+\node [coord, left=4mm of STOPPED.south east] (left STSE) {};
+\draw [->] (right STS) -- (below RSTS) -| (left STSE);
+
+
+%% OK -> OKCHOICE
+\node [coord, right=4mm of OK.south west] (right OKSW) {};
+\node [test] (OKCHOICE) [below=34mm of right OKSW] {};
+\draw [->] (right OKSW) -- (OKCHOICE.north);
+%% OKCHOICE -> EXPIRED & STOPPED
+\node [coord, above=2mm of EXPIRED.south west] (above EXSW) {};
+\node [coord, above=2mm of STOPPED.south west] (above STSW) {};
+\draw [->] (OKCHOICE.east) -- (above EXSW);
+\draw [->] (OKCHOICE.south) |- (above STSW);
+
+%% FAILED -> FAILEDCHOICE
+\node [coord, right=4mm of FAILED.south west] (right FASW) {};
+\node [test] (FAILEDCHOICE) [below=12mm of right FASW] {};
+\draw [->] (right FASW) -- (FAILEDCHOICE.north);
+%% FAILEDCHOICE -> EXPIRED & STOPPED
+\node [coord, below=2mm of EXPIRED.north west] (below EXNW) {};
+\node [coord, below=2mm of STOPPED.north west] (below STNW) {};
+\draw [->] (FAILEDCHOICE.east) -- (below EXNW);
+\draw [->] (FAILEDCHOICE.south) |- (below STNW);
+
+\end{tikzpicture}

@@ -149,10 +149,9 @@ state space without endangering the safety of the whole system?
 There must be an evaluation of the solution after the model has been
 implemented.  Does it ensure functional safety? How can one measure
 the size of the state space that is actually verified?  Even if test
-generation is implemented properly, the solution might not be within
-the ISO-standards means of functional safety.
+generation is implemented properly, the solution might not fulfill the
+functional safety properties defined by the ISO-standard.
 
-%% TODO: Ska vi ha med konfidensintervall eller det besökta state spacet?
 One must propose and motivate what should be done to be able to
 achieve a semi formal verification. This can include a confidence
 interval for how certain the verification is. The confidence interval
@@ -160,7 +159,6 @@ would help describing the visited state space because it is probably
 not feasible to exhaustively visit all states due to combinatorial
 explosion problem. \cite{grindal2007handling}
 
-%% TODO: Skriv om sista meningen.
 The main objective is to prove that it is possible to do semi formal
 verification for an AUTOSAR module and its specification.  It should
 not matter which configuration that is used or how the module is
@@ -173,7 +171,6 @@ implementing test suits, using the same techniques, for other modules.
 
 
 \section{Scope}
-%% TODO: Överväg "will be" i meningen om att vi väljer Watchdog managern.
 We will use AUTOSAR 4.0 revision 3 for our thesis work.  Since this
 version of AUTOSAR consists of more than 100 specifications and other
 auxiliary materials\cite{AUTOSAR:URL}, we will limit our scope to one
@@ -189,6 +186,5 @@ no work considered hardware or a combination of hardware and software
 will be prioritized. All implemented code for the verification will
 run on a standard PC-machine.
 
-%% TODO: skriv något om varför vi inte vill testa segmentation fault configs?
 We will not implement deprecated API-functions in our model, nor will
 we test configurations which will give raise to segmentation faults.
