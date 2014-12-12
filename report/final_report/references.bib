@@ -15,29 +15,38 @@
 
 @inbook{Advances:IEC61508,
   editor    = "Chris Dale and Tom Anderson",
-  booktitle = "Advances in Systems Safety",
+  booktitle = {Advances in Systems Safety: Proceedings of Nineteenth Safety-critical Systems Symposium},
   title     = "Introduction and Revision of IEC 61508",
   author    = "Ron Bell",
-  publisher = "Springer",
+  publisher = "Springer Verlag London Limited",
   year      = 2011,
+  month     = feb,
+  isbn      = {0857291327; 9780857291325},
+  language  = "German",
   key       = "ISBN 978-0-85729-132-5"
 }
 
 @inbook{Advances:SIL4,
   editor    = "Chris Dale and Tom Anderson",
-  booktitle = "Advances in Systems Safety",
+  booktitle = {Advances in Systems Safety: Proceedings of Nineteenth Safety-critical Systems Symposium},
   title     = "A Devil's advocate on SIL 4",
   author    = "Odd Nordland",
-  publisher = "Springer",
+  publisher = "Springer Verlag London Limited",
   year      = 2011,
+  month     = feb,
+  isbn      = {0857291327; 9780857291325},
+  language  = "German",
   key       = "ISBN 978-0-85729-132-5"
 }
 
+ARM techcon 3
 @proceedings{TI:safety_critical,
   author    = "Karl Greb and Anthony Seely",
+  series    = "ARM TechCon3",
+  address   = "Santa Clara Convention Center, California",
   title     = "Design of Microcontrollers for Safety Critical Operation",
-  year      = 2010,
-  month     = jan,
+  year      = 2009,
+  month     = oct,
   organization = "Texas Instruments"
 }
 
@@ -53,8 +62,7 @@
   author     = "{AUTOSAR}",
   title      = "Basic Information: Short Version",
   year       = 2011,
-  month      = dec,
-  journal    = {}
+  month      = dec
 }
 
 @misc{AUTOSAR:LayeredSoftwareArchitecture,
@@ -72,7 +80,7 @@
   note       = "Document Identification Number 080"
 }
 
-@misc{QUVIQ:flyer,
+misc{QUVIQ:flyer,
   author     = "QuviQ",
   title      = "Quick{C}heck",
   month      = sep,
@@ -88,17 +96,17 @@
   howpublished = "\url{http://quviq.com/about.html}"
 }
 
-@incollection{QUICKCHECK:software,
-  author     = "John Hughes",
-  editor     = "Zolt{\'{a}}n Horv{\'{a}}th and Rinus Plasmeijer and Vikt{\'{o}}ria Zs{\'{o}}k",
-  booktitle  = "Central European Functional Programming School",
-  title      = "Software {T}esting with {Q}uick{C}heck",
-  pages      = "183-223",
-  publisher  = "Springer Verlag",
-  series     = "LNCS 6299",
-  key        = "ISBN 978-3-642-17684-5",
-  type       = "Lecture Notes",
-  year       = 2010
+
+@inbook{QUICKCHECK:software,
+        author     = "John Hughes",
+        year={2010},
+        title={Software Testing with QuickCheck},
+        publisher={Springer Berlin Heidelberg},
+        address={Berlin, Heidelberg},
+        volume={6299},
+        pages={183-223},
+        isbn={0302-9743},
+        language={English}
 }
 
 @techreport{Testing:black_box,
@@ -108,11 +116,17 @@
   year       = 1998
 }
 
-@techreport{QUICKCHECK:lightweight,
-  author     = "Koen Claessen and John Hughes",
-  title      = "QuickCheck: A Lightweight Tool for Random Testing of {H}askell Programs",
-  year       = 2000,
-  howpublished = "ACM 1-58113-202-6/00/0009"
+
+
+@inproceedings{QUICKCHECK:lightweight,
+        author={Claessen,Koen and Hughes,John},
+        editor={ },
+        year={2000},
+        title={QuickCheck: a lightweight tool for random testing of {H}askell programs},
+        publisher={ACM},
+        pages={268-279},
+        isbn={1581132026; 9781581132021},
+        language={English}
 }
 
 @manual{QUICKCHECK:manual,
@@ -137,7 +151,7 @@
   howpublished = "\url{http://spinroot.com/spin/what.html}"
 }
 
-@manual{MCRL:manual,
+manual{MCRL:manual,
   title     = "$\mu$CRL toolset",
   author    = "Jan Friso Grote and Bert Lisser",
   organization = "department of Software Engineering, CWI",
@@ -145,41 +159,56 @@
   howpublished = "\url{http://homepages.cwi.nl/~mcrl/mutool.html}"
 }
 
-@manual{CADP:manual,
+manual{CADP:manual,
   title     = "Construction and Analysis of Distributed Processes",
   author    = "{CONVECS}",
   organization = "Inria",
   howpublished = "\url{http://cadp.inria.fr/}"
 }
 
-@techreport{MCERLANG:model-checker,
-  author    = "Fredlund, Lars-{\AA}ke and Hans Svensson",
-  title     = "McErlang: A Model checker for a Distributed Functional Programming Language",
-  year      = 2007,
+inproceedings{MCERLANG:model-checker,
+        author={Fredlund,Lars-Åke and Svensson,Hans},
+        editor={ },
+  month     = oct,
+        year=2007,
+        title={McErlang: a model checker for a distributed functional programming language},
+        publisher={ACM},
+        pages={125-136},
   institution = "Universidad Polit\'{e}cnica de Madrid, Chalmers University of Technology",
-  month     = oct
+        isbn={159593815X; 9781595938152},
+        language={English}
 }
 
-@book{STANDARDREFERENCE:FSM,
+
+book{STANDARDREFERENCE:FSM,
   author    = "Arthur Gill",
   title     = "Introduction to the theory of finite-state machines",
   publisher = "McGraw-Hill",
   key    = "ISSN 0016-0032",
+        address={United States},
+        language={English},
   year      = 1962
 }
 
-@book{STANDARDREFERENCE:petri_nets,
+
+book{STANDARDREFERENCE:petri_nets,
   author    = "James Lyle Peterson",
   title     = "Petri net theory and the modeling of systems",
   publisher = "Prentice-Hall",
   key       = "ISBN 0-13-661983-5",
+        address={Englewood Cliffs, N.J},
+        isbn={9780136619833; 0136619835},
   year      = 1981
 }
+
 
 @book{COURSEBOOK:safety-critical,
   author    = "Neil Storey",
   title     = "Safety-Critical Computer Systems",
-  publisher = "Prentice-Hall",
+        publisher={Addison-Wesley},
+        address={Harlow},
+        isbn={0201427877; 9780201427875},
+        language={English},
   key       = "ISBN 978-0-201-42787-5",
   year      = 1996
 }
@@ -190,10 +219,11 @@
   howpublished = "\url{http://www.sartre-project.eu/en/Sidor/default.aspx}"
 }
 
-@techreport{SURVEY:car_communications,
+techreport{SURVEY:car_communications,
   title     = "Wireless Communications Vehicle-to-Vehicle and Vehicle-to-Infrastructure",
   author    = "Lars Strand\'{e}n and Erik Str{\"o}m and Elisabeth Uhlemann",
   institution = "SP, Chalmers and Volvo Technology",
+        language={English},
   year      = 2008,
   month     = apr
 }
@@ -206,7 +236,7 @@
   year      = 2012
 }
 
-@techreport{SAFE:interoperability,
+techreport{SAFE:interoperability,
   title     = "Interoperability as prerequisite for functional safety in the automotive industry",
   author    = "Stefan Voget",
   institution = "Continental Automotive",
@@ -227,14 +257,14 @@
   year         = 2013
 }
 
-@misc{Frost_Sullivan:flyer,
+misc{Frost_Sullivan:flyer,
   author     = "Sylvia Trage",
   title      = "Electronics: Driving Automotive Innovation",
   year       = 2004,
   howpublished = "Frost \& Sullivan"
 }
 
-@misc{AUTOSAR:gilberg,
+misc{AUTOSAR:gilberg,
    author="Alain Gilberg",
    note="{AUTOSAR} Spokesperson (PSA Peugeot Citro{\"e}n)",
    title={AUTOSAR (Automotive Open System Architecture) A Key Technological Enabler for ECUs integration},
@@ -242,45 +272,59 @@
    year=2011
 }
 
+
 @book{Cambridge:controlsystems,
   author    = "Ulsoy and A. Galip and Huei Peng and Melih {\c{C}}akmakci",
   title     = "Automotive Control Systems",
   publisher = "Cambridge University Press",
   year      = 2012,
+        address={New York; Cambridge [U.K.]},
+        isbn={9781107010116; 110701011X},
+        language={English},
   key       = "ISBN 9781107010116"
 }
 
-@phdthesis{Clemens:tech_acceptance,
-  author    = "Clemens Hiraoka",
-  title     = "Technology acceptance of connected services in the automotive industry",
-  school    = "Technische Universit{\"a}t M{\"u}nchen",
-  type      = "{dissertation}",
-  year      = 2009,
-  key       = "ISBN 9783834918703"
+@book{Clemens:tech_acceptance,
+        author={Hiraoka,Clemens},
+        year={2009},
+        title={Technology Acceptance of Connected Services in the Automotive Industry},
+        publisher={Gabler Verlag},
+        isbn={9783834918703; 3834918709},
+        language={English}
 }
 
 @book{Wiley:internetworking,
-  author    = "Timo Kosch and Markus Strassberger and Christoph Schroth",
+       author={Strassberger,Markus and Schroth,Christoph and Bechler,Marc and Kosch,Timo},
   title     = "Automotive Internetworking",
-  publisher = "Wiley \& Sons",
+        isbn={9780470749791; 0470749792},
+        publisher={Wiley-Blackwell},
+        language={English},
   year      = 2012,
   key       = "ISBN 9780470749791"
 }
 
+
 @book{CRC:embedded_handbook,
-  editor    = "Nicolas Navet and Françoise Simonot-Lion",
+  author    = {Navet,Nicolas and Simonot-Lion,Francoise},
   title     = "Automotive Embedded Systems Handbook",
   publisher = "CRC Press",
   year      = 2008,
+  address   = {Hoboken},
+  isbn      = {9780849380266; 084938026X},
+  language  = {English},
   key       = "ISBN 978-0-8493-8026-6"
 }
 
 @inbook{Springer:advanced_microsystems,
+        author={Gut,Georg and Allmann,Christian},
   editor    = "Gereon Meyer",
   booktitle = "Advanced Microsystems for Automotive Applications 2012",
   title     = "In-Research Project E-Performance - In-Car-Network Optimization for Electric Vehicles",
-  author    = "G. Gut and C. Allmann",
-  publisher = "Springer Verlag",
+        address={Berlin, Heidelberg},
+        pages={69-78},
+        publisher={Springer Berlin Heidelberg},
+        isbn={3642296726; 9783642296727},
+        language={English},
   year      = 2012,
   key       = "ISBN 9783642296727"
 }
@@ -292,12 +336,15 @@
   year      = 2009,
   month     = feb
 }
+
 @article{grindal2007handling,
   title={Handling combinatorial explosion in software testing},
   author={Grindal, Mats},
-  year={2007},
+  year=2007,
+        isbn={9185715743; 9789185715749},
+        language={English},
   journal = {},
-  publisher={Institutionen f{\"o}r datavetenskap}
+  publisher={Institutionen f{\"o}r datavetenskap Linköpings universitet}
 }
 %http://users.ece.cmu.edu/~koopman/des_s99/sw_testing/
 @article{mellon,
@@ -311,12 +358,14 @@
 @article{Fink:1997:PTN:263244.263267,
  author = {Fink, George and Bishop, Matt},
  title = {Property-based Testing: A New Approach to Testing for Assurance},
+        journal={ACM SIGSOFT Software Engineering Notes},
  journal = {SIGSOFT Softw. Eng. Notes},
  issue_date = {July 1997},
  volume = {22},
  number = {4},
  month = jul,
  year = {1997},
+        isbn={0163-5948},
  issn = {0163-5948},
  pages = {74--80},
  numpages = {7},
@@ -324,10 +373,13 @@
  doi = {10.1145/263244.263267},
  acmid = {263267},
  publisher = {ACM},
+        language={English},
  address = {New York, NY, USA},
 }
 
-@incollection{Meinke:ModelbasedTesting,
+
+
+@inbook{Meinke:ModelbasedTesting,
         year={2012},
         isbn={978-3-642-34025-3},
         booktitle={Leveraging Applications of Formal Methods, Verification and Validation. Technologies for Mastering Change},
@@ -338,7 +390,10 @@
         title={Model-Based Testing and Model Inference},
         url={http://dx.doi.org/10.1007/978-3-642-34026-0_32},
         publisher={Springer Berlin Heidelberg},
+        address={Berlin, Heidelberg},
         author={Meinke, Karl and Walkinshaw, Neil},
+        isbn={0302-9743},
+        chapter={1},
         pages={440-443},
         language={English}
 }
@@ -352,21 +407,18 @@
         number={1},
         pages={14-18},
         isbn={0740-7459},
-        language={English},
-        url={www.summon.com},
+        language={English}
 }
 
-@book{MODEL_CHECKING:Donaldson,
+book{MODEL_CHECKING:Donaldson,
         author={Donaldson,Alastair and Parker,David and Lecture notes in computer science (e-book collection) and SpringerLink (e-book collection)},
         year={2012},
         title={Model checking software: 19th International Workshop, SPIN 2012, Oxford, UK, July 23-24, 2012. Proceedings},
         publisher={Springer Berlin Heidelberg},
         address={New York; Berlin},
         volume={7385.; 7385},
-        keywords={Computer Science; Verification; COMPUTERS; Computer software; Testing; Software engineering},
         isbn={3642317588; 9783642317590; 3642317596; 9783642317583},
-        language={English},
-        url={www.summon.com},
+        language={English}
 }
 @inproceedings{HOLZMANN:SPIN,
         author={Holzmann,Gerard J.},
@@ -376,16 +428,18 @@
         volume={65},
         pages={77-108},
         isbn={0065-2458},
-        language={English},
-        url={www.summon.com},
+        language={English}
 }
 
 @book{MODELCHECKING:CLARKE,
         title={Model checking},
         author={Clarke, Edmund M and Grumberg, Orna and Peled, Doron},
         year={1999},
-        publisher={MIT press}
-}
+        publisher={MIT},
+        address={Cambridge, Mass; London},
+        isbn={9780262032704; 0262032708},
+        language={English}
+ }
 
 @article{MODELCHECKING:SOFTWARE,
         author={Jhala,Ranjit and Majumdar,Rupak},
@@ -396,8 +450,7 @@
         number={4},
         pages={1-54},
         isbn={0360-0300},
-        language={English},
-        url={www.summon.com},
+        language={English}
 }
 
 @inproceedings{RandomTesting:Microsoft,
@@ -409,12 +462,12 @@
         pages={1-1},
         keywords={automatic test generation; software testing; program verification; security},
         isbn={9781595938817; 1595938818},
-        language={English},
-        url={www.summon.com},
+        language={English}
 }
 
 @article{RandomTesting:Revisited,
         title = "Random testing revisited",
+        author = "PS Loo and WK Tsai",
         journal = "Information and Software Technology",
         volume = "30",
         number = "7",
@@ -423,8 +476,7 @@
         note = "",
         issn = "0950-5849",
         doi = "http://dx.doi.org/10.1016/0950-5849(88)90037-7",
-        url = "http://www.sciencedirect.com/science/article/pii/0950584988900377",
-        author = "PS Loo and WK Tsai"
+        url = "http://www.sciencedirect.com/science/article/pii/0950584988900377"
 }
 
 @inbook{UnitTesting,

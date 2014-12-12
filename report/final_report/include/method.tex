@@ -177,18 +177,17 @@ have elapsed since the start checkpoint was visited. Because AUTOSAR
 does not specify how the handling of time should be implemented, see
 sections \ref{SEC:CALLING_COMMANDS} and
 \ref{SEC:FUNCTIONAL_SAFETY_TIME}, we implemented the model as the
-C-code, with the use of \lstinline!WdgM_MainFunction!. This is
-possible because we know that \lstinline!WdgM_MainFunction! is called
-periodically.
+source C-code was implemented, with the use of
+\lstinline!WdgM_MainFunction!. This is possible because we know that
+\lstinline!WdgM_MainFunction! is called periodically.
 
 
 \section{Implementation}
 The chosen module was already unit tested and run actively
-in lab environment.
+in the lab environment.
 
-%% TODO: eventuellt skriva om delar i stycket, framför allt i slutet.
 The implementation of the properties was done to be able to test
-API-calls, also described in appendix~\ref{APP:QUICKCHECK}, against
+API-calls, which is also described in appendix~\ref{APP:QUICKCHECK}, against
 the C-code. QuickCheck then checked that the postconditions held,
 according to figure \ref{FIG:api_calls}. The postconditions were
 written to test that AUTOSAR requirements held. In other words that
@@ -209,9 +208,9 @@ transformed into properties in Erlang code. In other words
 transforming informal notation into formal notation.
 
 A problem when translating the AUTOSAR specifications into code was
-that there were ambiguities. It was easy to see that there were room
+that there were ambiguities. It was easy to see that there was room
 for different interpretations, which most likely would result in
-errors later. This is described more precise in section
+implementation conflicts later. This is described more precise in section
 \ref{SUBSEC:CONFLICTS}.
 
 The translating process was done iteratively as described in section
@@ -223,14 +222,14 @@ choices in the C-code. The idea was to ensure an independent model; if
 the model was inspired by the C-code, it could have transmitted
 faults. Implementing the Erlang module independent of the
 C-implementation would also result in that ambiguities in the
-AUTOSAR specification would be easier to find. This since two
+AUTOSAR specification would be easier to find, since two
 different interpretations of the same specification would eventually be
 available.
 
 \subsection{Iterative strategy}
 \label{SEC:ITERATIVE}
 The implementation of the AUTOSAR module in Erlang was done in an
-iterative way. Every piece of code were not required to be implemented
+iterative way. Not every piece of code were required to be implemented
 before tests could be run. This is because a module in AUTOSAR consist
 of a number of API-calls. It was enough to implement some of the
 specifications for one API-call before tests could be run. Of course
@@ -299,10 +298,8 @@ When thoroughly reading the AUTOSAR API not only ambiguous rules were
 found but also rules that contradicted each other were recognized. In
 those cases the implementation in the C-code was followed.
 
-Although the C-code was used actively in lab environments, bugs were found early
+Although the C-code was used in lab environments, bugs were found early
 in the process.
-% Bugs in the C-code were found early, even though it already run
-% actively in lab environments.
 
 \subsection{Advantage of having the Actual C-code}
 A great method for understanding the AUTOSAR specification, when a clear
@@ -448,8 +445,8 @@ implemented in a clever way so that it is possible to get some kind of
 confidence on the correctness of the code?
 
 \section{Configurations}
-When the code coverage was calculated it was recognized that every
-piece of code was not executed. The reason seemed to be that the
+When the code coverage was calculated it was recognized that not every
+piece of code was executed. The reason seemed to be that the
 current configuration disallowed the execution of some parts of the
 code, even though the program behaved correctly. It was easy to run
 tests on several configurations, because the implementation of the
@@ -502,8 +499,8 @@ handled. The C-code just used ticks, not actual time stamps, which
 was incremented every time the main function was called. It was in
 other words assumed that the RTE was able to execute the main function
 correctly and a fixed amount of ticks would always represent the same
-amount of time. Accepting this solution it was easy to adopt the same
-approach in the Erlang module. More about this can be found in section
+amount of time. After accepting this implementation, it was easy to adopt the
+same approach in the Erlang module. More about this can be found in section
 \ref{SEC:FUNCTIONAL_SAFETY_TIME}.
 
 \section{Model State}

@@ -1,6 +1,3 @@
-%%\section{Formal verification according to ISO~26262}
-%% TODO: write what formal/semi-formal verification means according to ISO.
-
 \section{Achieving good test cases}
 To find good test cases is not trivial. It may not be enough to
 generate test cases which follows a correct behavior. Negative testing
@@ -46,30 +43,28 @@ were found. This emphasizes the importance of finding tests that are
 critical for the system and not lean the results only on line
 coverage.
 
-Since there are different supervisions of checkpoints that can be
-configured at the same time, the supervision functions must be
-prioritized when generating command sequences and arguments. A
-checkpoint that is generated too many times can for example cause the
-alive supervision to fail because it goes outside of its bound. The
-same can happen if it is not generated enough. If a checkpoint is
-generated only because it needs to be inside of its alive supervision
-bound, then there is a risk that rules for deadline or logical
-supervision is violated. The easiest way to prioritize checkpoint
-generation is to start with logical supervision. This is because
-logical supervision follows certain graphs, where each vertex is
-represented by a checkpoint and each edge is a valid transition
-between two checkpoints. These graphs are defined by the logical
-supervision functions in the AUTOSAR configuration.  Logical
-supervision maintains both internal graphs, inside of each supervised
-entity, and external graphs which is transitions between supervised
-entities. It is easy to get next possible checkpoints for all graphs,
-and then check whether one of those checkpoints also is configured for
-alive or deadline supervision. If it is, calculate the status for
-those supervision functions and then choose which checkpoint should be
-selected.  If checkpoint generation is not prioritized with logical
-supervision as foundation, alive supervision or deadline supervision
-could be used. This is harder because it is more likely to end up with
-a checkpoint that violates logical supervision rules.
+Since there are different supervisions of checkpoints that can be configured at
+the same time, the supervision functions must be prioritized when generating
+command sequences and arguments. A checkpoint that is generated too many times
+can for example cause the alive supervision to fail because it goes outside of
+its bound. Alive supervision can also fail if a checkpoint is not generated
+enough times, according to the configuration. If a checkpoint is generated only
+because it needs to be inside of its alive supervision bound, then there is a
+risk that rules for deadline or logical supervision is violated. The easiest way
+to prioritize checkpoint generation is to start with logical supervision. This
+is because logical supervision follows certain graphs, where each vertex is
+represented by a checkpoint and each edge is a valid transition between two
+checkpoints. These graphs are defined by the logical supervision functions in
+the AUTOSAR configuration.  Logical supervision maintains both internal graphs,
+inside of each supervised entity, and external graphs which are transitions
+between supervised entities. It is easy to get next possible checkpoints for all
+graphs, and then check whether one of those checkpoints also is configured for
+alive or deadline supervision. If it is, calculate the status for those
+supervision functions and then choose which checkpoint should be selected.  If
+checkpoint generation is not prioritized with logical supervision as foundation,
+alive supervision or deadline supervision could be used. This is harder because
+it is more likely to end up with a checkpoint that violates logical supervision
+rules.
 
 \subsection{Tweaking the generators}
 The generators did not need to be tweaked much when performing
@@ -104,8 +99,8 @@ simple, it is actually impossible to hit any other states than
 \lstinline!WDGM_GLOBAL_STATUS_OK! or
 \lstinline!WDGM_GLOBAL_STATUS_DEACTIVATED!. There are no checkpoints
 or supervision functions configured for the \emph{BSI} configuration.
-It is easy to run tests using this configuration, but it does not by it
-self, fully test the code because most of the specification
+It is easy to run tests using this configuration, but it does not by itself,
+fully test the code because most of the specification 
 requirements will never be tested. The untested requirements are
 mainly requirements for supervision functions that are, according to
 the configuration, never executed. Those untested requirements also
@@ -158,7 +153,7 @@ different supervision functions and supervised entities. That is why
 we need to call this function often. It should retain the states of
 supervised entities that are activated in the new mode and should reset
 the local state if the entity is deactivated in the new mode. The
-function \lstinline!WdgM_Init! is in contrast called lesser and lesser
+function \lstinline!WdgM_Init! is in contrast called fewer and fewer
 times. This function is only needed when the global state is
 deactivated. It has more likelihood to be generated among the first
 commands in the command sequence, or right after a
@@ -174,14 +169,10 @@ environments. The state machine for the global status is totally
 covered by running QuickCheck, see table
 \ref{TABLE:STATUSES_FREESCALE} and figure
 \ref{FIG:STATUSES_FREESCALE}. Looking at table \ref{TABLE:STATUSES_FREESCALE}
-one can see that some transitions are done very seldom. This is due to a lot of
-things must be fulfilled for those transitions to occur, which also highly depend on
-the configuration supplied. Due to the randomness factor of QuickCheck such cases are
-hard to reach.
-
-%% TODO: Fyll på text, beskriv resultaten. Det är i dagsläget den
-%% kortaste texten om konfigurationer, trots att det är den viktigaste
-%% konfigurationen.
+one can see that some transitions are done very seldom. This is due to the fact
+that a lot of things must be fulfilled for those transitions to occur, which
+also highly depend on the configuration supplied. Due to the randomness factor
+of QuickCheck such cases are hard to reach.
 
 \begin{figure}[!ht]
   \subfigure[Shows percentage of each possible command executed, state
@@ -271,7 +262,7 @@ seen in those plots.
 \newcommand{\bullseyecoverage}{85.64\%}
 The Erlang module \lstinline!cover! was used to calculate the line
 coverage for the Erlang module. To get an idea of how many tests that
-needed to be executed, before the line coverage of the Erlang module
+were needed to be executed, before the line coverage of the Erlang module
 converges against a certain value, the coverage was measured after
 each executed test for every configuration.
 
@@ -414,7 +405,7 @@ based on that the model for the watchdog manager is correct, namely
 the AUTOSAR specification.
 
 \subsection{AUTOSAR}
-Due to the informal syntax of AUTOSAR it is not good fitted for
+Due to the informal syntax of AUTOSAR it is not well fitted for
 functional safety, since the informal syntax makes it possible for
 different interpretation. To be able to reach the requirements for a higher
 ASIL classification, AUTOSAR modules must be interpreted dependently. In other
@@ -508,16 +499,14 @@ it only took around 200 test cases to achieve the maximum 38\%
 coverage the BSI configuration could supply.
 
 \subsection{Measurements of the state space}
-One way when trying the measure the state space is to collect
-statistical data during the execution of the tests. It is hard to say
-much about the whole system's state space since it is very large, due
-to the combinatorial explosion problem. In the case of an AUTOSAR module the
-state space also varies on the configuration in use, since features
-and supervision features can be configured.  However looking at
-certain parts that are considered to be important for the system, much
-more can be said. For instance when examining the internal graphs of
-the watchdog manager, one can easily see that every node in those
-graphs is visited.
+One way of measuring the state space, is to collect statistical data during the
+execution of the tests. It is hard to say much about the whole system's state
+space since it is very large, due to the combinatorial explosion problem. In the
+case of an AUTOSAR module the state space also varies on the configuration in
+use, since features and supervision features can be configured.  However looking
+at certain parts that are considered to be important for the system, much more
+can be said. For instance when examining the internal graphs of the watchdog
+manager, one can easily see that every node in those graphs is visited.
 
 Measuring the code coverage can in itself tell if important parts of
 the state space are covered or not. This is possible because the parts
