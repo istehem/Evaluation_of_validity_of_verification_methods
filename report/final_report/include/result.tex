@@ -40,8 +40,8 @@ since they specify transitions, liveness and timing properties of the
 program. It was therefore chosen to prioritize different algorithms
 when running some of the tests on the module. When doing so, more bugs
 were found. This emphasizes the importance of finding tests that are
-critical for the system and not lean the results only on line
-coverage.
+critical for the system and not only trust that results have been achieved
+based on line coverage.
 
 Since there are different supervisions of checkpoints that can be configured at
 the same time, the supervision functions must be prioritized when generating
@@ -295,7 +295,7 @@ As can be seen in the figures \ref{FIG:COV_PER_TESTS_BSI},
 \ref{FIG:COV_PER_TESTS_FREESCALE} and \ref{FIG:COV_PER_TESTS_EXAMPLE},
 the example configuration takes the longest time before it
 converges. It also becomes clear that the freescale configuration
-needs more tests than the BSI configuration before it convergence. The
+needs more tests to converge than the BSI configuration. The
 complexity of the configurations seem to play an important
 part. This is not surprising because a more complex configuration may
 drastically increase the state space.
@@ -339,7 +339,7 @@ wdgm\_next              & 37  & 37 & 100\%
 \end{table}
 
 The total line coverage results is \linecoverage. The reason we do not
-achieve 100\% code coverage depends on certain limitations. Some lines
+achieve 100\% code coverage depends on certain delimitations. Some lines
 can not be covered when the configuration parameter
 \lstinline!WdgMDevErrorDetect! is true. On the other hand, if it is
 false, then the C-model will fail with a segmentation fault and the
@@ -357,8 +357,8 @@ results show that the condition/decision coverage is {\bullseyecoverage}
 and all functions except for two are covered, see figure
 \ref{FIG:BULLSEYE}. The reason that there are functions which are not
 covered, is that one of the functions is deprecated and the other is a
-support function to that function. One of our limitations was to not
-implement deprecated functions into Erlang code.  The missing
+support function to that function. One of our delimitations was to not
+implement deprecated functions into Erlang code. The missing
 condition/decision coverages in the C-code are for example checks for
 null pointers, some of which never evaluated to false. Many checks
 seems to be redundant and impossible to evaluate to true, if one

@@ -9,12 +9,11 @@ essential when it comes to pure unit testing. One can of course take the
 simplicity to achieve good unit testing into account, but this was not the goal
 of this project. \cite{UnitTesting} \cite{ArtOfSoftwareTesting}
 
-Since the purpose was about benchmarking software the phase
-``verification of software safety requirements'' will not influence
-the choice. To be able to test this phase, a greater amount of
-components of the whole system must be available. Such components
-include hardware, and this report will not cover hardware
-integration. The scope of this project was to be able to run the
+The phase ``verification of software safety requirements'' in the V-model, will
+not influence the choice of benchmarking software; to be able to test
+this phase, a greater amount of components of the whole system must be
+available. Such components include hardware, and this report will not cover
+hardware integration. The scope of this project was to be able to run the
 implementation on a standard PC-machine.
 
 The most interesting part of the V-model was the phase ``software
@@ -25,8 +24,8 @@ combination, for example by corrupting some software elements.
 
 Two tools that could be used in order to achieve better code and some
 functional safety was SPIN and Parasoft C/C++test. While SPIN can
-verify the model, Parasoft C/C++test defines policies on work flow as
-well as coding.
+be used to verify the model, Parasoft C/C++test is used to define policies on
+work flow as well as on coding.
 
 \subsection{SPIN}
 SPIN is used to trace logical design errors in distributed
@@ -67,7 +66,6 @@ are not immutable. This gives raise to the idea of a state based
 testing tool.
 
 \section{Choice of AUTOSAR module to test}
-%% TODO: "less complicated" in what way?
 When deciding which AUTOSAR module to test, there were a number of
 modules up for discussion. Since the goal was to get a proof of
 concept; examining if it was possible to get an ASIL-classification
@@ -240,8 +238,6 @@ API-calls.
 
 \section{Conflicts and Bugs}
 \label{SUBSEC:CONFLICTS}
-%% TODO: Skriv om stycket "every programmer makes mistakes". Det borde
-%% isf läggas till om ambiguites i AUTOSAR tidigare.
 Early in the implementation phase QuickCheck found differences between
 the Erlang and C-implementation. This was expected because every
 programmer makes mistakes.  The question was whether the fault was in
@@ -471,7 +467,6 @@ similar to the example configuration but a bit more relaxed. The
 global status stayed in a non-absorbing state more often; it was
 easier to do positive testing.
 
-%% TODO: Stämmer sista meningen? Stämmer referensen.?
 The tweaking of generators, where the aim was to generate better test
 cases, seemed in some sense to be configuration dependent. Better test
 cases were generated if the generators were tweaked according to a
